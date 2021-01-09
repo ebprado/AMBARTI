@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1598551216910.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B615F876",
+    "lastKnownWriteTime" : 1607529180,
+    "last_content_update" : 1607906222437,
+    "path" : "~/Documents/GitHub/MOTR-BART/AMBARTI/R/modify_tree.R",
+    "project_path" : "R/modify_tree.R",
+    "properties" : {
+        "cursorPosition" : "416,0",
+        "scrollLine" : "0",
+        "source_window_id" : ""
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

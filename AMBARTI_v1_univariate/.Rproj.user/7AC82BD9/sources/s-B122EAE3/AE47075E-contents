@@ -1,0 +1,58 @@
+library(devtools)
+install()
+load_all()
+document()
+check()
+build()
+
+library(devtools)
+library(tidyverse)
+install_github("ebprado/MOTR-BART/AMBARTI")
+library(AMBARTI)
+
+# Simulate a Friedman data set
+friedman_data = function(n, num_cov, sd_error){
+  x = matrix(runif(n*num_cov),n,num_cov)
+  y = 10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-.5)^2+10*x[,4]+5*x[,5] + rnorm(n, sd=sd_error)
+  return(list(y = y,
+              x = x))
+}
+data = friedman_data(200, 10, 1)
+y = data$y
+x = data$x
+
+# Run MOTR-BART
+set.seed(99)
+fit.bart = rBART(x, y, 10)
+yhat = apply(fit.bart$y_hat, 2, mean)
+plot(y, yhat); abline(0, 1)
+cor(y, yhat); # 0.9655144
+
+fit.ambarti = ambarti(x, y, ntrees = 10, nburn = 250, npost = 1000)
+yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
+plot(y, yhat_ambarti); abline(0, 1)
+cor(y, yhat_ambarti); # 0.9541614
+
+
+# apply(x, 2, quantile, probs=seq(0,1, length.out = 10))
+# min(x[,1])
+# numcut=30
+# x[,1] = rbinom(200,1,0.5)
+# aa = quantile(x[ , 2], type=7,
+#          probs=(0:(numcut+1))/(numcut+1))[-c(1, numcut+2)]
+# aa = quantile(x[ , 2], type=7,
+#               probs=0.75)
+# unname(aa)
+# 
+# 
+# 
+# temp <- data.frame(name=letters[1:12], value=rnorm(12), quartile=rep(NA, 12))
+# temp
+# 
+# 
+# temp$quartile <- with(temp, cut(value, 
+#                                 breaks=quantile(value, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+#                                 include.lowest=TRUE))
+# temp
+# as.numeric(temp$quartile)
+# sort(temp$quartile)

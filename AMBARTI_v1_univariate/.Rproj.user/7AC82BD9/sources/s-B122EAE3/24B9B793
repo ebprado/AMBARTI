@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1598443904065.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "24B9B793",
+    "lastKnownWriteTime" : 1607528580,
+    "last_content_update" : 1607528580816,
+    "path" : "~/Documents/GitHub/MOTR-BART/AMBARTI/R/aux_tree.R",
+    "project_path" : "R/aux_tree.R",
+    "properties" : {
+        "cursorPosition" : "121,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
