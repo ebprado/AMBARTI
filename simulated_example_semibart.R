@@ -94,7 +94,7 @@ y = Y
 set.seed(101)
 
 # Run AMBARTI (I'm using only 50 trees)
-fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, skip_trees = FALSE, nburn = 100, npost = 100, sparse= FALSE)
+fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, nburn = 100, npost = 100, sparse= FALSE)
 
 # Get the final prediction (y hat)
 yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
