@@ -11,16 +11,17 @@ install_github("ebprado/AMBARTI")
 ```
 ## Example
 ``` r
-################################################################################
+# -------------------------------
 # Generate the simulated example
-################################################################################
+# -------------------------------
 
 # An Additive Main effects and Multiplicative Interaction (AMMI) effects model
 
-# Andrew Parnell / Danilo Sarti: A Bayesian version of the AMMI model as specified here:
+# A Bayesian version of the AMMI model as specified here:
 https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf (JosseE et al JABES 2014)
 
 # In this file, we simulate from the AMMI model specified in the paper above.
+# The below was written by Andrew Parnell and Danilo Sarti.
 
 rm(list = ls())
 library(R2jags)
