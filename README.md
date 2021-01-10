@@ -96,7 +96,7 @@ cor(y, yhat_ambarti);
 
 # Get the prediction specifically from BART
 yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
-cor(y, yhat_bart); # correlation btw y and BART (AMBARTI package)
+cor(y, yhat_bart); # correlation btw y and the BART component (from AMBARTI)
 
 # Plot the main effects estimates and add the true values
 alpha_hat = apply(fit.ambarti$beta_hat[,1:10], 2, mean)
@@ -112,7 +112,7 @@ points(beta_hat, cex=2) # estimates
 legend(8,4,'AMBARTI', col=1, pch = 2)
 legend(8,5,'True', col=2, pch = 1, cex=1)
 
-fit.ambarti$trees[[100]][[1]] # shows the tree 1 in the last (100) MCMC iteration.
+fit.ambarti$trees[[100]][[1]] # show the first tree in the last (100) MCMC iteration.
 
 # ---------------------------------------
 # BART (just to have a benchmark)
