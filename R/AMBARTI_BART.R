@@ -29,7 +29,6 @@
 ambarti = function(x,
                    y,
                    sparse = FALSE,
-                   skip_trees = FALSE,
                    ntrees = 10,
                    node_min_size = 5,
                    alpha = 0.95,
@@ -197,8 +196,6 @@ ambarti = function(x,
     ##### TEST #######
     ##### TEST #######
 
-    if (skip_trees == FALSE){
-
       # Start looping through trees
       for (j in 1:ntrees) {
 
@@ -286,8 +283,6 @@ ambarti = function(x,
       tree_fits_store[,j] = current_fit # update the new fit
 
       } # End loop through trees
-
-    }
 
     # beta_hat = update_linear_component(y_scale, yhat_bart, x, sigma2, sigma2_psi_inv)
     #
