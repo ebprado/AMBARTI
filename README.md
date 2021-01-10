@@ -119,5 +119,5 @@ fit.ambarti$trees[[100]][[1]] # show the first tree in the last (100) MCMC itera
 # ---------------------------------------
 library(BART)
 bart = BART::wbart(x.ambarti, y)
-cor(y, bart$yhat.train.mean) # BART and semibart are quite similar. That's fine.
+cor(y, bart$yhat.train.mean)
 ```
