@@ -11,36 +11,118 @@ install_github("ebprado/AMBARTI")
 ```
 ## Example
 ``` r
-library(AMBARTI)
+################################################################################
+# Generate the simulated example
+################################################################################
 
-# Simulate a Friedman data set
-friedman_data = function(n, num_cov, sd_error){
-  x = matrix(runif(n*num_cov),n,num_cov)
-  y = 10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-.5)^2+10*x[,4]+5*x[,5] + rnorm(n, sd=sd_error)
-  return(list(y = y,
-              x = x))
-}
-# Training data
-data = friedman_data(200, 10, 1)
-y = data$y
-x = data$x
+# An Additive Main effects and Multiplicative Interaction (AMMI) effects model
 
-# Test data
-data_test = friedman_data(100, 10, 1)
-y.test = data_test$y
-x.test = data_test$x
+# A Bayesian version of the AMMI model as specified here: https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf (JosseE et al JABES 2014)
+# Andrew Parnell / Danilo Sarti
 
-# Run MOTR-BART
-set.seed(99)
-fit.motr.bart = motr_bart(x, y, ntrees = 10, nburn = 100, npost = 100)
-y.test.hat = predict_motr_bart(fit.motr.bart, x.test, 'mean')
-plot(y.test, y.test.hat); abline(0, 1)
-cor(y.test, y.test.hat)
+# In this file, we simulate from the AMMI model specified in the paper above.
 
-# Run MOTR-BART for classification
-set.seed(01)
-y = ifelse(y > median(y), 1, 0)
-y.test = ifelse(y.test > median(y.test), 1, 0)
-fit.motr.bart = motr_bart_class(x, y, ntrees = 10, nburn = 100, npost = 100)
-y.test.hat = predict_motr_bart_class(fit.motr.bart, x.test, 'mean')
+rm(list = ls())
+library(R2jags)
+library(ggplot2)
+library(tidyverse)
+
+# Maths -------------------------------------------------------------------
+
+# Description of the Bayesian model fitted in this file
+
+# Likelihood
+# Y_{ij} ~ N(mu_{ij}, sigma^2_E)
+# with
+# mu_{ij} = mu + alpha_i + beta_j + sum_{q=1}^Q lambda_q*gamma_iq*delta_jq
+# AA = sum_{q=1}^Q lambda_q*gamma_iq*delta_jq
+# Our idea is to estimate alpha_i + beta_j parametrically and the component AA via BART.
+
+# Notation
+# Y_ij = response (e.g. yield) for genotype i and environment j, i = 1, ..., I genotypes and j = 1, ..., J environments
+# mu is the grand mean
+# alpha_i is the genotype effect
+# beta_j is the environment effect
+# lambda_q is the q-th eigenvalue q = 1,.., Q of the interaction matrix
+# Q is the number of components used to model the interaction. Usually Q is fixed at a small number, e.g. 2
+# gamma_{iq} is the interaction effect for the q-th eigenvector for genotype i
+# delta_{iq} is the interaction effect for the q-th eigenvector for environment j
+# E_{ij} is a residual term with E_{ij} ~ N(0, sigma^2_E)
+# Usually these models have quite complicated restrictions on the gamma/delta/lambda values but Josse et al show that these are not fully necessary
+
+# Priors
+# alpha_i ~ N(0, s_alpha^2)
+# beta_j ~ N(0, s_beta^2)
+
+# Simulate data -----------------------------------------------------------
+
+# We will follow the simulation strategy detailed in Section 3.1 of the Josse et al paper
+
+# Specify fixed values
+Q = 1 # Number of components
+I = 10 # Number of genotypes
+J = 10# Number of environments
+N = I*J # Total number of obs
+
+# Some further fixed values
+mu = 10
+sigma_E = 1
+sigma_alpha = 2
+sigma_beta = 2
+alpha = rnorm(I, 0, sigma_alpha)
+beta = rnorm(J, 0, sigma_beta)
+lambda_1 = 12
+gamma = seq(2, -2,length.out = I)/sqrt(10)
+delta = seq(-0.5, 0.5,length.out = J)
+
+# Now simulate the values
+set.seed(123)
+G_by_E = expand.grid(1:I, 1:J) ## setting the interaction matrix
+mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  + lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
+Y = rnorm(N, mu_ij, sigma_E) ## response variable
+
+##########################################
+# AMBARTI
+##########################################
+
+# Some pre-processing
+x.ambarti = G_by_E
+names(x.ambarti) = c('g', 'e')
+x.ambarti$g = as.factor(x.ambarti$g)
+x.ambarti$e = as.factor(x.ambarti$e)
+y = Y
+set.seed(101)
+
+# Run AMBARTI (I'm using only 50 trees)
+fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, skip_trees = FALSE, nburn = 100, npost = 100, sparse= FALSE)
+
+# Get the final prediction (y hat)
+yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
+yhat_ambarti2 = predict_ambarti(fit.ambarti, newdata = x.ambarti, type = 'mean')
+cor(y, yhat_ambarti); # AMBARTI, BART and semibart are quite similar. That's fine.
+
+# Get the prediction specifically from BART
+yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
+cor(y, yhat_bart); # correlation btw y and BART (AMBARTI package)
+
+# Plot the main effects estimates and add the true values
+plot(1:length(alpha), alpha, col=2, cex=2, main='AMBARTI - Genotype', ylim= c(-5,5)) # true values
+points(apply(fit.ambarti$beta_hat[,1:10], 2, mean), cex=2, pch = 2) # estimates
+legend(8,4,'AMBARTI', col=1, pch = 2)
+legend(8,5,'True', col=2, pch = 1, cex=1)
+
+# Plot the main effects estimates and add the true values
+plot(1:length(beta), beta, col=2, cex=2, main='AMBARTI - Environment', ylim = c(-5,5)) # true values
+points(apply(fit.ambarti$beta_hat[,11:20], 2, mean), cex=2) # estimates
+legend(8,4,'AMBARTI', col=1, pch = 2)
+legend(8,5,'True', col=2, pch = 1, cex=1)
+
+fit.ambarti$trees[[100]][[1]] # shows the tree 1 in the last (100) MCMC iteration.
+
+##################################
+# BART (just to have a benchmark)
+##################################
+library(BART)
+bart = BART::wbart(x.ambarti, y)
+cor(y, bart$yhat.train.mean) # BART and semibart are quite similar. That's fine.
 ```
