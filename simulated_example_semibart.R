@@ -81,7 +81,7 @@ mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  + lambda_1 * gamma[G_by_E[,1]
 Y = rnorm(N, mu_ij, sigma_E) ## response variable
 
 ##########################################
-# AMBARTI (my implementation of semibart)
+# AMBARTI
 ##########################################
 library(AMBARTI)
 
@@ -98,6 +98,7 @@ fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, skip_trees = FALSE, nburn = 100
 
 # Get the final prediction (y hat)
 yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
+yhat_ambarti2 = predict_ambarti(fit.ambarti, newdata = x.ambarti, type = 'mean')
 cor(y, yhat_ambarti); # AMBARTI, BART and semibart are quite similar. That's fine.
 
 # Get the prediction specifically from BART
