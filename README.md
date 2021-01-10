@@ -99,14 +99,16 @@ yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
 cor(y, yhat_bart); # correlation btw y and BART (AMBARTI package)
 
 # Plot the main effects estimates and add the true values
-plot(1:length(alpha), alpha, col=2, cex=2, main='AMBARTI - Genotype', ylim= c(-5,5)) # true values
-points(apply(fit.ambarti$beta_hat[,1:10], 2, mean), cex=2, pch = 2) # estimates
+alpha_hat = apply(fit.ambarti$beta_hat[,1:10], 2, mean)
+plot(1:length(alpha), alpha, col=2, cex=2, main='AMBARTI-Genotype', ylim=c(-5,5)) # true values
+points(alpha_hat, cex=2, pch = 2) # estimates
 legend(8,4,'AMBARTI', col=1, pch = 2)
 legend(8,5,'True', col=2, pch = 1, cex=1)
 
 # Plot the main effects estimates and add the true values
-plot(1:length(beta), beta, col=2, cex=2, main='AMBARTI - Environment', ylim = c(-5,5)) # true values
-points(apply(fit.ambarti$beta_hat[,11:20], 2, mean), cex=2) # estimates
+beta_hat = apply(fit.ambarti$beta_hat[,11:20], 2, mean)
+plot(1:length(beta), beta, col=2, cex=2, main='AMBARTI-Environment', ylim=c(-5,5)) # true values
+points(beta_hat, cex=2) # estimates
 legend(8,4,'AMBARTI', col=1, pch = 2)
 legend(8,5,'True', col=2, pch = 1, cex=1)
 
