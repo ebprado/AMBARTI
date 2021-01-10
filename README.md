@@ -17,8 +17,8 @@ install_github("ebprado/AMBARTI")
 
 # An Additive Main effects and Multiplicative Interaction (AMMI) effects model
 
-# A Bayesian version of the AMMI model as specified here: https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf (JosseE et al JABES 2014)
-# Andrew Parnell / Danilo Sarti
+# Andrew Parnell / Danilo Sarti: A Bayesian version of the AMMI model as specified here:
+https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf (JosseE et al JABES 2014)
 
 # In this file, we simulate from the AMMI model specified in the paper above.
 
@@ -35,20 +35,23 @@ library(tidyverse)
 # Y_{ij} ~ N(mu_{ij}, sigma^2_E)
 # with
 # mu_{ij} = mu + alpha_i + beta_j + sum_{q=1}^Q lambda_q*gamma_iq*delta_jq
-# AA = sum_{q=1}^Q lambda_q*gamma_iq*delta_jq
-# Our idea is to estimate alpha_i + beta_j parametrically and the component AA via BART.
+# Our idea is to estimate alpha_i + beta_j parametrically and the component 
+# "sum_{q=1}^Q lambda_q*gamma_iq*delta_jq" via BART.
 
 # Notation
-# Y_ij = response (e.g. yield) for genotype i and environment j, i = 1, ..., I genotypes and j = 1, ..., J environments
+# Y_ij = response (e.g. yield) for genotype i and environment j, i = 1, ..., I
+# genotypes and j = 1, ..., J environments
 # mu is the grand mean
 # alpha_i is the genotype effect
 # beta_j is the environment effect
 # lambda_q is the q-th eigenvalue q = 1,.., Q of the interaction matrix
-# Q is the number of components used to model the interaction. Usually Q is fixed at a small number, e.g. 2
+# Q is the number of components used to model the interaction. Usually Q is fixed 
+# at a small number, e.g. 2
 # gamma_{iq} is the interaction effect for the q-th eigenvector for genotype i
 # delta_{iq} is the interaction effect for the q-th eigenvector for environment j
 # E_{ij} is a residual term with E_{ij} ~ N(0, sigma^2_E)
-# Usually these models have quite complicated restrictions on the gamma/delta/lambda values but Josse et al show that these are not fully necessary
+# Usually these models have quite complicated restrictions on the gamma/delta/lambda
+# values but Josse et al show that these are not fully necessary
 
 # Priors
 # alpha_i ~ N(0, s_alpha^2)
@@ -56,7 +59,8 @@ library(tidyverse)
 
 # Simulate data -----------------------------------------------------------
 
-# We will follow the simulation strategy detailed in Section 3.1 of the Josse et al paper
+# We will follow the simulation strategy detailed in Section 3.1 of the
+# Josse et al paper
 
 # Specify fixed values
 Q = 1 # Number of components
@@ -78,12 +82,13 @@ delta = seq(-0.5, 0.5,length.out = J)
 # Now simulate the values
 set.seed(123)
 G_by_E = expand.grid(1:I, 1:J) ## setting the interaction matrix
-mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  + lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
+mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  +
+lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
 Y = rnorm(N, mu_ij, sigma_E) ## response variable
 
-##########################################
+# ---------------------------------------
 # AMBARTI
-##########################################
+# ---------------------------------------
 
 # Some pre-processing
 x.ambarti = G_by_E
@@ -93,7 +98,7 @@ x.ambarti$e = as.factor(x.ambarti$e)
 y = Y
 set.seed(101)
 
-# Run AMBARTI (I'm using only 50 trees)
+# Run AMBARTI
 fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, skip_trees = FALSE, nburn = 100, npost = 100, sparse= FALSE)
 
 # Get the final prediction (y hat)
@@ -119,9 +124,9 @@ legend(8,5,'True', col=2, pch = 1, cex=1)
 
 fit.ambarti$trees[[100]][[1]] # shows the tree 1 in the last (100) MCMC iteration.
 
-##################################
+# ---------------------------------------
 # BART (just to have a benchmark)
-##################################
+# ---------------------------------------
 library(BART)
 bart = BART::wbart(x.ambarti, y)
 cor(y, bart$yhat.train.mean) # BART and semibart are quite similar. That's fine.
