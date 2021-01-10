@@ -18,7 +18,7 @@ install_github("ebprado/AMBARTI")
 # An Additive Main effects and Multiplicative Interaction (AMMI) effects model
 
 # A Bayesian version of the AMMI model as specified here:
-https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf (JosseE et al JABES 2014)
+[Josse et al, JABES, 2014](https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf)
 
 # In this file, we simulate from the AMMI model specified in the paper above.
 # The below was written by Andrew Parnell and Danilo Sarti.
