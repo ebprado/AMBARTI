@@ -9,19 +9,13 @@ In addition, it provides an implementation of AMBARTI in the format of an R pack
 library(devtools)
 install_github("ebprado/AMBARTI")
 ```
+Below, we generate a simulated example of the Bayesian version of the Additive Main effects and Multiplicative Interaction (AMMI) effects model presented in the [Josse et al, JABES, 2014](https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf). The code of the simulated example was written by @andrewcparnell and @danilosarti
+
 ## Example
 ``` r
 # -------------------------------
 # Generate the simulated example
 # -------------------------------
-
-# An Additive Main effects and Multiplicative Interaction (AMMI) effects model
-
-# A Bayesian version of the AMMI model as specified here:
-[Josse et al, JABES, 2014](https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf)
-
-# In this file, we simulate from the AMMI model specified in the paper above.
-# The below was written by Andrew Parnell and Danilo Sarti.
 
 rm(list = ls())
 library(R2jags)
