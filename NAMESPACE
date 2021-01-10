@@ -2,7 +2,6 @@
 
 export(ambarti)
 export(predict_ambarti)
-export(predict_ambarti_class)
 importFrom(MCMCpack,'rdirichlet')
 importFrom(mvtnorm,'rmvnorm')
 importFrom(stats,'aggregate')

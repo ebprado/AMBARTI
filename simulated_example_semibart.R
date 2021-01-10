@@ -1,8 +1,13 @@
 library(devtools)
+check()
+document()
+build()
+install()
+
 install_github("ebprado/semibart") # I just added the BART predictions to the output
 library(semibart)
 
-install_github("ebprado/MOTR-BART/AMBARTI") # This my implementation of the semibart idea
+install_github("ebprado/AMBARTI") # This my implementation of the semibart idea
 library(AMBARTI)
 
 ################################################################################
@@ -61,8 +66,10 @@ N = I*J # Total number of obs
 # Some further fixed values
 mu = 10
 sigma_E = 1
-alpha = seq(-3,3, length.out = I)
-beta = seq(-4,4, length.out = J)
+sigma_alpha = 2
+sigma_beta = 2
+alpha = rnorm(I, 0, sigma_alpha)
+beta = rnorm(J, 0, sigma_beta)
 lambda_1 = 12
 gamma = seq(2, -2,length.out = I)/sqrt(10)
 delta = seq(-0.5, 0.5,length.out = J)
@@ -72,6 +79,51 @@ set.seed(123)
 G_by_E = expand.grid(1:I, 1:J) ## setting the interaction matrix
 mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  + lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
 Y = rnorm(N, mu_ij, sigma_E) ## response variable
+
+##########################################
+# AMBARTI (my implementation of semibart)
+##########################################
+library(AMBARTI)
+
+# Some pre-processing
+x.ambarti = G_by_E
+names(x.ambarti) = c('g', 'e')
+x.ambarti$g = as.factor(x.ambarti$g)
+x.ambarti$e = as.factor(x.ambarti$e)
+y = Y
+set.seed(101)
+
+# Run AMBARTI (I'm using only 50 trees)
+fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, skip_trees = FALSE, nburn = 100, npost = 100, sparse= FALSE)
+
+# Get the final prediction (y hat)
+yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
+cor(y, yhat_ambarti); # AMBARTI, BART and semibart are quite similar. That's fine.
+
+# Get the prediction specifically from BART
+yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
+cor(y, yhat_bart); # correlation btw y and BART (AMBARTI package)
+
+# Plot the main effects estimates and add the true values
+plot(1:length(alpha), alpha, col=2, cex=2, main='AMBARTI - Genotype', ylim= c(-5,5)) # true values
+points(apply(fit.ambarti$beta_hat[,1:10], 2, mean), cex=2, pch = 2) # estimates
+legend(8,4,'AMBARTI', col=1, pch = 2)
+legend(8,5,'True', col=2, pch = 1, cex=1)
+
+# Plot the main effects estimates and add the true values
+plot(1:length(beta), beta, col=2, cex=2, main='AMBARTI - Environment', ylim = c(-5,5)) # true values
+points(apply(fit.ambarti$beta_hat[,11:20], 2, mean), cex=2) # estimates
+legend(8,4,'AMBARTI', col=1, pch = 2)
+legend(8,5,'True', col=2, pch = 1, cex=1)
+
+fit.ambarti$trees[[100]][[1]] # shows the tree 1 in the last (100) MCMC iteration.
+
+##################################
+# BART (just to have a benchmark)
+##################################
+library(BART)
+bart = BART::wbart(x.ambarti, y)
+cor(y, bart$yhat.train.mean) # BART and semibart are quite similar. That's fine.
 
 ##################################
 # Semiparametric BART
@@ -105,13 +157,17 @@ semib = semibart(x.train = x, y.train = y, a.train = x)
 betahat = apply(semib$beta,2,mean)[1:10] # The first 10 are associated to the covariate g (genotype)
 
 # Plot the main effects estimates and add the true values
-plot(betahat, cex=2, ylim = c(min(betahat, alpha), max(betahat, alpha)), main='Genotype - semibart') # estimates (black)
+plot(betahat, cex=2, ylim = c(-5,5), main='Genotype - semibart') # estimates (black)
 points(1:length(alpha), alpha, col=2, cex=2) # true values (red). Looks not too bad.
+legend(8,4,'semi BART', col=1, pch = 2)
+legend(8,5,'True', col=2, pch = 1, cex=1)
 
 # Plot the main effects estimates and add the true values
 alphahat = apply(semib$beta,2,mean)[11:20] # The remaining 10 are associated to the covariate e (environment)
-plot(alphahat, cex=2, ylim = c(min(alphahat, beta), max(alphahat, beta)), main='Environment - semibart') # estimates
+plot(alphahat, cex=2, ylim = c(-5,5), main='Environment - semibart') # estimates
 points(1:length(beta), beta, col=2, cex=2) # true values. Looks fine.
+legend(8,4,'semi BART', col=1, pch = 2)
+legend(8,5,'True', col=2, pch = 1, cex=1)
 
 # Correlation btw y and BART estimate
 cor(y, apply(semib$bartfit, 2, mean)) # ~0.31
@@ -120,64 +176,3 @@ cor(y, apply(semib$bartfit, 2, mean)) # ~0.31
 yhat = x%*%apply(semib$beta,2,mean) + apply(semib$bartfit, 2, mean)
 plot(y, yhat, main = 'semibart - y versus y hat'); abline(0,1) # Looks fine
 cor(y, yhat); # ~0.89
-
-# Just verifying whether the tree are splitting on the covariates
-#aa = t(semib$test) # it correponds to the number of terminal nodes for every tree along the MCMC iteration
-#bb = apply(aa, 2, function(x)length(unique(x))) # the number of terminal nodes per tree for each MCMC iteration
-#hist(bb, freq = FALSE) # the trees are splitting on the covariates.
-
-##################################
-# BART (just to have a benchmark)
-##################################
-library(BART)
-bart = BART::wbart(x, y)
-cor(y, bart$yhat.train.mean) # BART and semibart are quite similar. That's fine.
-
-##########################################
-# AMBARTI (my implementation of semibart)
-##########################################
-library(AMBARTI)
-
-# Some pre-processing
-x.ambarti = G_by_E
-names(x.ambarti) = c('g', 'e')
-x.ambarti$g = as.factor(x.ambarti$g)
-x.ambarti$e = as.factor(x.ambarti$e)
-y = Y
-set.seed(101)
-
-# Run AMBARTI (I'm using only 50 trees)
-fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, skip_trees = FALSE, nburn = 100, npost = 100, sparse= FALSE)
-
-# Run AMBARTI (I'm using only one tree).
-# set.seed(103)
-# fit.ambarti = ambarti(x.ambarti, y, ntrees = 1, skip_trees = FALSE, nburn = 100, npost = 100, sparse= FALSE)
-
-# Get the final prediction (y hat)
-yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
-cor(y, yhat_ambarti); # AMBARTI, BART and semibart are quite similar. That's fine.
-
-# Get the prediction specifically from BART
-yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
-cor(y, yhat_bart); # correlation btw y and BART (AMBARTI package)
-cor(y, apply(semib$bartfit, 2, mean)) # correlation btw y and BART estimate (semibart package)
-
-# Plot the main effects estimates and add the true values
-plot(1:length(alpha), alpha, col=2, cex=2, main='Genotype - estimates versus true values', ylim= c(-4,4)) # true values
-points(apply(fit.ambarti$beta_hat[,1:10], 2, mean), cex=2) # estimates
-
-# Plot the main effects estimates and add the true values
-plot(1:length(beta), beta, col=2, cex=2, main='Environment - estimates versus true values') # true values
-points(apply(fit.ambarti$beta_hat[,11:20], 2, mean), cex=2, ylim = c(-4,4)) # estimates
-
-# We can see the covariates that are used in the trees have their effect
-# in the linear prediction affected (this is easier to be visualise if we
-# uncomment rows 153 and 154, and run the results again).
-
-# Tree matrix for the last MCMC iteration. It's possible to see the covariates
-# that were used to create the tree structure (column "split_variable").
-# From 1:10, the covariates are associated to covariate 'g' (genotypes).
-# The remaining ones are associated to covariate 'e' (environment).
-
-fit.ambarti$trees[[100]][[1]] # shows the tree 1 in the last (100) MCMC iteration.
-
