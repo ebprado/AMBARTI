@@ -92,7 +92,7 @@ fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, skip_trees = FALSE, nburn = 100
 # Get the final prediction (y hat)
 yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
 yhat_ambarti2 = predict_ambarti(fit.ambarti, newdata = x.ambarti, type = 'mean')
-cor(y, yhat_ambarti); # AMBARTI, BART and semibart are quite similar. That's fine.
+cor(y, yhat_ambarti);
 
 # Get the prediction specifically from BART
 yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
