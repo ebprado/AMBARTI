@@ -1,0 +1,159 @@
+---
+title: 'AMBARTI models for agricultural experiments'
+date: "January 11th, 2021 - Group meeting"
+author: "Prado, E. B., Lemos, A. A. \\newline \\vspace{1cm} \\textit{Hamilton Institute \\& Dept. of Mathematics and Statistics} \\newline \\vspace{1cm} \\includegraphics[width=3cm]{MU_logo.jpg}"
+header-includes:
+output:
+  beamer_presentation:
+  includes:
+  in_header: header.tex
+bibliography: math_refs.bib
+biblio-style: apalike
+link-citations: true
+natbiboptions: round
+---
+## Agenda
+
+- Additive Main Effect interaction (AMMI) models
+\vspace{0.5cm}
+
+- AMMI + BART = AMBARTI
+\vspace{0.5cm}
+
+- Some preliminary results
+
+<!-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------------------------------->
+
+## Additive Main effects and Multiplicative Interactions (AMMI)
+\begin{itemize}
+\itemsep 10pt
+ \item Linear–bilinear models are frequently used to analyse two-way data such as
+genotype-by-environment data;
+\item A example of this class of models is the AMMI model.
+\begin{eqnarray*}
+y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
+\end{eqnarray*}
+where
+\begin{itemize}
+    \item $y$ - response
+    \item $g$ - genotype
+    \item $e$ - environment
+    \item $\lambda$ - singular value of the multiplicative component
+    \item $\gamma$ - genotype singular value
+    \item $\delta$ - environment singular value
+\end{itemize}
+\end{itemize}
+
+## Additive Main effects and Multiplicative Interactions (AMMI)
+
+The following priors are assumed in its Bayesian version (Josse et al, JABES, 2014):
+\vspace{-0.5cm}
+    \begin{eqnarray*} 
+    \mu & \sim& \mathcal{N}\left(m, s_{\mu}^{2}\right) \\ 
+    g_{i} & \sim&  \mathcal{N}\left(0, s_{g}^{2}\right) \\ e_{j} &\sim& \mathcal{N}\left(0, s_{e}^{2}\right)\\
+    \left(\lambda_{q}\right)_{q=1, \ldots, Q} &\sim& \text { ordered sample of } Q \text { independent } \mathcal{N}^{+}\left(0, s_{\lambda}^{2}\right) \\ \gamma_{1 q} & \sim&  \mathcal{N}^{+}(0,1) \quad \text { for } q=1, \ldots, Q \\ \gamma_{i q} & \sim&  \mathcal{N}(0,1) \quad \text { for } i>1 \text { and } q=1, \ldots, Q \\ \delta_{j q} & \sim&  \mathcal{N}(0,1) \quad \text { for } j \geq 1 \text { and } q=1, \ldots, Q \\ \sigma_{E} & \sim& \mathcal{U}\left(0, S_{\mathrm{ME}}\right)
+    \end{eqnarray*}
+
+<!-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------------------------------->
+
+# Additive Main Effect Bayesian Additive Regression Tree interaction models (AMBARTI)
+
+## BART
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{c}
+\includegraphics[width=0.95\linewidth]{TreeTermsBART.pdf}
+\end{tabular}
+\end{figure}
+
+
+## AMMI + BART
+
+BART is a flexible tree-based method that can be used for predicting when there are interactions and non-linear relationships.
+$$
+\begin{aligned}
+y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( g_{i} + e_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
+\end{aligned}
+$$
+where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and $e_j$ are the genotype and environment effects, respectively. 
+$$
+  \begin{aligned}
+\mu_{t\ell}|\mathcal{T}_{t}  & \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu}),\\
+g_{i}|\mathcal{T}_{t}   & \sim \mbox{N}(\mu_{g}, \sigma^{2}_{g}), \\
+e_{j}|\mathcal{T}_{t}   & \sim \mbox{N}(\mu_{e}, \sigma^{2}_{e}), \\
+\sigma^{2}_{g} & \sim \mbox{IG}(a_{g}, b_{g}), \\
+\sigma^{2}_{e} & \sim \mbox{IG}(a_{e}, b_{e}), \\
+\sigma^{2} & \sim \mbox{IG}(a, b). \\
+\end{aligned}
+$$
+
+# Some preliminary results
+
+## Simulated example
+
+We consider the following setting to generate a simulated data set.
+$$
+y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
+$$
+where
+\begin{itemize}
+ \item $Q = 1$
+ \item $I = J = 10$ 
+ \item $\mu = 10$
+ \item $g = \mbox{N}(0, s_g)$
+ \item $e = \mbox{N}(0, s_e)$
+ \item $s_g = 2$, $s_e = 2$
+ \item $\lambda = 12$
+ \item $\tau = 1$
+ \end{itemize}
+<!-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------------------------------->
+
+## Preliminary results
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{genAMBARTI.pdf}
+\end{center}
+
+<!-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------------------------------->
+
+## Preliminary results
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{envAMBARTI.pdf}
+\end{center}
+
+## Some remarks and next steps
+ - Interestingly, BART is doing a good job...
+```{r, eval=FALSE}
+cor(y, y_hat_AMBARTI) = 0.98
+cor(y, y_hat_AMMI) = 0.93
+```
+\vspace{-0.5cm}
+
+- More simulations
+
+\vspace{0.005cm}
+
+- Calculate the interactions
+
+\vspace{0.005cm}
+
+- Real datasets
+
+
+## That's all, folks! Thank you!
+
+This work was supported by a Science Foundation Ireland Career Development Award grant number: 17/CDA/4695
+\begin{center}
+\includegraphics[width=7cm]{SFI_logo.jpg}
+\end{center}
+
+<!-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------------------------------->
+
+## References

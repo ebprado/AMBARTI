@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Just Another Gibbs Sampler: JAGS</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Inglis, A., Ahmed, A., Wundervald, B. and Prado, E." />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/maynooth.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/maynooth-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Just Another Gibbs Sampler: JAGS
+### Inglis, A., Ahmed, A., Wundervald, B. and Prado, E.
+### 14th November of 2018
+
+---
+
+## Agenda
+`\begin{enumerate}
+\item Introduction
+\vspace{0.15cm}
+
+\item R scripts
+\vspace{0.15cm}
+
+\item New Python scripts
+\vspace{0.15cm}
+
+\item New models in JAGS
+
+  \begin{enumerate}
+    \item Poisson model
+    \item Exponential survival model
+    \item Gaussian Mixture model
+  \end{enumerate}
+  
+\item Final remarks
+\vspace{0.15cm}
+
+\item Acknowledgments
+\end{enumerate}`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+---
+## Introduction
+`\begin{itemize}
+
+\item JAGS is a program to perform inference for Bayesian Hierarchical models. It was proposed by Martyn Plummer in 2003 as an alternative to the BUGS software;
+
+\vspace{0.35cm}
+
+\item JAGS does not require the specification of the conditional distributions;
+
+\vspace{0.35cm}
+
+\item The Gibbs Sampler function of JAGS is ARMS, which is flexible for dealing with univariate target densities.
+
+\vspace{0.35cm}
+
+\item The main advantages of JAGS, compared to BUGS, is the programming language and its interfaces with other software, such as R and Python;
+
+\end{itemize}`
+
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+---
+## Introduction
+`\begin{itemize}
+
+\item Although JAGS is a really useful software to learn, there are few good examples online that explain both theory and code;
+
+\vspace{0.35cm}
+
+\item The goals of this project were:
+  \begin{itemize}
+    \item Learn how to use JAGS to perform Bayesian modelling and;
+    \item Write new codes;
+  \end{itemize}
+  
+\vspace{0.35cm}  
+\item Basically, JAGS requires only the sampling distribution and the prior distribution for each parameter;
+
+\end{itemize}`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Introduction
+
+```
+model {
+    for (i in 1:n) {
+        y[i] ~ dnorm(mu[i], precision)
+        mu[i] &lt;- alpha + beta * x
+    }
+# Prior distributions
+    alpha ~ dnorm(0.0, 1.0E-3)
+    beta ~ dnorm(0.0, 1.0E-3)   
+    aux &lt;- dgamma(0.001, 0.001)
+    precision ~ 1.0/ aux
+}
+```
+
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+---
+## R scripts
+
+`\begin{itemize}
+
+\item Our main contributions were to add \textbf{mathematical details} and provide \textbf{real datasets examples} for \textbf{5} R scripts;
+\vspace{0.35cm}
+
+\item The models involved were:
+
+  \begin{itemize}
+    \item Random effect model;
+    \item Multivariate Normal model;
+    \item Beta regression;
+    \item Time series Beta Auto-Regressive model of order 1 and;
+    \item Mixture model.
+  \end{itemize}
+
+\end{itemize}`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## R script - Beta regression
+
+Let `\(\{Y_{i}\}_{i=1}^{n}\)` be independent and identically distributed random variables and `\(X_{i} = (1, x_{i,1},...,x_{i,1})\)` a line vector with all covariates of the individual `\(i\)`. We assume that `\(Y_{i}\)` is distributed according to a Beta distribution  \cite{Ferrari:Cribari:2004}, denoted by `\(Y_{i} \sim \mbox{Beta}(\mu, \phi)\)`, where the Beta distribution may be written in the form
+`\begin{align}
+f(Y_{i}|\mu, \phi) = \frac{\Gamma(\phi) \Gamma(\mu\phi)}{\Gamma((1-\mu)\phi)} Y_{i}^{\mu\phi - 1} (1- Y_{i})^{(1-\mu)/\phi }, \nonumber
+\end{align}`
+\noindent
+where `\(0 &lt; Y_{i} &lt; 1\)`, `\(\mathbb{E}(Y_{i}) = \mu\)`, `\(\mathbb{V}(Y_{i}) = \mu(1-\mu)/(1+\phi)\)`, `\(0 &lt; \mu &lt; 1\)` and `\(\phi &gt;0\)`. Thus, it is possible to model `\(g(\mu) = X_{i}\boldsymbol\beta\)`, where `\(g(\cdot)\)` is the link function that maps the unit interval into `\(\mathbb{R}\)`.
+
+\noindent
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## R script - Beta regression
+
+```r
+  # Likelihood
+  for (t in 1:T) {
+  y[t] ~ dbeta(a[t], b[t])
+  a[t] &lt;- mu[t] * phi
+  b[t] &lt;- (1 - mu[t]) * phi
+  mu[t] &lt;- ilogit(logit_mu[t])
+  }
+  logit_mu[1] ~ dnorm(alpha, 1)
+  for(t in 2:T) {
+  logit_mu[t] ~ dnorm(alpha + beta * logit_mu[t-1],
+                      sigma_mu^-2)
+  }
+  # Priors
+  alpha ~ dnorm(0, 10^-2)
+  beta ~ dnorm(0, 10^-2)
+  phi ~ dunif(0, 10)
+  sigma_mu ~ dunif(0, 10)
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## R script - Beta regression
+
+DESCRIPTION OF THE DATASET
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## R script - Beta regression
+
+
+```r
+library(datasets)
+head(attenu)
+
+#Set up the data
+acc=with(attenu,list(y=attenu$accel
+                     ,T=nrow(attenu)))
+
+# Set up jags model
+jags_model=jags(acc,
+                parameters.to.save = model_parameters,
+                model.file = textConnection(model_code),
+                n.chains=4,
+                n.iter=1000,
+                n.burnin=200,
+                n.thin=2)
+# Plot the jags output
+print(jags_model)
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## R script - Beta regression
+
+PUT SOME GRAPHIC HERE
+
+
+
+
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+---
+## Python scripts
+
+`\begin{itemize}
+
+\item 3 Python scripts were created providing \textbf{mathematical details} and \textbf{simulated and real datasets examples};
+\vspace{0.35cm}
+
+\item The models involved were:
+
+  \begin{itemize}
+    \item Bayesian linear regression;
+    \item Logistic regression;
+    \item Beta regression.
+  \end{itemize}
+
+\end{itemize}`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Python script - Logistic regression
+
+The logistic regression model assumes that a sequence of independent and identically distributed random variables `\(\{Y_{i}\}_{1}^{n}\)` has a Bernoulli distribution, denoted by `\(Y_{i} \sim \mbox{Bernoulli}(p_{i})\)`, in the form of
+`\begin{align}
+f(Y_{i}|p_{i}) = p_{i}^{Y_{i}} (1 - p_{i})^{1-Y_{i}} \nonumber,
+\end{align}`
+
+\noindent
+where `\(y \in \{0,1\}\)`, `\(\mbox{log} (\frac{p_{i}}{1-p_{i}}) = X_{i}\boldsymbol\beta\)`, `\(X_{i} = (1, x_{i,1},...,x_{i,1})\)` is the line vector of covariates associated to the individual `\(i\)` and `\(\boldsymbol\beta\)` is the vector of unknown parameters. 
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Python script - Logistic regression
+
+```r
+model
+{
+  # Likelihood
+  for (t in 1:n) {
+  y[t] ~ dbin(p[t], 1)
+  logit(p[t]) &lt;- beta_0 + beta_1 * x_1[t] +
+                 beta_2 * x_2[t]
+  }
+  
+  # Priors
+  beta_0 ~ dnorm(0.0,0.01)
+  beta_1 ~ dnorm(0.0,0.01)
+  beta_2 ~ dnorm(0.0,0.01)
+}
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Python script - Logistic regression
+
+DESCRIPTION OF THE DATASET
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Python script - Logistic regression
+
+
+```r
+library(datasets)
+head(attenu)
+
+#Set up the data
+acc=with(attenu,list(y=attenu$accel
+                     ,T=nrow(attenu)))
+
+# Set up jags model
+jags_model=jags(acc,
+                parameters.to.save = model_parameters,
+                model.file = textConnection(model_code),
+                n.chains=4,
+                n.iter=1000,
+                n.burnin=200,
+                n.thin=2)
+# Plot the jags output
+print(jags_model)
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Python script - Logistic regression
+
+PUT SOME GRAPHIC HERE
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## New models
+
+Here we present 3 new models that we implemented both in R and Python;
+
+The models involved were:
+
+  \begin{itemize}
+    \item Poisson regression model;
+    \item Exponential survival model;
+    \item Gaussian Mixture model.
+  \end{itemize}
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Poisson regression model
+
+A random variable `\(Y\)` is said to have a Poisson distribution
+with parameter `\(\lambda\)` if it takes integers `\(y = 0, 1, 2 \dots\)`
+with probability mass function
+
+$$ P(Y = y) = \frac{exp\{-\lambda\} \lambda^{y}}{y!},$$
+\noindent
+where `\(\lambda &gt; 0\)`. This mean can be modelled via a link function passed in a systematic component. For the Poisson regression case, the most widely used link function is the natural log, resulting in a equation that has the form
+
+$$ log(\hat\lambda) = \beta_0 + \beta_1 \phi(x_1) + \dots + \beta_n \phi(x_n).$$
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Poisson regression model
+
+```
+model
+{
+  # Likelihood
+  for (i in 1:T) {
+    y[i] ~ dpois(p[i])
+    log(p[i]) &lt;- alpha + beta_1 * x_1[i] + beta_2 * x_2[i]
+  }
+  # Priors
+  alpha ~ dnorm(0.0, 0.01)
+  beta_1 ~ dnorm(0.0, 0.01)
+  beta_2 ~ dnorm(0.0, 0.01)
+}
+'
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Poisson regression model
+
+```
+Simulate data -----------------------
+
+# Some R code to simulate data from the Poisson model
+T = 1000
+set.seed(123)
+x_1 = sort(runif(T, 0, 5))
+x_2 = sort(runif(T, 0, 5))
+alpha = 1
+beta_1 = 1.2
+beta_2 = -0.3
+mu = alpha + beta_1 * x_1 + beta_2 * x_2
+lambda = exp(mu)
+y = rpois(n = T, lambda = lambda)
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Poisson regression model
+
+`\begin{center}
+\includegraphics[width=10cm]{poisson-1.pdf}
+\end{center}`
+
+## Exponential Survival models
+
+In survival analysis, we are usually interested in modelling the
+time until a certain event occurs - the 'failure'. Let `\(T\)` be a random variable representing the survival times
+of individuals in some population. The probability density function 
+of `\(T\)` can be written as 
+$$ F(t) = P(T \leq t) = \int_{0}^{t} f(u)du$$
+Survival data is also often censored. In this case, the likelihood is written as
+$$ L(t) = \prod_{i = 1}^{n} [f(t_i)]^{\delta_i} [S(t_i)]^{1 - \delta_i},$$
+where `\(\delta_i\)` is the indicator variable that takes 1 for the failures
+and 0 for censored observations. We consider for the failure time the Exponential distribution, given by
+$$ f(t) = \frac{1}{\alpha} exp\Big\{-\frac{t}{\alpha} \Big \}
+, \quad \alpha &gt; 0.$$`
+
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Exponential Survival models
+```
+model
+{
+  # Likelihood
+  for (i in 1:T) {
+    mu[i] = exp(beta_1 * x_1[i] + beta_2 * x_2[i])
+    t[i] ~ dexp(mu[i] * lambda_0)
+  }
+  # Priors
+  lambda_0 ~ dgamma(1, 1)
+  beta_1 ~ dnorm(0.0, 0.01)
+  beta_2 ~ dnorm(0.0, 0.01)
+}
+'
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Exponential Survival models
+
+`\begin{center}
+\includegraphics[width=10cm]{survival.png}
+\end{center}`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Gaussian Mixture model
+
+The mixture model is viewed hierarchically: the observations `\(y\)`
+are modeled conditionally on the vector `\(z\)`, having `\(z\)` itself
+a probabilistic specification. 
+$$ p(y_i | \theta, \lambda) = \lambda_1 f(y_i | \theta_i) + 
+\dots + \lambda_H f(y_i | \theta_H),$$`
+where the vector `\(\lambda = (\lambda_1,\dots,\lambda_H)\)` 
+represents the proportions of the population taken as 
+being drawn from each `\(f_h(y_i | \theta_h)\)` distribution, for
+`\(h = 1, \dots, H\)`, aso that `\(\sum_{h = 1}^{H} \lambda_h = 1\)`. 
+Usually, the mixture components are assumed to be part of the same
+parametric family, such as the Gaussian, but with different
+parameter vectors. The unobserved variables is written as 
+$$ z_{ih} = 
+`\begin{cases}
+1, &amp; \text{of the } \textit{i}\text{th unite is drawn from the }
+\textit{h}\text{th component} \\
+0, &amp; \text{otherwise}
+\end{cases}$$`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Gaussian Mixture model
+```
+model {
+  # Likelihood:
+  for(i in 1:N) {
+    y[i] ~ dnorm(mu[i] , 1/sigma_inv) 
+    mu[i] &lt;- mu_clust[clust[i]]
+    clust[i] ~ dcat(lambda_clust[1:Nclust])
+  }
+  # Prior:
+  sigma_inv ~ dgamma( 0.01 ,0.01)
+  mu_clust[1] ~ dnorm(0, 10)
+  mu_clust[2] ~ dnorm(5, 10)
+  
+  lambda_clust[1:Nclust] ~ ddirch(ones)
+}
+```
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Gaussian Mixture model
+`\begin{center}
+\includegraphics[width=10cm]{gaussianmixture-2.pdf}
+\end{center}`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Final remarks
+
+`\begin{itemize}
+
+\item This project we learned how to use JAGS to perform Bayesian analysis;
+\vspace{0.35cm}
+
+\item We had some challenges: i) JAGS was new for whole the group; ii) Difficulties to run the package \textbf{pyjags};
+\vspace{0.35cm}
+
+\item Our contributions were to provide mathematical details and codes for existing and new models. In the end, we produced:
+  \begin{itemize}
+    \item 8 R scripts (3 new);
+    \item 6 Python scripts (all of them new);
+  \end{itemize}
+
+\vspace{0.35cm}
+
+\item As future work other models can be implemented, such as other GLMs, Geostatistical models, more complex Survival models and other GLMMs with/without longitudinal structure.
+\end{itemize}`
+---
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+&lt;!--------------------------------------------------------------------------------------------------------------&gt;
+
+## Acknowledgments
+
+This work was supported by a Science Foundation Ireland Career Development Award grant number: 17/CDA/4695
+
+`\begin{center}
+\includegraphics[width=10cm]{SFI_logo.jpg}
+\end{center}`
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

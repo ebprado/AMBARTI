@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Your title</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Your name" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/maynooth.css" rel="stylesheet" />
+    <link href="libs/remark-css/maynooth-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Your title
+### Your name
+### Your date
+
+---
+
+
+
+
+
+
+
+class: inverse, middle, center
+
+# A title slide
+
+Text
+
+---
+class: middle, center
+
+## Another title slide
+
+Text
+
+---
+
+# First slide
+
+More text here
+
+- Bullet points
+  - 'Sub' bullet points
+  
+1. Numbered topics
+
+&gt; Highlighting something
+
+# Big
+## Not so big
+### Now is small
+
+
+---
+
+# Second slide
+
+
+.pull-left[
+
+- This is on the left side
+
+]
+
+.pull-right[
+- While this is on the right side
+]
+
+### Inserting images
+
+Use the following R code: 
+  
+
+```r
+knitr::include_graphics("path/to/your/image")
+```
+
+  - Note that figure width and height are specified in
+  chunk options, as 'out.width' and 'out.height'
+
+
+Highlightning code:
+
+    ```{r tidy=FALSE}
+    if (TRUE) {
+    *{{ message("Very important!") }}
+    }
+    ```
+---
+
+## Third slide
+
+1. This might be in a footnote *;
+
+.footnote[[*] Not really. ]
+
+Math expression: `$$y_i \sim N(\mu, \sigma^{2})$$`
+
+Tables:
+
+```r
+knitr::kable(head(iris), format = 'html')
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Sepal.Length &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sepal.Width &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Petal.Length &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Petal.Width &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Fourth slide
+
+You can find more features by
+1. Creating a `rmarkdown` file 
+2. Selecting the xaringan theme for it: the example document
+comes with instructions about how to use it!
+
+
+---
+
+# References
+
+&lt;p&gt;&lt;cite&gt;Friedman, J, T. Hastie and R. Tibshirani
+(2008).
+&amp;ldquo;Sparse inverse covariance estimation with the graphical lasso&amp;rdquo;.
+In: &lt;em&gt;Biostatistics&lt;/em&gt; 9.3, pp. 432&amp;ndash;441.&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;Rowley, H. A, S. Baluja and T. Kanade
+(1998).
+&amp;ldquo;Neural network-based face detection&amp;rdquo;.
+In: &lt;em&gt;IEEE Transactions on pattern analysis and machine intelligence&lt;/em&gt; 20.1, pp. 23&amp;ndash;38.&lt;/cite&gt;&lt;/p&gt;
+&lt;p&gt;&lt;cite&gt;Friedman, J, T. Hastie and R. Tibshirani
+(2008).
+&amp;ldquo;Sparse inverse covariance estimation with the graphical lasso&amp;rdquo;.
+In: &lt;em&gt;Biostatistics&lt;/em&gt; 9.3, pp. 432&amp;ndash;441.&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;Rowley, H. A, S. Baluja and T. Kanade
+(1998).
+&amp;ldquo;Neural network-based face detection&amp;rdquo;.
+In: &lt;em&gt;IEEE Transactions on pattern analysis and machine intelligence&lt;/em&gt; 20.1, pp. 23&amp;ndash;38.&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;Zhao, P. and B. Yu
+(2006).
+&amp;ldquo;On model selection consistency of Lasso&amp;rdquo;.
+In: &lt;em&gt;Journal of Machine learning research&lt;/em&gt; 7.Nov, pp. 2541&amp;ndash;2563.&lt;/cite&gt;&lt;/p&gt;
+
+---
+
+class: center, middle
+
+# Thanks!
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

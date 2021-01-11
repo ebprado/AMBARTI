@@ -1,0 +1,140 @@
+---
+title: "Your title"
+author: "Your name"
+date: "Your date"
+output:
+  xaringan::moon_reader:
+    css: [default, maynooth, maynooth-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r, eval=FALSE, echo=FALSE}
+# Make sure you use the xaringan version 
+# from github, so it has the maynooth template ------------------------
+devtools::install_github("brunaw/xaringan")
+```
+
+
+class: inverse, middle, center
+
+# A title slide
+
+Text
+
+---
+class: middle, center
+
+## Another title slide
+
+Text
+
+---
+
+# First slide
+
+More text here
+
+- Bullet points
+  - 'Sub' bullet points
+  
+1. Numbered topics
+
+> Highlighting something
+
+# Big
+## Not so big
+### Now is small
+
+
+---
+
+# Second slide
+
+
+.pull-left[
+
+- This is on the left side
+
+]
+
+.pull-right[
+- While this is on the right side
+]
+
+### Inserting images
+
+Use the following R code: 
+  
+```{r, out.width="85%", fig.align='center', echo = TRUE, eval=FALSE}
+knitr::include_graphics("path/to/your/image")
+```
+
+  - Note that figure width and height are specified in
+  chunk options, as 'out.width' and 'out.height'
+
+
+Highlightning code:
+
+    `r ''````{r tidy=FALSE}
+    if (TRUE) {
+    *{{ message("Very important!") }}
+    }
+    ```
+---
+
+## Third slide
+
+1. This might be in a footnote *;
+
+.footnote[[*] Not really. ]
+
+Math expression: $$y_i \sim N(\mu, \sigma^{2})$$
+
+Tables:
+```{r, echo = TRUE}
+knitr::kable(head(iris), format = 'html')
+```
+
+---
+
+## Fourth slide
+
+You can find more features by
+1. Creating a `rmarkdown` file 
+2. Selecting the xaringan theme for it: the example document
+comes with instructions about how to use it!
+
+
+---
+
+# References
+
+```{r, refs, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+source('references.R')
+
+# Selecting some references
+references(bib_file = 'scholar.bib', select = TRUE, 
+           keys = c('friedman2008sparse', 'rowley1998neural'))
+
+# Or printing it all
+references(bib_file = 'scholar.bib', select = FALSE)
+```
+
+---
+
+class: center, middle
+
+# Thanks!
+
+
+
