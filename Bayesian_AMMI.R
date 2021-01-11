@@ -48,45 +48,37 @@ model
   # Likelihood
   for (k in 1:N) {
   Y[k] ~ dnorm(mu[k], sigma_E^-2)
-  mu[k] = mu_all + alpha[genotype[k]] + beta[environment[k]] + sum(lambda * gamma[genotype[k],1:Q] * delta[environment[k],1:Q])
+  mu[k] = mu_all + alpha[genotype[k]] + beta[environment[k]] + lambda_1 * gamma[genotype[k]] * delta[environment[k]]
   }
   # Priors
   mu_all ~ dnorm(0, s_mu^-2) # Prior on grand mean
   for(i in 1:I) {
   alpha[i] ~ dnorm(0, s_alpha^-2) # Prior on genotype effect
   }
+  gamma[1] ~ dnorm(0, 1)T(0,) # First one is restriced to be positive
+  for(i in 2:I) {
+  gamma[i] ~ dnorm(0, 1) # Prior on genotype interactions
+  }
   for(j in 1:J) {
   beta[j] ~ dnorm(0, s_beta^-2) # Prior on environment effect
+  delta[j] ~ dnorm(0, 1) # Prior on environment interactions
   }
-  # Priors on gamma
-  for(q in 1:Q) {
-  gamma[1, q] ~ dnorm(0, 1)T(0,) # First one is restriced to be positive
-  for(i in 2:I) {
-  gamma[i, q] ~ dnorm(0, 1) # Prior on genotype interactions
-  }
-  }
-  # Priors on delta
-  for(q in 1:Q) {
-  for(j in 1:J) {
-  delta[j, q] ~ dnorm(0, 1) # Prior on environment interactions
-  }
-  }
-  # Prior on eigenvalues
-  for(q in 1:Q) {
-  lambda_raw[q] ~ dnorm(0, s_lambda^-2)T(0,)
-  }
-  lambda = sort(lambda_raw)
+  # Prior on first (and only) eigenvalue
+  lambda_1 ~ dnorm(0, s_lambda^-2)T(0,)
   # Prior on residual standard deviation
   sigma_E ~ dunif(0, S_ME)
 }
 '
-
+s_mu = 20
+s_alpha = 10
+s_beta = 10
+s_lambda = 10
+S_ME = 10
 # Set up the data
 model_data = list(N = N,
                   Y = Y,
                   I = I,
                   J = J,
-                  Q = 2, # Set Q to be 2 even though the simulation was for Q = 1
                   genotype = G_by_E[,1],
                   environment = G_by_E[,2],
                   s_mu = s_mu,

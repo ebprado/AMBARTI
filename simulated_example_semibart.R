@@ -10,53 +10,11 @@ library(semibart)
 install_github("ebprado/AMBARTI") # This my implementation of the semibart idea
 library(AMBARTI)
 
-################################################################################
-# Generate the simulated example
-################################################################################
-
-# An Additive Main effects and Multiplicative Interaction (AMMI) effects model
-
-# A Bayesian version of the AMMI model as specified here: https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf (JosseE et al JABES 2014)
-# Andrew Parnell / Danilo Sarti
-
-# In this file, we simulate from the AMMI model specified in the paper above.
-
-rm(list = ls())
-library(R2jags)
-library(ggplot2)
-library(tidyverse)
-
-# Maths -------------------------------------------------------------------
-
-# Description of the Bayesian model fitted in this file
-
-# Likelihood
-# Y_{ij} ~ N(mu_{ij}, sigma^2_E)
-# with
-# mu_{ij} = mu + alpha_i + beta_j + sum_{q=1}^Q lambda_q*gamma_iq*delta_jq
-# AA = sum_{q=1}^Q lambda_q*gamma_iq*delta_jq
-# Our idea is to estimate alpha_i + beta_j parametrically and the component AA via BART.
-
-# Notation
-# Y_ij = response (e.g. yield) for genotype i and environment j, i = 1, ..., I genotypes and j = 1, ..., J environments
-# mu is the grand mean
-# alpha_i is the genotype effect
-# beta_j is the environment effect
-# lambda_q is the q-th eigenvalue q = 1,.., Q of the interaction matrix
-# Q is the number of components used to model the interaction. Usually Q is fixed at a small number, e.g. 2
-# gamma_{iq} is the interaction effect for the q-th eigenvector for genotype i
-# delta_{iq} is the interaction effect for the q-th eigenvector for environment j
-# E_{ij} is a residual term with E_{ij} ~ N(0, sigma^2_E)
-# Usually these models have quite complicated restrictions on the gamma/delta/lambda values but Josse et al show that these are not fully necessary
-
-# Priors
-# alpha_i ~ N(0, s_alpha^2)
-# beta_j ~ N(0, s_beta^2)
-
 # Simulate data -----------------------------------------------------------
 
-# We will follow the simulation strategy detailed in Section 3.1 of the Josse et al paper
-
+# We will follow the simulation strategy detailed in Section 3.1 of the
+# Josse et al paper
+set.seed(001)
 # Specify fixed values
 Q = 1 # Number of components
 I = 10 # Number of genotypes
@@ -77,13 +35,13 @@ delta = seq(-0.5, 0.5,length.out = J)
 # Now simulate the values
 set.seed(123)
 G_by_E = expand.grid(1:I, 1:J) ## setting the interaction matrix
-mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  + lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
+mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  +
+  lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
 Y = rnorm(N, mu_ij, sigma_E) ## response variable
 
-##########################################
+# ---------------------------------------
 # AMBARTI
-##########################################
-library(AMBARTI)
+# ---------------------------------------
 
 # Some pre-processing
 x.ambarti = G_by_E
@@ -93,31 +51,116 @@ x.ambarti$e = as.factor(x.ambarti$e)
 y = Y
 set.seed(101)
 
-# Run AMBARTI (I'm using only 50 trees)
+# Run AMBARTI
 fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, nburn = 100, npost = 100, sparse= FALSE)
 
 # Get the final prediction (y hat)
 yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
 yhat_ambarti2 = predict_ambarti(fit.ambarti, newdata = x.ambarti, type = 'mean')
-cor(y, yhat_ambarti); # AMBARTI, BART and semibart are quite similar. That's fine.
+cor(y, yhat_ambarti);
 
 # Get the prediction specifically from BART
 yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
-cor(y, yhat_bart); # correlation btw y and BART (AMBARTI package)
+cor(y, yhat_bart); # correlation btw y and the BART component (from AMBARTI)
 
 # Plot the main effects estimates and add the true values
-plot(1:length(alpha), alpha, col=2, cex=2, main='AMBARTI - Genotype', ylim= c(-5,5)) # true values
-points(apply(fit.ambarti$beta_hat[,1:10], 2, mean), cex=2, pch = 2) # estimates
-legend(8,4,'AMBARTI', col=1, pch = 2)
-legend(8,5,'True', col=2, pch = 1, cex=1)
+alpha_hat = apply(fit.ambarti$beta_hat[,1:10], 2, mean)
+plot(1:length(alpha), alpha, col=2, cex=2, main='AMBARTI-Genotype', ylim=c(-5,5), ylab=expression(g[i]), xlab = expression(i)) # true values
+points(alpha_hat, cex=2, pch = 2) # estimates
+legend(8,4,'AMBARTI', col=1, pch = 2, bty = 'n')
+legend(8,5,'True', col=2, pch = 1, cex=1, bty = 'n')
 
 # Plot the main effects estimates and add the true values
-plot(1:length(beta), beta, col=2, cex=2, main='AMBARTI - Environment', ylim = c(-5,5)) # true values
-points(apply(fit.ambarti$beta_hat[,11:20], 2, mean), cex=2) # estimates
-legend(8,4,'AMBARTI', col=1, pch = 2)
-legend(8,5,'True', col=2, pch = 1, cex=1)
+beta_hat = apply(fit.ambarti$beta_hat[,11:20], 2, mean)
+plot(1:length(beta), beta, col=2, cex=2, main='AMBARTI-Environment', ylim=c(-5,5), ylab=expression(e[j]), xlab = expression(j)) # true values
+points(beta_hat, cex=2, pch = 2) # estimates
+legend(8,4,'AMBARTI', col=1, pch = 2, bty='n')
+legend(8,5,'True', col=2, pch = 1, cex=1, bty='n')
 
-fit.ambarti$trees[[100]][[1]] # shows the tree 1 in the last (100) MCMC iteration.
+fit.ambarti$trees[[100]][[1]] # show the first tree in the last (100) MCMC iteration.
+
+# ---------------------------------------
+# AMMI
+# ---------------------------------------
+
+model_code = '
+model
+{
+  # Likelihood
+  for (k in 1:N) {
+  Y[k] ~ dnorm(mu[k], sigma_E^-2)
+  mu[k] = mu_all + alpha[genotype[k]] + beta[environment[k]] + lambda_1 * gamma[genotype[k]] * delta[environment[k]]
+  }
+  # Priors
+  mu_all ~ dnorm(0, s_mu^-2) # Prior on grand mean
+  for(i in 1:I) {
+  alpha[i] ~ dnorm(0, s_alpha^-2) # Prior on genotype effect
+  }
+  gamma[1] ~ dnorm(0, 1)T(0,) # First one is restriced to be positive
+  for(i in 2:I) {
+  gamma[i] ~ dnorm(0, 1) # Prior on genotype interactions
+  }
+  for(j in 1:J) {
+  beta[j] ~ dnorm(0, s_beta^-2) # Prior on environment effect
+  delta[j] ~ dnorm(0, 1) # Prior on environment interactions
+  }
+  # Prior on first (and only) eigenvalue
+  lambda_1 ~ dnorm(0, s_lambda^-2)T(0,)
+  # Prior on residual standard deviation
+  sigma_E ~ dunif(0, S_ME)
+}
+'
+s_mu = 20
+s_alpha = 10
+s_beta = 10
+s_lambda = 10
+S_ME = 10
+# Set up the data
+model_data = list(N = N,
+                  Y = Y,
+                  I = I,
+                  J = J,
+                  genotype = G_by_E[,1],
+                  environment = G_by_E[,2],
+                  s_mu = s_mu,
+                  s_alpha = s_alpha,
+                  s_beta = s_beta,
+                  s_lambda = s_lambda,
+                  S_ME = S_ME)
+
+# Choose the parameters to watch
+model_parameters =  c("alpha", "beta", "lambda_1", "gamma", "delta",
+                      'sigma_E')
+
+# Run the model
+model_run = jags(data = model_data,n.chains=5,
+                 parameters.to.save = model_parameters,
+                 model.file=textConnection(model_code))
+
+#
+post_means = model_run$BUGSoutput$mean
+
+# Plot the main effects estimates and add the true values
+alpha_hat = post_means$alpha
+plot(1:length(alpha), alpha, col=2, cex=2, main='AMMI - Genotype', ylim= c(-4,4)) # true values
+points(alpha_hat, cex=2, pch = 3, col=4) # estimates
+legend(8,3,'AMMI', pch = 3, col=4, bty='n')
+legend(8,4,'True', col=2, pch = 1, cex=1)
+
+beta_hat = post_means$beta
+plot(1:length(beta), beta, col=2, cex=2, main='AMMI - Environment', ylim= c(-4,4)) # true values
+points(beta_hat, cex=2, pch = 3, col=4) # estimates
+legend(8,3,'AMMI', pch = 3, col=4, bty='n')
+legend(8,4,'True', col=2, pch = 1, cex=1, bty='n')
+
+delta_hat = post_means$delta
+gamma_hat = post_means$gamma
+lambda_hat = as.numeric(post_means$lambda)
+
+yhat_ammi = mu + alpha_hat[G_by_E[,1]] + beta_hat[G_by_E[,2]]  +
+  lambda_hat * gamma_hat[G_by_E[,1]] * delta_hat[G_by_E[,2]]
+
+cor(y, yhat_ammi)
 
 ##################################
 # BART (just to have a benchmark)
@@ -171,7 +214,7 @@ legend(8,4,'semi BART', col=1, pch = 2)
 legend(8,5,'True', col=2, pch = 1, cex=1)
 
 # Correlation btw y and BART estimate
-cor(y, apply(semib$bartfit, 2, mean)) # ~0.31
+  cor(y, apply(semib$bartfit, 2, mean)) # ~0.31
 
 # Compute the final prediction (y hat)
 yhat = x%*%apply(semib$beta,2,mean) + apply(semib$bartfit, 2, mean)

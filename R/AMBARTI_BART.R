@@ -303,7 +303,7 @@ ambarti = function(x,
     # }
   } # End iterations loop
 
-  cat('\n') # Make sure progress bar ends on a new line
+    cat('\n') # Make sure progress bar ends on a new line
 
   return(list(trees = tree_store,
               sigma2 = sigma2_store*y_sd^2,
