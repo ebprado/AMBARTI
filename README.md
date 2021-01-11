@@ -13,6 +13,7 @@ Below, we generate a simulated example of the Bayesian Additive Main effects and
 
 ## Example
 ``` r
+library(AMBARTI)
 rm(list = ls())
 
 # Maths -------------------------------------------------------------------
