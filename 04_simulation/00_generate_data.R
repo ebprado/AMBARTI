@@ -1,10 +1,10 @@
 
-generate_data <- function(I = 5, # Number of genotypes
-                          J = 9, # Number of environments
-                          s_alpha = 1, # standard deviation of alpha
-                          s_beta = 1, # standard deviation of alpha
-                          s_y = 1, # standard deviation of y
-                          lambda = c(8,10,12) # values for lambda (number of Q)
+generate_data <- function(I, # Number of genotypes
+                          J, # Number of environments
+                          s_alpha, # standard deviation of alpha
+                          s_beta, # standard deviation of alpha
+                          s_y, # standard deviation of y
+                          lambda # values for lambda (number of Q)
                           ){
   
   # Total number of observations
