@@ -16,7 +16,7 @@ source('03_AMBARTI.R')
 I = c(5, 15, 30) # Number of genotypes
 J = c(5, 15, 30) # Number of environments
 s_alpha = c(1, 5, 10) # standard deviation of alpha
-s_beta = c(1, 5, 10) # standard deviation of alpha
+s_beta = c(1, 5, 10) # standard deviation of beta
 s_y = c(1, 5, 10) # standard deviation of y
 lambda = c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
@@ -58,7 +58,7 @@ for (i in 1:n_comb){
     bayesian_AMMI = run_bayesian_AMMI(data)
     
     # run AMBARTI
-    # ambarti = run_AMBARTI(data, ntrees = 20, nburn = 100, npost = 100) 
+    ambarti = run_AMBARTI(data, ntrees = 20, nburn = 100, npost = 100) 
     
     # Increment the seed number by 1
     nseed = nseed + 1

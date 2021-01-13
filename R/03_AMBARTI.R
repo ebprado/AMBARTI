@@ -1,3 +1,5 @@
+#' @export
+#'
 run_AMBARTI <- function(data,
                         ntrees = 50,
                         nburn = 2000,
@@ -9,9 +11,9 @@ run_AMBARTI <- function(data,
   names(x) = c('g', 'e')
   x$g = as.factor(x$g)
   x$e = as.factor(x$e)
-  
+
   # Run AMBARTI
   fit.ambarti = ambarti(x, y, ntrees = ntrees, nburn = nburn, npost = npost)
-  
+
   return(fit.ambarti)
 }

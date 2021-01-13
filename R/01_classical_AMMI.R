@@ -1,3 +1,6 @@
+#' @export
+#' @importFrom agricolae 'AMMI'
+#'
 run_classical_AMMI <- function(data){
 
   x <- data$x
