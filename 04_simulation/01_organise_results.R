@@ -1,9 +1,3 @@
-library(devtools)
-install_github("ebprado/AMBARTI/R package",
-               ref = 'main',
-               auth_token = '0fbb079f1b2c6c830725db8d82218ff58bde9f60')
-
-library(AMBARTI)
 
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
@@ -11,10 +5,9 @@ I = 10 # c(5, 15, 30) # Number of genotypes
 J = 10 # c(5, 15, 30) # Number of environments
 s_alpha = 1 # c(1, 5) # standard deviation of alpha
 s_beta = 1 # c(1, 5) # standard deviation of beta
-s_y = 1 # c(1, 5) # standard deviation of y
+s_y = c(1, 5) # standard deviation of y
 lambda = c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
-nseed = 0 # start seed
 
 # Get all combinations of the quantities above
 all_comb = expand.grid(I = I,
@@ -39,28 +32,7 @@ for (i in 1:n_comb){
   lambda = as.numeric(unlist(strsplit(aux_lambda,','))) # values for lambda
 
   for (j in 1:n_rep){
-    # Set a seed to make it reproducible
-    set.seed(nseed)
-
-    # generate the simulated data
-    train_data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
-    test_data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
-
-    # run classical AMMI
-    classical_AMMI = run_classical_AMMI(train_data)
-
-    # run Bayesian AMMI
-    bayesian_AMMI = run_bayesian_AMMI(train_data)
-
-    # run AMBARTI
-    # ambarti = run_AMBARTI(train_data, ntrees = 50, nburn = 1000, npost = 100)
-
-    # Increment the seed number by 1
-    nseed = nseed + 1
-
-    print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
-
-    # save files
+    # load files
     filename = paste('I', I,
                      'J', J,
                      'sa', s_alpha,
@@ -76,11 +48,25 @@ for (i in 1:n_comb){
     bammi_filename         = paste(filename, '_bayesian_AMMI.RData',  sep='')
     # ambarti_filename     = paste(filename, '_AMBARTI.RData',        sep='')
 
-    save(train_data,     file = paste(save_file, train_data_filename,    sep=''))
-    save(test_data,      file = paste(save_file, test_data_filename,     sep=''))
-    save(classical_AMMI, file = paste(save_file, ammi_filename,          sep=''))
-    save(bayesian_AMMI,  file = paste(save_file, bammi_filename,         sep=''))
-    # save(ambarti,        file = paste(save_file, ambarti_filename, sep=''))
+    load(paste(save_file, train_data_filename,    sep=''))
+    load(paste(save_file, test_data_filename,    sep=''))
+    load(paste(save_file, ammi_filename,          sep=''))
+    load(paste(save_file, bammi_filename,         sep=''))
+    # load(paste(save_file, ambarti_filename, sep=''))
+
+    # Get parameter estimates from the classical AMMI
+    classical_AMMI =
+
+    # Get parameter estimates from the Bayesian AMMI
+    bayesian_AMMI = run_bayesian_AMMI(data)
+
+    # run AMBARTI
+    # ambarti = run_AMBARTI(data, ntrees = 50, nburn = 1000, npost = 100)
+
+    # Increment the seed number by 1
+    nseed = nseed + 1
+
+    print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
 
   }
 }

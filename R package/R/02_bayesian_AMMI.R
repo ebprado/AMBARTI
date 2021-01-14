@@ -74,7 +74,7 @@ run_bayesian_AMMI <- function(data,
 
   # Choose the parameters to watch
   model_parameters =  c("alpha", "beta", "lambda", "gamma", "delta",
-                        'sigma_E')
+                        'sigma_E', 'mu_all')
 
   # Run the model
   model_run = jags(data = model_data,
