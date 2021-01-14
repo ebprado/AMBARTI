@@ -5,11 +5,13 @@ install_github("ebprado/AMBARTI",
 
 library(AMBARTI)
 
+save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/"
+
 I = c(5, 15, 30) # Number of genotypes
 J = c(5, 15, 30) # Number of environments
-s_alpha = c(1, 5, 10) # standard deviation of alpha
-s_beta = c(1, 5, 10) # standard deviation of beta
-s_y = c(1, 5, 10) # standard deviation of y
+s_alpha = c(1, 5) # standard deviation of alpha
+s_beta = c(1, 5) # standard deviation of beta
+s_y = c(1, 5) # standard deviation of y
 lambda = c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
 nseed = 0 # start seed
@@ -56,5 +58,26 @@ for (i in 1:n_comb){
     nseed = nseed + 1
 
     print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
+    
+    # save files
+    filename = paste('I', I,
+                     'J', J,
+                     'sa', s_alpha,
+                     'sb', s_beta,
+                     'sy', s_y,
+                     'L', gsub(', ', '', toString(lambda)),
+                     'r', j,
+                     sep='')
+    
+    data_filename    = paste(filename, '_train_data.RData',     sep='')
+    ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
+    bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
+    ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
+    
+    save(data,           file = paste(save_file, data_filename,    sep=''))
+    save(classical_AMMI, file = paste(save_file, ammi_filename,    sep=''))
+    save(bayesian_AMMI,  file = paste(save_file, bammi_filename,   sep=''))
+    save(ambarti,        file = paste(save_file, ambarti_filename, sep=''))
+    
   }
 }
