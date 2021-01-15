@@ -7,7 +7,10 @@ run_bayesian_AMMI <- function(data,
                               s_lambda = 10,
                               s_alpha_hyperpar = 10,
                               s_beta_hyperpar = 10,
-                              S_ME = 2){
+                              S_ME = 2,
+                              n.thin = 10,
+                              n.burnin = 4000,
+                              n.iter = 5000){
 
   # Specify the Bayesian AMMI model similar to Josse et al (JABES, 2014)
   model_code = '
@@ -80,7 +83,10 @@ run_bayesian_AMMI <- function(data,
   model_run = jags(data = model_data,
                    parameters.to.save = model_parameters,
                    model.file=textConnection(model_code),
-                   progress.bar = 'none')
+                   progress.bar = 'none',
+                   n.thin = n.thin,
+                   n.burnin = n.burnin,
+                   n.iter = n.iter)
 
   return(model_run)
 

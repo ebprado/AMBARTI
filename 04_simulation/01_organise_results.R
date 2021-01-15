@@ -6,7 +6,7 @@ J = 10 # c(5, 15, 30) # Number of environments
 s_alpha = 1 # c(1, 5) # standard deviation of alpha
 s_beta = 1 # c(1, 5) # standard deviation of beta
 s_y = c(1, 5) # standard deviation of y
-lambda = c('8', '12', '8, 12', '10, 12','8, 10, 12')
+lambda = 12 # c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
 
 # Get all combinations of the quantities above

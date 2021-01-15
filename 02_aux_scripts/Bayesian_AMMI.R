@@ -88,7 +88,7 @@ model_data = list(N = N,
                   S_ME = S_ME)
 
 # Choose the parameters to watch
-model_parameters =  c("alpha", "beta", "lambda", "gamma", "delta",
+model_parameters =  c('mu_all', "alpha", "beta", "lambda_1", "gamma", "delta",
                       'sigma_E')
 
 # Run the model
@@ -99,7 +99,12 @@ model_run = jags(data = model_data,
 # Plot the results
 print(model_run)
 
-#
+# model_run = bayesian_AMMI
+# alpha = train_data$alpha
+# beta = train_data$beta
+# G_by_E = train_data$x
+# Y = train_data$y
+
 post_means = model_run$BUGSoutput$mean
 
 # Plot the main effects estimates and add the true values
@@ -115,4 +120,13 @@ points(beta_hat, cex=2, pch = 3, col=4) # estimates
 legend(8,3,'AMMI', pch = 3, col=4)
 legend(8,4,'True', col=2, pch = 1, cex=1)
 
+gamma_hat = post_means$gamma
+delta_hat = post_means$delta
+lambda_hat = as.numeric(post_means$lambda_1)
+mu_hat = as.numeric(post_means$mu_all)
 
+blin_train = lambda_hat*gamma_hat[G_by_E[,1],k]*delta_hat[G_by_E[,2],k]
+
+# Compute the predicted response for the TRAINING data
+y_hat_train = mu_hat + alpha_hat[G_by_E[,1]] + beta_hat[G_by_E[,2]] + blin_train
+plot(Y, y_hat_train);abline(0,1)

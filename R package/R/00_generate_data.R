@@ -45,7 +45,7 @@ generate_data <- function(I, # Number of genotypes
   }
 
   # Now simulate the response
-  mu_ij = mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]] + blin
+  mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]] + blin
   y = rnorm(N, mu_ij, s_y)
 
   # I1 <- rep(1,I)
