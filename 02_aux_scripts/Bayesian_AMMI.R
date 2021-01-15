@@ -125,8 +125,13 @@ delta_hat = post_means$delta
 lambda_hat = as.numeric(post_means$lambda_1)
 mu_hat = as.numeric(post_means$mu_all)
 
-blin_train = lambda_hat*gamma_hat[G_by_E[,1],k]*delta_hat[G_by_E[,2],k]
+blin_train = lambda_hat*gamma_hat[G_by_E[,1]]*delta_hat[G_by_E[,2]]
 
 # Compute the predicted response for the TRAINING data
 y_hat_train = mu_hat + alpha_hat[G_by_E[,1]] + beta_hat[G_by_E[,2]] + blin_train
 plot(Y, y_hat_train);abline(0,1)
+cor(Y, y_hat_train)
+
+
+plot(Y, bb);abline(0,1)
+#

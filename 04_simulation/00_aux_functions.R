@@ -70,17 +70,17 @@ plot(y_train, bb$y_hat_train);abline(0,1)
 cor(y_train, bb$y_hat_train)
 
 plot(y_test, bb$y_hat_test);abline(0,1)
-points(y_test, bb$y_hat_test, col=2)
+cor(y_test, bb$y_hat_test)
 
-organise_bayesian_AMMI <- function(object, train_data, test_data){
+organise_bayesian_AMMI <- function(object, data){
 
   # Get training info
-  x_train = train_data$x
-  y_train = train_data$y
+  x_train = data$x
+  y_train = data$y_train
 
   # Get test info
-  x_test = test_data$x
-  y_test = test_data$y
+  x_test = data$x
+  y_test = data$y_test
 
   # Get estimates info
   estimate   = bayesian_AMMI$BUGSoutput$mean
@@ -122,3 +122,7 @@ organise_bayesian_AMMI <- function(object, train_data, test_data){
               y_hat_train = y_hat_train,
               y_hat_test  = y_hat_test))
 }
+
+plot(train_data$alpha, ylim=c(-4,4))
+points(bb$alpha_hat, col=2)
+points(aa$alpha_hat, col=3)

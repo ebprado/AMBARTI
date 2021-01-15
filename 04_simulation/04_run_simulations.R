@@ -43,8 +43,7 @@ for (i in 1:n_comb){
     set.seed(nseed)
 
     # generate the simulated data
-    train_data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
-    test_data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
+    data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
 
     # run classical AMMI
     classical_AMMI = run_classical_AMMI(train_data)
@@ -70,16 +69,14 @@ for (i in 1:n_comb){
                      'r', j,
                      sep='')
 
-    train_data_filename    = paste(filename, '_train_data.RData',     sep='')
-    test_data_filename     = paste(filename, '_test_data.RData',      sep='')
-    ammi_filename          = paste(filename, '_classical_AMMI.RData', sep='')
-    bammi_filename         = paste(filename, '_bayesian_AMMI.RData',  sep='')
-    # ambarti_filename     = paste(filename, '_AMBARTI.RData',        sep='')
+    data_filename      = paste(filename, '_data.RData',           sep='')
+    ammi_filename      = paste(filename, '_classical_AMMI.RData', sep='')
+    bammi_filename     = paste(filename, '_bayesian_AMMI.RData',  sep='')
+    # ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
 
-    save(train_data,     file = paste(save_file, train_data_filename,    sep=''))
-    save(test_data,      file = paste(save_file, test_data_filename,     sep=''))
-    save(classical_AMMI, file = paste(save_file, ammi_filename,          sep=''))
-    save(bayesian_AMMI,  file = paste(save_file, bammi_filename,         sep=''))
+    save(data,           file = paste(save_file, data_filename,       sep=''))
+    save(classical_AMMI, file = paste(save_file, ammi_filename,       sep=''))
+    save(bayesian_AMMI,  file = paste(save_file, bammi_filename,      sep=''))
     # save(ambarti,        file = paste(save_file, ambarti_filename, sep=''))
 
   }

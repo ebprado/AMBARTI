@@ -35,19 +35,23 @@ generate_data <- function(I, # Number of genotypes
   delta <- matrix(rnorm(J*Q), nrow = J ,ncol = Q)
 
   # Generate the "design matrix"
-  G_by_E = expand.grid(1:I, 1:J)
-  names(G_by_E) <- c('gen', 'env') # gen = genotype and env = envorinment
+  x = expand.grid(1:I, 1:J)
+  names(x) <- c('gen', 'env') # gen = genotype and env = envorinment
 
   # Generate the interaction/bilinear part
   blin = rep(0, I*J)
   for (k in 1:length(lambda)) {
-    blin <- blin + lambda[k]*gamma[G_by_E[,1],k]*delta[G_by_E[,2],k]
+    blin <- blin + lambda[k]*gamma[x[,1],k]*delta[x[,2],k]
   }
 
   # Now simulate the response
-  mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]] + blin
-  y = rnorm(N, mu_ij, s_y)
+  mu_ij = mu + alpha[x[,1]] + beta[x[,2]] + blin
 
+  # Compute the response for the TRAINING set
+  y_train = rnorm(N, mu_ij, s_y)
+
+  # Compute the response for the TEST set
+  y_test = rnorm(N, mu_ij, s_y)
   # I1 <- rep(1,I)
   # J1 <- rep(1,J)
 
@@ -55,16 +59,17 @@ generate_data <- function(I, # Number of genotypes
   # mu_ij <- mu*I1%*%t(J1) + kronecker(alpha,t(J1)) + kronecker(t(beta), (I1)) + gamma%*%diag(lambda)%*%t(delta)
   # y <- rnorm(N, c(mu.Y), s_y)
 
-  return(list(y = y,
-              x = G_by_E,
-              I = I,
-              J = J,
+  return(list(y_train = y_train,
+              y_test  = y_test,
+              x       = x,
+              I       = I,
+              J       = J,
               s_alpha = s_alpha,
-              s_beta = s_beta,
-              s_y = s_y,
-              lambda = lambda,
-              alpha = alpha,
-              beta = beta,
-              gamma = gamma,
-              delta = delta))
+              s_beta  = s_beta,
+              s_y     = s_y,
+              lambda  = lambda,
+              alpha   = alpha,
+              beta    = beta,
+              gamma   = gamma,
+              delta   = delta))
 }
