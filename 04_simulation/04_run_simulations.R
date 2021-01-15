@@ -14,7 +14,6 @@ s_beta = 1 # c(1, 5) # standard deviation of beta
 s_y = 1 # c(1, 5) # standard deviation of y
 lambda = 12 # c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
-nseed = 0 # start seed
 
 # Get all combinations of the quantities above
 all_comb = expand.grid(I = I,
@@ -37,6 +36,7 @@ for (i in 1:n_comb){
   s_y = comb$s_y # standard deviation of y
   aux_lambda = as.character(comb$lambda)
   lambda = as.numeric(unlist(strsplit(aux_lambda,','))) # values for lambda
+  nseed = 0 # start seed
 
   for (j in 1:n_rep){
     # Set a seed to make it reproducible
@@ -46,13 +46,13 @@ for (i in 1:n_comb){
     data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
 
     # run classical AMMI
-    classical_AMMI = run_classical_AMMI(train_data)
+    classical_AMMI = run_classical_AMMI(data)
 
     # run Bayesian AMMI
-    bayesian_AMMI = run_bayesian_AMMI(train_data)
+    bayesian_AMMI = run_bayesian_AMMI(data)
 
     # run AMBARTI
-    # ambarti = run_AMBARTI(train_data, ntrees = 50, nburn = 1000, npost = 100)
+    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 1000, npost = 100)
 
     # Increment the seed number by 1
     nseed = nseed + 1
@@ -69,15 +69,15 @@ for (i in 1:n_comb){
                      'r', j,
                      sep='')
 
-    data_filename      = paste(filename, '_data.RData',           sep='')
-    ammi_filename      = paste(filename, '_classical_AMMI.RData', sep='')
-    bammi_filename     = paste(filename, '_bayesian_AMMI.RData',  sep='')
-    # ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
+    data_filename    = paste(filename, '_data.RData',           sep='')
+    ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
+    bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
+    ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
 
-    save(data,           file = paste(save_file, data_filename,       sep=''))
-    save(classical_AMMI, file = paste(save_file, ammi_filename,       sep=''))
-    save(bayesian_AMMI,  file = paste(save_file, bammi_filename,      sep=''))
-    # save(ambarti,        file = paste(save_file, ambarti_filename, sep=''))
+    save(data,           file = paste(save_file, data_filename,    sep=''))
+    save(classical_AMMI, file = paste(save_file, ammi_filename,    sep=''))
+    save(bayesian_AMMI,  file = paste(save_file, bammi_filename,   sep=''))
+    save(ambarti,        file = paste(save_file, ambarti_filename, sep=''))
 
   }
 }

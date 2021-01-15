@@ -8,9 +8,9 @@ run_bayesian_AMMI <- function(data,
                               s_alpha_hyperpar = 10,
                               s_beta_hyperpar = 10,
                               S_ME = 2,
-                              n.thin = 10,
-                              n.burnin = 4000,
-                              n.iter = 5000){
+                              n.thin = 1,
+                              n.burnin = 2000,
+                              n.iter = 3000){
 
   # Specify the Bayesian AMMI model similar to Josse et al (JABES, 2014)
   model_code = '

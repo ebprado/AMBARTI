@@ -12,7 +12,6 @@ Q = 1 # Number of components
 I = 10 # Number of genotypes
 J = 10# Number of environments
 N = I*J # Total number of obs
-m = 90
 s_mu = 20
 s_alpha = 10
 s_beta = 10
@@ -30,8 +29,15 @@ lambda_1 = 12
 gamma = seq(2, -2,length.out = I)/sqrt(10)
 delta = seq(-0.5, 0.5,length.out = J)
 
+# gamma <- matrix(NA, nrow = I ,ncol = Q)
+# gamma[1,] <- truncnorm::rtruncnorm(Q, a=0)
+# gamma[-1,] <- rnorm((I-1)*Q)
+
+# Generate delta
+delta <- matrix(rnorm(J*Q), nrow = J ,ncol = Q)
+
 # Now simulate the values
-set.seed(123)
+# set.seed(123)
 G_by_E = expand.grid(1:I, 1:J) ## setting the interaction matrix
 mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]] + lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
 Y = rnorm(N, mu_ij, sigma_E) ## response variable
@@ -131,7 +137,3 @@ blin_train = lambda_hat*gamma_hat[G_by_E[,1]]*delta_hat[G_by_E[,2]]
 y_hat_train = mu_hat + alpha_hat[G_by_E[,1]] + beta_hat[G_by_E[,2]] + blin_train
 plot(Y, y_hat_train);abline(0,1)
 cor(Y, y_hat_train)
-
-
-plot(Y, bb);abline(0,1)
-#

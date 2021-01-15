@@ -135,6 +135,7 @@ ambarti = function(x,
   var_count_store = matrix(0, ncol = ncol(x), nrow = store_size)
   s_prob_store = matrix(0, ncol = ncol(x), nrow = store_size)
   beta_hat_store = matrix(0, ncol = ncol(x), nrow = store_size)
+  colnames(beta_hat_store) <- names(x)
   tree_fits_store = matrix(0, ncol = ntrees, nrow = length(y))
 
   # Scale the response target variable
@@ -308,7 +309,7 @@ ambarti = function(x,
   return(list(trees = tree_store,
               sigma2 = sigma2_store*y_sd^2,
               y_hat = y_hat_store*y_sd + y_mean,
-              y_hat_bart = bart_store*y_sd + y_mean,
+              y_hat_bart = bart_store*y_sd,
               npost = npost,
               nburn = nburn,
               nthin = nthin,

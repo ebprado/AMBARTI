@@ -1,12 +1,12 @@
-organise_classical_AMMI <- function(object, train_data){
+organise_classical_AMMI <- function(object, data){
 
   # Get training info
-  x_train = train_data$x
-  y_train = train_data$y
+  x_train = data$x
+  y_train = data$y
 
   # Get test info
-  x_test = test_data$x
-  y_test = test_data$y
+  x_test = data$x
+  y_test = data$y_test
 
   gen = as.factor(x_train[,"gen"])
   env = as.factor(x_train[,"env"])
@@ -19,7 +19,7 @@ organise_classical_AMMI <- function(object, train_data){
   interaction_tab = interaction_tab$tables$`gen:env`
 
   # Get the number of PCs
-  PC = length(train_data$lambda)
+  PC = length(data$lambda)
 
   # Run the Singular Value Decomposition (SVD) to compute lambda, gamma, and delta
   sv_dec <- svd(interaction_tab, nu = PC, nv = PC)
@@ -44,18 +44,9 @@ organise_classical_AMMI <- function(object, train_data){
 
   # Compute the predicted response for the TRAINING data
   y_hat_train = mu_hat + alpha_hat[x_train[,'gen']] + beta_hat[x_train[,'env']] + blin_train
-  plot(y_train, y_hat_train);abline(0,1)
+
   # Compute the predicted response for the TEST data
   y_hat_test = mu_hat + alpha_hat[x_test[,'gen']] + beta_hat[x_test[,'env']] + blin_test
-  plot(y_test, y_hat_test);abline(0,1)
-
-  aa = list(alpha_hat   = alpha_hat,
-            beta_hat    = beta_hat,
-            delta_hat   = delta_hat,
-            gamma_hat   = gamma_hat,
-            lambda_hat  = lambda_hat,
-            y_hat_train = y_hat_train,
-            y_hat_test  = y_hat_test)
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat,
@@ -66,24 +57,24 @@ organise_classical_AMMI <- function(object, train_data){
               y_hat_test  = y_hat_test))
 }
 
-plot(y_train, bb$y_hat_train);abline(0,1)
-cor(y_train, bb$y_hat_train)
-
-plot(y_test, bb$y_hat_test);abline(0,1)
-cor(y_test, bb$y_hat_test)
+# plot(y_train, bb$y_hat_train);abline(0,1)
+# cor(y_train, bb$y_hat_train)
+#
+# plot(y_test, bb$y_hat_test);abline(0,1)
+# cor(y_test, bb$y_hat_test)
 
 organise_bayesian_AMMI <- function(object, data){
 
   # Get training info
   x_train = data$x
-  y_train = data$y_train
+  y_train = data$y
 
   # Get test info
   x_test = data$x
   y_test = data$y_test
 
   # Get estimates info
-  estimate   = bayesian_AMMI$BUGSoutput$mean
+  estimate   = object$BUGSoutput$mean
   mu_hat     = as.numeric(estimate$mu_all)
   alpha_hat  = estimate$alpha
   beta_hat   = estimate$beta
@@ -106,14 +97,6 @@ organise_bayesian_AMMI <- function(object, data){
   # Compute the predicted response for the TEST data
   y_hat_test = mu_hat + alpha_hat[x_test[,'gen']] + beta_hat[x_test[,'env']] + blin_test
 
-  bb = list(alpha_hat  = alpha_hat,
-            beta_hat    = beta_hat,
-            delta_hat   = delta_hat,
-            gamma_hat   = gamma_hat,
-            lambda_hat  = lambda_hat,
-            y_hat_train = y_hat_train,
-            y_hat_test  = y_hat_test)
-
   return(list(alpha_hat  = alpha_hat,
               beta_hat    = beta_hat,
               delta_hat   = delta_hat,
@@ -123,6 +106,17 @@ organise_bayesian_AMMI <- function(object, data){
               y_hat_test  = y_hat_test))
 }
 
-plot(train_data$alpha, ylim=c(-4,4))
-points(bb$alpha_hat, col=2)
-points(aa$alpha_hat, col=3)
+organise_AMBARTI <- function(object, data){
+
+  # Get training info
+  x_train = data$x
+  y_train = data$y
+
+  # Get test info
+  x_test = data$x
+  y_test = data$y_test
+
+  # Get estimates info
+  estimate = apply(ambarti$beta_hat, 2, mean)
+
+  }

@@ -27,9 +27,7 @@ generate_data <- function(I, # Number of genotypes
   # Generate gamma
   gamma <- matrix(NA, nrow = I ,ncol = Q)
   gamma[1,] <- truncnorm::rtruncnorm(Q, a=0)
-  for(k in 2:nrow(gamma)){
-    gamma[k,] <- rnorm(Q)
-  }
+  gamma[-1,] <- rnorm((I-1)*Q)
 
   # Generate delta
   delta <- matrix(rnorm(J*Q), nrow = J ,ncol = Q)
@@ -48,7 +46,7 @@ generate_data <- function(I, # Number of genotypes
   mu_ij = mu + alpha[x[,1]] + beta[x[,2]] + blin
 
   # Compute the response for the TRAINING set
-  y_train = rnorm(N, mu_ij, s_y)
+  y = rnorm(N, mu_ij, s_y)
 
   # Compute the response for the TEST set
   y_test = rnorm(N, mu_ij, s_y)
@@ -59,7 +57,7 @@ generate_data <- function(I, # Number of genotypes
   # mu_ij <- mu*I1%*%t(J1) + kronecker(alpha,t(J1)) + kronecker(t(beta), (I1)) + gamma%*%diag(lambda)%*%t(delta)
   # y <- rnorm(N, c(mu.Y), s_y)
 
-  return(list(y_train = y_train,
+  return(list(y       = y,
               y_test  = y_test,
               x       = x,
               I       = I,
