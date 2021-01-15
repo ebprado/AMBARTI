@@ -1,7 +1,7 @@
 library(devtools)
 install_github("ebprado/AMBARTI/R package",
                ref = 'main',
-               auth_token = '0fbb079f1b2c6c830725db8d82218ff58bde9f60')
+               auth_token = '363d4ad84eaa25d3eb26752732cc208f7e698086')
 
 library(AMBARTI)
 

@@ -25,6 +25,11 @@
 # b_g = 1
 # a_e = 1
 # b_e = 1
+# x = data$x
+# names(x) <- c('g','e')
+# x$g <- as.factor(x$g)
+# x$e <- as.factor(x$e)
+# y = data$y
 
 ambarti = function(x,
                    y,
@@ -135,7 +140,7 @@ ambarti = function(x,
   var_count_store = matrix(0, ncol = ncol(x), nrow = store_size)
   s_prob_store = matrix(0, ncol = ncol(x), nrow = store_size)
   beta_hat_store = matrix(0, ncol = ncol(x), nrow = store_size)
-  colnames(beta_hat_store) <- names(x)
+  colnames(beta_hat_store) <- colnames(x)
   tree_fits_store = matrix(0, ncol = ntrees, nrow = length(y))
 
   # Scale the response target variable
