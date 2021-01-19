@@ -74,7 +74,7 @@ ambarti = function(x,
   #### Genotype
   ###########################################
   number_geno = length(ng)
-  num_comb_g = floor(number_geno/2)
+  num_comb_g = max(2, floor(number_geno/2))
   formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
   x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = y, x[, grepl("g", colnames(x))]))
   individual_g = (1:(number_geno + 1))
@@ -99,7 +99,7 @@ ambarti = function(x,
   ###########################################
 
   number_env = length(ne)
-  num_comb_e = floor(number_env/2)
+  num_comb_e = max(2, floor(number_env/2))
   formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
   x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = y, x[, grepl("e", colnames(x))]))
   individual_e = (1:(number_env + 1))
@@ -107,7 +107,7 @@ ambarti = function(x,
   name_all_comb_e = colnames(x_all_iter_e)
   name_all_comb_e = name_all_comb_e[-c(individual_e)] # remove individual effects
 
-  if (length(ne)%%2 == 0){ #even
+  if (number_env%%2 == 0){ #even
     repeated_comb_e = choose(number_env, num_comb_e)/2
     name_all_comb_e = name_all_comb_e[-c(repeated_comb_e)] # remove some equivalent columns
   }
@@ -120,6 +120,7 @@ ambarti = function(x,
     x_e[,k] = apply(x[,name_col_e],1,sum)
   }
   # Put x_g and x_e into a data frame and get the column indices
+  if (number_env <= 2 || number_geno <= 2) {stop('Number of genotypes and environments needs to be >= 3.')}
   x_g_e = as.data.frame(cbind(x_g, x_e))
   ind_x_g = 1:ncol(x_g)
   ind_x_e = (ncol(x_g) + 1):ncol(x_g_e)

@@ -7,7 +7,7 @@ library(AMBARTI)
 
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
-I = 10 # c(5, 15, 30) # Number of genotypes
+I = c(3, 20) # c(5, 15, 30) # Number of genotypes
 J = 10 # c(5, 15, 30) # Number of environments
 s_alpha = 1 # c(1, 5) # standard deviation of alpha
 s_beta = 1 # c(1, 5) # standard deviation of beta
@@ -52,7 +52,7 @@ for (i in 1:n_comb){
     bayesian_AMMI = run_bayesian_AMMI(data)
 
     # run AMBARTI
-    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 1000, npost = 100)
+    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 10, npost = 10)
 
     # Increment the seed number by 1
     nseed = nseed + 1

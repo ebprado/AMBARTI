@@ -1,4 +1,4 @@
-
+source('00_aux_functions.R')
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
 I = 10 # c(5, 15, 30) # Number of genotypes
@@ -42,31 +42,31 @@ for (i in 1:n_comb){
                      'r', j,
                      sep='')
 
-    data_filename          = paste(filename, '_data.RData',     sep='')
-    test_data_filename     = paste(filename, '_test_data.RData',      sep='')
-    ammi_filename          = paste(filename, '_classical_AMMI.RData', sep='')
-    bammi_filename         = paste(filename, '_bayesian_AMMI.RData',  sep='')
-    # ambarti_filename     = paste(filename, '_AMBARTI.RData',        sep='')
+    data_filename    = paste(filename, '_data.RData',           sep='')
+    ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
+    bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
+    ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
 
-    load(paste(save_file, data_filename,          sep=''))
-    load(paste(save_file, test_data_filename,     sep=''))
-    load(paste(save_file, ammi_filename,          sep=''))
-    load(paste(save_file, bammi_filename,         sep=''))
-    # load(paste(save_file, ambarti_filename, sep=''))
+    load(paste(save_file, data_filename,      sep=''))
+    load(paste(save_file, ammi_filename,      sep=''))
+    load(paste(save_file, bammi_filename,     sep=''))
+    load(paste(save_file, ambarti_filename,   sep=''))
 
     # Get parameter estimates from the classical AMMI
-    results_classical_AMMI = organise_classical_AMMI(classical_AMMI, data)
+    res_AMMI = organise_classical_AMMI(classical_AMMI, data)
 
     # Get parameter estimates from the Bayesian AMMI
-    results_bayesian_AMMI = organise_bayesian_AMMI(bayesian_AMMI, data)
+    res_bAMMI_with_post = organise_bayesian_AMMI_WITH_postprocessing(bayesian_AMMI, data)
+    res_bAMMI_without_post = organise_bayesian_AMMI_WITHOUT_postprocessing(bayesian_AMMI, data)
 
     # Get parameter estimates from AMBARTI
-    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 1000, npost = 100)
+    res_ambarti = organise_AMBARTI(ambarti, data)
 
-    # Increment the seed number by 1
-    nseed = nseed + 1
+    # Compute the Relative Root Mean Square Error (RRMSE)
 
-    print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
+
 
   }
 }
+
+
