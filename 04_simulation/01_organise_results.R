@@ -1,3 +1,8 @@
+library(devtools)
+install_github("ebprado/AMBARTI/R package",
+               ref = 'main',
+               auth_token = '363d4ad84eaa25d3eb26752732cc208f7e698086')
+
 source('00_aux_functions.R')
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
@@ -64,8 +69,11 @@ for (i in 1:n_comb){
 
     # Compute the Relative Root Mean Square Error (RRMSE)
 
-
-
+    get_metrics(res_AMMI, data)
+    get_metrics(res_bAMMI_with_post, data)
+    get_metrics(res_bAMMI_without_post, data)
+    get_metrics(res_bAMMI_without_post, data)
+    get_metrics(res_ambarti, data)
   }
 }
 
