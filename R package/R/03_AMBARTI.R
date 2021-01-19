@@ -8,7 +8,6 @@ run_AMBARTI <- function(data,
   # Some pre-processing
   y = data$y
   x = data$x
-  names(x) = c('g', 'e')
   x$g = as.factor(x$g)
   x$e = as.factor(x$e)
 

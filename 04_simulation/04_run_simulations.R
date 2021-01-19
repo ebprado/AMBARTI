@@ -7,12 +7,12 @@ library(AMBARTI)
 
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
-I = c(3, 20) # c(5, 15, 30) # Number of genotypes
-J = 10 # c(5, 15, 30) # Number of environments
-s_alpha = 1 # c(1, 5) # standard deviation of alpha
-s_beta = 1 # c(1, 5) # standard deviation of beta
+I = c(10) # c(5, 15, 30) # Number of genotypes
+J = c(10) # c(5, 15, 30) # Number of environments
+s_alpha = c(1, 5) # c(1, 5) # standard deviation of alpha
+s_beta = c(1,5) # c(1, 5) # standard deviation of beta
 s_y = 1 # c(1, 5) # standard deviation of y
-lambda = 12 # c('8', '12', '8, 12', '10, 12','8, 10, 12')
+lambda = c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
 
 # Get all combinations of the quantities above

@@ -34,7 +34,7 @@ generate_data <- function(I, # Number of genotypes
 
   # Generate the "design matrix"
   x = expand.grid(1:I, 1:J)
-  names(x) <- c('gen', 'env') # gen = genotype and env = envorinment
+  names(x) <- c('g', 'e') # g = genotype and e = envorinment
 
   # Generate the interaction/bilinear part
   blin = rep(0, I*J)

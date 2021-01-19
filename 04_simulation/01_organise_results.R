@@ -2,8 +2,8 @@ library(devtools)
 install_github("ebprado/AMBARTI/R package",
                ref = 'main',
                auth_token = '363d4ad84eaa25d3eb26752732cc208f7e698086')
+library(AMBARTI)
 
-source('00_aux_functions.R')
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
 I = 10 # c(5, 15, 30) # Number of genotypes
@@ -11,7 +11,7 @@ J = 10 # c(5, 15, 30) # Number of environments
 s_alpha = 1 # c(1, 5) # standard deviation of alpha
 s_beta = 1 # c(1, 5) # standard deviation of beta
 s_y = c(1, 5) # standard deviation of y
-lambda = 12 # c('8', '12', '8, 12', '10, 12','8, 10, 12')
+lambda = c(8, 12) # c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
 
 # Get all combinations of the quantities above
@@ -24,6 +24,7 @@ all_comb = expand.grid(I = I,
 
 # Get the number of combinations
 n_comb = nrow(all_comb)
+save_results = NULL
 
 for (i in 1:n_comb){
 
@@ -68,12 +69,16 @@ for (i in 1:n_comb){
     res_ambarti = organise_AMBARTI(ambarti, data)
 
     # Compute the Relative Root Mean Square Error (RRMSE)
+    metrics_AMMI       = get_metrics(res_AMMI, data, j)
+    metrics_bAMMI_post = get_metrics(res_bAMMI_with_post, data, j)
+    metrics_bAMMI      = get_metrics(res_bAMMI_without_post, data, j)
+    metrics_ambarti    = get_metrics(res_ambarti, data, j)
 
-    get_metrics(res_AMMI, data)
-    get_metrics(res_bAMMI_with_post, data)
-    get_metrics(res_bAMMI_without_post, data)
-    get_metrics(res_bAMMI_without_post, data)
-    get_metrics(res_ambarti, data)
+    save_results = rbind(save_results,
+                         metrics_AMMI,
+                         metrics_bAMMI_post,
+                         metrics_bAMMI,
+                         metrics_ambarti)
   }
 }
 
