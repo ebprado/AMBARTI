@@ -50,12 +50,25 @@ get_metrics = function(object, data, rep){
 
   }
 
+  I  = data$I
+  J  = data$J
+  sa = data$s_alpha
+  sb = data$s_beta
+  sy = data$s_y
+  lambda = gsub(', ', ' ', toString(data$lambda))
+
 aux = data.frame(
                  id           = id,
                  rep          = rep,
+                 I            = I,
+                 J            = J,
+                 sa           = sa,
+                 sb           = sb,
+                 sy           = sy,
+                 lambda       = lambda,
                  y_train_rmse = rmse_y_train,
                  y_test_rmse  = rmse_y_test,
-                 lambda_rrmse  = rrmse_lambda,
+                 lambda_rrmse = rrmse_lambda,
                  gamma_rrmse  = rrmse_gamma,
                  delta_rrmse  = rrmse_delta
                  )

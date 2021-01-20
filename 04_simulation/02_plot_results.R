@@ -4,6 +4,9 @@ save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/
 load(paste(save_file, '00_results_consolidated.RData',    sep=''))
 
 tab = save_results
+tab$id = factor(tab$id, levels = c('classical AMMI', 'Bayesian AMMI (postproc)', 'Bayesian AMMI (NO postproc)', 'AMBARTI'),
+                        labels = c('AMMI', ' B-AMMI (postproc)', 'B-AMMI (no postproc)', 'AMBARTI'))
+
 
 tab %>%
   ggplot(aes(x = equation, y=rmse_test, colour=algorithm2)) +
