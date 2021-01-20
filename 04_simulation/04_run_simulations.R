@@ -46,13 +46,13 @@ for (i in 1:n_comb){
     data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
 
     # run classical AMMI
-    classical_AMMI = run_classical_AMMI(data)
+    # classical_AMMI = run_classical_AMMI(data)
 
     # run Bayesian AMMI
     bayesian_AMMI = run_bayesian_AMMI(data)
 
     # run AMBARTI
-    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 10, npost = 10)
+    # ambarti = run_AMBARTI(data, ntrees = 50, nburn = 10, npost = 10)
 
     # Increment the seed number by 1
     nseed = nseed + 1
@@ -70,14 +70,14 @@ for (i in 1:n_comb){
                      sep='')
 
     data_filename    = paste(filename, '_data.RData',           sep='')
-    ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
+    # ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
     bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
-    ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
+    # ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
 
-    save(data,           file = paste(save_file, data_filename,    sep=''))
-    save(classical_AMMI, file = paste(save_file, ammi_filename,    sep=''))
+    # save(data,           file = paste(save_file, data_filename,    sep=''))
+    # save(classical_AMMI, file = paste(save_file, ammi_filename,    sep=''))
     save(bayesian_AMMI,  file = paste(save_file, bammi_filename,   sep=''))
-    save(ambarti,        file = paste(save_file, ambarti_filename, sep=''))
+    # save(ambarti,        file = paste(save_file, ambarti_filename, sep=''))
 
   }
 }

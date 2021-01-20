@@ -76,8 +76,8 @@ for (i in 1:n_comb){
 
     save_results = rbind(save_results,
                          metrics_AMMI,
-                         metrics_bAMMI_post,
-                         metrics_bAMMI,
+                         # metrics_bAMMI_post,
+                         # metrics_bAMMI,
                          metrics_ambarti)
   }
 }

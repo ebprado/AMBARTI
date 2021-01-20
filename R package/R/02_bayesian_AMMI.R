@@ -58,8 +58,8 @@ run_bayesian_AMMI <- function(data,
   I = data$I
   J = data$J
   Q = length(data$lambda)
-  genotype = data$x[,'gen']
-  environment = data$x[,'env']
+  genotype = data$x[,'g']
+  environment = data$x[,'e']
 
   # Set up the data
   model_data = list(N = N,
