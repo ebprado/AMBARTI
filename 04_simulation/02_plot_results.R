@@ -7,9 +7,15 @@ tab = save_results
 tab$id = factor(tab$id, levels = c('classical AMMI', 'Bayesian AMMI (postproc)', 'Bayesian AMMI (NO postproc)', 'AMBARTI'),
                         labels = c('AMMI', ' B-AMMI (postproc)', 'B-AMMI (no postproc)', 'AMBARTI'))
 
+tab$I = as.factor(tab$I)
+tab$J = as.factor(tab$J)
+tab$lambda = as.factor(tab$lambda)
+tab$sa = as.factor(tab$sa)
+tab$sb = as.factor(tab$sb)
+tab$sy = as.factor(tab$sy)
 
 tab %>%
-  ggplot(aes(x = equation, y=rmse_test, colour=algorithm2)) +
+  ggplot(aes(x = id, y=rmse_test, colour=algorithm2)) +
   geom_boxplot(outlier.shape = 1) +
   labs(#title = '(a)',
     # title = paste(varA, sep=''),
