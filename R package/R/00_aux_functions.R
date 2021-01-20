@@ -169,7 +169,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   blin_train = matrix(0, nrow = npost, ncol = nrow(x_train))
   blin_test  = matrix(0, nrow = npost, ncol = nrow(x_test))
 
-  for (k in 1:length(PC)) {
+  for (k in 1:PC) {
     blin_train = blin_train + lambda_hat[,k] * gamma_hat[,x_train[,'gen']]* delta_hat[,x_train[,'env']]
     blin_test  = blin_test +  lambda_hat[,k] * gamma_hat[,x_test[,'gen']] * delta_hat[, x_test[,'env']]
   }
@@ -189,7 +189,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   snew_mu_hat     = matrix(NA, nrow=npost, ncol=1)
   snew_alpha_hat  = matrix(NA, nrow=npost, ncol=n_gen)
   snew_beta_hat   = matrix(NA, nrow=npost, ncol=n_env)
-  snew_lambda_hat = matrix(NA, nrow=npost, ncol=length(PC))
+  snew_lambda_hat = matrix(NA, nrow=npost, ncol=PC)
   snew_gamma_hat  = list()
   snew_delta_hat  = list()
 
@@ -333,7 +333,7 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data){
   blin_train = rep(0, length(y_train))
   blin_test  = rep(0, length(y_test))
 
-  for (k in 1:length(PC)) {
+  for (k in 1:PC) {
     blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'gen'],k]*delta_hat[x_train[,'env'],k]
     blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'gen'],k]*delta_hat[x_test[,'env'],k]
   }

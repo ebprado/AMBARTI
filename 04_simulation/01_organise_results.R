@@ -6,12 +6,12 @@ library(AMBARTI)
 
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
-I = 10 # c(5, 15, 30) # Number of genotypes
-J = 10 # c(5, 15, 30) # Number of environments
-s_alpha = 1 # c(1, 5) # standard deviation of alpha
-s_beta = 1 # c(1, 5) # standard deviation of beta
-s_y = c(1, 5) # standard deviation of y
-lambda = c(8, 12) # c('8', '12', '8, 12', '10, 12','8, 10, 12')
+I = c(10) # c(5, 15, 30) # Number of genotypes
+J = c(10) # c(5, 15, 30) # Number of environments
+s_alpha = c(1, 5) # c(1, 5) # standard deviation of alpha
+s_beta = c(1,5) # c(1, 5) # standard deviation of beta
+s_y = 1 # c(1, 5) # standard deviation of y
+lambda = c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
 
 # Get all combinations of the quantities above
@@ -68,7 +68,7 @@ for (i in 1:n_comb){
     # Get parameter estimates from AMBARTI
     res_ambarti = organise_AMBARTI(ambarti, data)
 
-    # Compute the Relative Root Mean Square Error (RRMSE)
+    # Compute the RMSE and RRMSE
     metrics_AMMI       = get_metrics(res_AMMI, data, j)
     metrics_bAMMI_post = get_metrics(res_bAMMI_with_post, data, j)
     metrics_bAMMI      = get_metrics(res_bAMMI_without_post, data, j)
@@ -76,10 +76,12 @@ for (i in 1:n_comb){
 
     save_results = rbind(save_results,
                          metrics_AMMI,
-                         # metrics_bAMMI_post,
-                         # metrics_bAMMI,
+                         metrics_bAMMI_post,
+                         metrics_bAMMI,
                          metrics_ambarti)
+
+    print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
   }
 }
 
-
+save(save_results, file = paste(save_file, '00_results_consolidated.RData',    sep=''))

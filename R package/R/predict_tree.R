@@ -25,7 +25,7 @@ predict_ambarti = function(object, newdata,
   #### Genotype
   ###########################################
   number_geno = length(ng)
-  num_comb_g = floor(number_geno/2)
+  num_comb_g = max(2,floor(number_geno/2))
   formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
   x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = y_aux, new_x[, grepl("g", colnames(new_x))]))
   individual_g = (1:(number_geno + 1))
@@ -50,7 +50,7 @@ predict_ambarti = function(object, newdata,
   ###########################################
 
   number_env = length(ne)
-  num_comb_e = floor(number_env/2)
+  num_comb_e = max(2,floor(number_env/2))
   formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
   x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = y_aux, new_x[, grepl("e", colnames(new_x))]))
   individual_e = (1:(number_env + 1))
