@@ -1,34 +1,43 @@
 library(ggplot2)
 library(tidyverse)
 
+# Where the file containing the consolidated results is
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
+
+# Load the consolidated results
 load(paste(save_file, '00_results_consolidated.RData',    sep=''))
 
+# Some preprocessing
 tab = save_results
 tab$id = factor(tab$id, levels = c('classical AMMI', 'Bayesian AMMI (postproc)', 'Bayesian AMMI (NO postproc)', 'AMBARTI'),
-                        labels = c('AMMI', ' B-AMMI (postproc)', 'B-AMMI (no postproc)', 'AMBARTI'))
+                        labels = c('AMMI', 'B-AMMI (postproc)', 'B-AMMI (no postproc)', 'AMBARTI'))
 
 tab$Q = factor(sapply(strsplit(as.character(tab$lambda), split = ' '), function(x) length(x)), levels = c('1','2','3'), labels = c('Q = 1', 'Q = 2', 'Q = 3'))
-tab$I = as.factor(tab$I)
-tab$J = as.factor(tab$J)
+tab$I = factor(tab$I, levels=c('10'), labels=c('I = 10'))
+tab$J = factor(tab$J, levels=c('10'), labels=c('J = 10'))
 tab$lambda = as.factor(tab$lambda)
 tab$sa = as.factor(tab$sa)
 tab$sb = as.factor(tab$sb)
 tab$sy = as.factor(tab$sy)
 
-tab2$lambda <- factor(tab2$lambda, levels = c('50'),
-                      labels = c(expression(paste(lambda, '= 50'))))
+# Generate plots
+myplot <- function(varA, varB, varC){
 
-myplot <- function(varA, varB){
+  if (varA == 'sa'){aux = expression(sigma[alpha])}
+  if (varA == 'sb'){aux = expression(sigma[beta])}
 
-  # pdf(paste(SaveFigures,'P_by_lambda.pdf', sep = ''), width = 8, height = 6)
+  if(varB=='rrmse_alpha'){varC = expression("RRMSE - "~alpha[i])}
+  if(varB=='rrmse_beta'){varC = expression("RRMSE - "~beta[j])}
+  if(varB=='lambda_rrmse'){varC = expression("RRMSE - "~lambda[q])}
+  if(varB=='gamma_rrmse'){varC = expression("RRMSE - "~gamma[iq])}
+  if(varB=='delta_rrmse'){varC = expression("RRMSE - "~delta[jq])}
+
 
   tab %>%
     ggplot(aes_string(x = varA , y = varB, colour='id')) +
     geom_boxplot(outlier.shape = 1) +
-    labs(
-      title = paste(varB, sep=''),
-      # subtitle = 'Descriptive statistics',
+    labs(x = aux,
+      title = varC,
       colour = '',
       y = 'RMSE') +
     theme_bw(base_size = 12) +
@@ -36,24 +45,31 @@ myplot <- function(varA, varB){
           legend.position = 'bottom',
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
-    # facet_grid(. ~ num_trees_class, scales='free')
-    # facet_grid(.~Q + sa) +
     facet_wrap(~ Q, scales='free', nrow=1) +
+    # facet_grid(I ~ Q) +
     labs(colour='') +
     guides(col = guide_legend(nrow=2))
 
-  # dev.off()
-
 }
-myplot('sb','y_test_rmse')
-myplot('sa','y_test_rmse')
-myplot('sa','rrmse_alpha')
-myplot('sb','rrmse_beta')
-myplot('sb','lambda_rrmse')
-myplot('sa','lambda_rrmse')
-myplot('sb','gamma_rrmse')
-myplot('sa','gamma_rrmse')
-myplot('sb','delta_rrmse')
-myplot('sa','delta_rrmse')
+myplot('sb','y_test_rmse', 'RMSE - y test')
+myplot('sa','y_test_rmse', 'RMSE - y test')
+myplot('sa','rrmse_alpha', 'RRMSE - alpha')
+myplot('sb','rrmse_beta', 'RRMSE - beta')
+myplot('sb','lambda_rrmse', 'RRMSE - lambda')
+myplot('sa','lambda_rrmse', 'RRMSE - lambda')
+myplot('sb','gamma_rrmse', 'RRMSE - gamma')
+myplot('sa','gamma_rrmse', 'RRMSE - gamma')
+myplot('sb','delta_rrmse', 'RRMSE - delta')
+myplot('sa','delta_rrmse', 'RRMSE - delta')
 
-mean(apply(ambarti$beta_hat, 2, mean))
+# Check -----------
+# they're quite similar, but still different
+myplot('sa','lambda_rrmse', 'RRMSE - lambda')
+
+tab %>%
+  filter(id %in% c('AMMI', 'B-AMMI (postproc)'), Q == 'Q = 1', sa == '1') %>%
+  select(id,
+         lambda_rrmse,
+         sb)
+
+
