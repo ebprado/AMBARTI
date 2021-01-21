@@ -28,15 +28,15 @@ n_comb = nrow(all_comb)
 
 for (i in 1:n_comb){
 
-  comb = all_comb[i,] # Get the row of the combination i
-  I = comb$I # Number of genotypes
-  J = comb$J # Number of environments
-  s_alpha = comb$s_alpha # standard deviation of alpha
-  s_beta = comb$s_beta # standard deviation of alpha
-  s_y = comb$s_y # standard deviation of y
+  comb       = all_comb[i,] # Get the row of the combination i
+  I          = comb$I # Number of genotypes
+  J          = comb$J # Number of environments
+  s_alpha    = comb$s_alpha # standard deviation of alpha
+  s_beta     = comb$s_beta # standard deviation of alpha
+  s_y        = comb$s_y # standard deviation of y
   aux_lambda = as.character(comb$lambda)
-  lambda = as.numeric(unlist(strsplit(aux_lambda,','))) # values for lambda
-  nseed = 0 # start seed
+  lambda     = as.numeric(unlist(strsplit(aux_lambda,','))) # values for lambda
+  nseed      = 0 # start seed
 
   for (j in 1:n_rep){
     # Set a seed to make it reproducible

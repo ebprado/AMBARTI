@@ -5,7 +5,7 @@ library(tidyverse)
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
 
 # Load the consolidated results
-load(paste(save_file, '00_results_consolidated.RData',    sep=''))
+load(paste(save_file, '00_results_consolidated.RData', sep=''))
 
 # Some preprocessing
 tab = save_results
@@ -54,7 +54,7 @@ myplot <- function(varA, varB, varC){
 myplot('sb','y_test_rmse', 'RMSE - y test')
 myplot('sa','y_test_rmse', 'RMSE - y test')
 myplot('sa','rrmse_alpha', 'RRMSE - alpha')
-myplot('sb','rrmse_beta', 'RRMSE - beta')
+myplot('sb','rrmse_beta',  'RRMSE - beta')
 myplot('sb','lambda_rrmse', 'RRMSE - lambda')
 myplot('sa','lambda_rrmse', 'RRMSE - lambda')
 myplot('sb','gamma_rrmse', 'RRMSE - gamma')
@@ -72,4 +72,68 @@ tab %>%
          lambda_rrmse,
          sb)
 
+#-------------------------------------------------
+# Individual plots
+#-------------------------------------------------
+library(MCMCvis)
+library(reshape2)
+setwd(save_file)
+filename = 'I10J10sa1sb1sy1L1012r1'
 
+data_filename    = paste(filename, '_data.RData',           sep='')
+ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
+bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
+ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
+
+load(paste(save_file, data_filename,      sep=''))
+load(paste(save_file, ammi_filename,      sep=''))
+load(paste(save_file, bammi_filename,     sep=''))
+load(paste(save_file, ambarti_filename,   sep=''))
+
+# Get parameter estimates from the classical AMMI
+res_AMMI = organise_classical_AMMI(classical_AMMI, data)
+
+mu_pos <- MCMCchains(bayesian_AMMI, params = 'mu_all') %>% data.frame()
+alpha_pos <- MCMCchains(bayesian_AMMI, params = 'alpha') %>% data.frame()
+beta_pos <- MCMCchains(bayesian_AMMI, params = 'beta') %>% data.frame()
+lambda_pos <- MCMCchains(bayesian_AMMI, params = 'lambda') %>% data.frame()
+gamma_pos <- MCMCchains(bayesian_AMMI, params = 'gamma') %>% data.frame()
+delta_pos <- MCMCchains(bayesian_AMMI, params = 'delta') %>% data.frame()
+sigma_E_pos <- MCMCchains(bayesian_AMMI, params = 'sigma_E') %>% data.frame()
+
+p_mu_all <- ggplot(data = melt(mu_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
+  geom_point(data = data.frame(x = names(mu_pos), y = 100), aes(x=x, y = y), color = 'red') +
+  theme(axis.title = element_blank())
+
+p_alpha <- ggplot(data = melt(alpha_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
+  geom_point(data = data.frame(x = names(alpha_pos), y = alpha), aes(x=x, y = y), color = 'red') +
+  theme(axis.title = element_blank())
+
+p_beta <- ggplot(data = melt(beta_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
+  geom_point(data = data.frame(x = names(beta_pos), y = beta), aes(x=x, y = y), color = 'red') +
+  theme(axis.title = element_blank())
+
+p_lambda <- ggplot(data = melt(lambda_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
+  geom_point(data = data.frame(x = names(lambda_pos), y = lambda), aes(x=x, y = y), color = 'red') +
+  theme(axis.title = element_blank())
+
+p_gamma <- ggplot(data = melt(gamma_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
+  geom_point(data = data.frame(x = names(gamma_pos), y = gamma), aes(x=x, y = y), color = 'red') +
+  theme(axis.title = element_blank())
+
+p_delta <- ggplot(data = melt(delta_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
+  geom_point(data = data.frame(x = names(delta_pos), y = delta), aes(x=x, y = y), color = 'red') +
+  theme(axis.title = element_blank())
+
+p_sigma_E <- ggplot(data = melt(sigma_E_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
+  geom_point(data = data.frame(x = names(sigma_E_pos), y = sigma_E), aes(x=x, y = y), color = 'red') +
+  theme(axis.title = element_blank())
+
+all_par <- list(
+  p_alpha,
+  p_beta,
+  p_lambda,
+  p_gamma,
+  p_delta,
+  p_sigma_E
+)
