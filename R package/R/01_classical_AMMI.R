@@ -9,8 +9,8 @@ run_classical_AMMI <- function(data){
 
   REP = 1 # no repetitions
 
-  model <- with(sim_data, AMMI(ENV = env,
-                               GEN = gen,
+  model <- with(sim_data, AMMI(ENV = e,
+                               GEN = g,
                                REP = REP,
                                Y =  y,
                                console = FALSE))
