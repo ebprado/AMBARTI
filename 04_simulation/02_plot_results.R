@@ -32,7 +32,6 @@ myplot <- function(varA, varB, varC){
   if(varB=='gamma_rrmse'){varC = expression("RRMSE - "~gamma[iq])}
   if(varB=='delta_rrmse'){varC = expression("RRMSE - "~delta[jq])}
 
-
   tab %>%
     ggplot(aes_string(x = varA , y = varB, colour='id')) +
     geom_boxplot(outlier.shape = 1) +
@@ -55,15 +54,15 @@ myplot <- function(varA, varB, varC){
 myplot('sa','rrmse_alpha', 'RRMSE - alpha')
 myplot('sb','rrmse_beta',  'RRMSE - beta')
 myplot('sb','lambda_rrmse', 'RRMSE - lambda')
-myplot('sa','lambda_rrmse', 'RRMSE - lambda')
+# myplot('sa','lambda_rrmse', 'RRMSE - lambda')
 myplot('sb','gamma_rrmse', 'RRMSE - gamma')
-myplot('sa','gamma_rrmse', 'RRMSE - gamma')
+# myplot('sa','gamma_rrmse', 'RRMSE - gamma')
 myplot('sb','delta_rrmse', 'RRMSE - delta')
-myplot('sa','delta_rrmse', 'RRMSE - delta')
+# myplot('sa','delta_rrmse', 'RRMSE - delta')
 myplot('sa','rmse_blinear', 'RMSE - Bilinear part')
-myplot('sb','rmse_blinear', 'RMSE - Bilinear part')
+# myplot('sb','rmse_blinear', 'RMSE - Bilinear part')
 myplot('sb','y_test_rmse', 'RMSE - y test')
-myplot('sa','y_test_rmse', 'RMSE - y test')
+# myplot('sa','y_test_rmse', 'RMSE - y test')
 
 # Check -----------
 # they're quite similar, but still different

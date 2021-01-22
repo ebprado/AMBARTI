@@ -127,7 +127,7 @@ organise_classical_AMMI <- function(object, data){
   blin_train = rep(0, length(y_train))
   blin_test  = rep(0, length(y_test))
 
-  for (k in 1:length(lambda_hat)) {
+  for (k in 1:PC) {
     blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
     blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
   }
@@ -149,11 +149,6 @@ organise_classical_AMMI <- function(object, data){
               id          = 'classical AMMI'))
 }
 
-# plot(y_train, bb$y_hat_train);abline(0,1)
-# cor(y_train, bb$y_hat_train)
-#
-# plot(y_test, bb$y_hat_test);abline(0,1)
-# cor(y_test, bb$y_hat_test)
 #' @export
 #'
 organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
