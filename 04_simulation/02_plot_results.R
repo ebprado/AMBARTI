@@ -51,8 +51,7 @@ myplot <- function(varA, varB, varC){
     guides(col = guide_legend(nrow=2))
 
 }
-myplot('sb','y_test_rmse', 'RMSE - y test')
-myplot('sa','y_test_rmse', 'RMSE - y test')
+
 myplot('sa','rrmse_alpha', 'RRMSE - alpha')
 myplot('sb','rrmse_beta',  'RRMSE - beta')
 myplot('sb','lambda_rrmse', 'RRMSE - lambda')
@@ -61,6 +60,10 @@ myplot('sb','gamma_rrmse', 'RRMSE - gamma')
 myplot('sa','gamma_rrmse', 'RRMSE - gamma')
 myplot('sb','delta_rrmse', 'RRMSE - delta')
 myplot('sa','delta_rrmse', 'RRMSE - delta')
+myplot('sa','rmse_blinear', 'RMSE - Bilinear part')
+myplot('sb','rmse_blinear', 'RMSE - Bilinear part')
+myplot('sb','y_test_rmse', 'RMSE - y test')
+myplot('sa','y_test_rmse', 'RMSE - y test')
 
 # Check -----------
 # they're quite similar, but still different
@@ -70,6 +73,13 @@ tab %>%
   filter(id %in% c('AMMI', 'B-AMMI (postproc)'), Q == 'Q = 1', sa == '1') %>%
   select(id,
          lambda_rrmse,
+         sb)
+
+myplot('sa','rmse_blinear', 'RMSE - Bilinear part')
+tab %>%
+  filter(id %in% c('AMMI', 'B-AMMI (postproc)'), Q == 'Q = 1', sa == '1') %>%
+  select(id,
+         rmse_blinear,
          sb)
 
 #-------------------------------------------------
