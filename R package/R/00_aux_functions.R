@@ -13,12 +13,15 @@ get_metrics = function(object, data, rep){
 
   id          = object$id
   y_train     = data$y
+  blinear     = data$blinear
   y_test      = data$y_test
   y_hat_train = object$y_hat_train
   y_hat_test  = object$y_hat_test
+  blinear_hat = object$blinear_hat
 
   rmse_y_train = RMSE(y_train, y_hat_train)
   rmse_y_test  = RMSE(y_test, y_hat_test)
+  rmse_blinear = RMSE(blinear, blinear_hat)
 
   alpha  = data$alpha
   beta   = data$beta
@@ -68,6 +71,7 @@ aux = data.frame(
                  lambda       = lambda,
                  y_train_rmse = rmse_y_train,
                  y_test_rmse  = rmse_y_test,
+                 rmse_blinear = rmse_blinear,
                  rrmse_alpha  = rrmse_alpha,
                  rrmse_beta   = rrmse_beta,
                  lambda_rrmse = rrmse_lambda,
@@ -141,6 +145,7 @@ organise_classical_AMMI <- function(object, data){
               lambda_hat  = lambda_hat,
               y_hat_train = y_hat_train,
               y_hat_test  = y_hat_test,
+              blinear_hat = blin_train,
               id          = 'classical AMMI'))
 }
 
@@ -272,6 +277,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
               lambda_hat  = new_lambda_hat,
               y_hat_train = new_mu_ij_train,
               y_hat_test  = new_mu_ij_test,
+              blinear_hat = new_blin_train,
               id          = 'Bayesian AMMI (postproc)'))
 }
 
@@ -311,11 +317,14 @@ organise_AMBARTI <- function(object, data){
   beta_hat = estimate[grepl('e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
   y_hat_test = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+  blinear_hat = apply(object$y_hat_bart,2,mean)
+
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat,
               y_hat_train = y_hat_train,
               y_hat_test  = y_hat_test,
+              blinear_hat = blinear_hat,
               id          = 'AMBARTI'))
 
 }
@@ -365,6 +374,6 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data){
               lambda_hat  = lambda_hat,
               y_hat_train = y_hat_train,
               y_hat_test  = y_hat_test,
+              blinear_hat = blin_train,
               id          = 'Bayesian AMMI (NO postproc)'))
 }
-

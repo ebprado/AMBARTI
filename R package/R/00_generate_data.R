@@ -69,5 +69,6 @@ generate_data <- function(I, # Number of genotypes
               alpha   = alpha,
               beta    = beta,
               gamma   = gamma,
-              delta   = delta))
+              delta   = delta,
+              blinear = blin))
 }
