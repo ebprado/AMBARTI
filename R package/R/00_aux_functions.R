@@ -96,8 +96,8 @@ organise_classical_AMMI <- function(object, data){
   x_test = data$x
   y_test = data$y_test
 
-  gen = as.factor(x_train[,"gen"])
-  env = as.factor(x_train[,"env"])
+  gen = as.factor(x_train[,"g"])
+  env = as.factor(x_train[,"e"])
 
   # Fit the linear model
   linear_mod = aov(y_train ~ gen + env + gen:env)
@@ -128,15 +128,15 @@ organise_classical_AMMI <- function(object, data){
   blin_test  = rep(0, length(y_test))
 
   for (k in 1:length(lambda_hat)) {
-    blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'gen'],k]*delta_hat[x_train[,'env'],k]
-    blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'gen'],k]*delta_hat[x_test[,'env'],k]
+    blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
+    blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
   }
 
   # Compute the predicted response for the TRAINING data
-  y_hat_train = mu_hat + alpha_hat[x_train[,'gen']] + beta_hat[x_train[,'env']] + blin_train
+  y_hat_train = mu_hat + alpha_hat[x_train[,'g']] + beta_hat[x_train[,'e']] + blin_train
 
   # Compute the predicted response for the TEST data
-  y_hat_test = mu_hat + alpha_hat[x_test[,'gen']] + beta_hat[x_test[,'env']] + blin_test
+  y_hat_test = mu_hat + alpha_hat[x_test[,'g']] + beta_hat[x_test[,'e']] + blin_test
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat,
@@ -190,20 +190,20 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   blin_test  = matrix(0, nrow = npost, ncol = nrow(x_test))
 
   for (k in 1:PC) {
-    blin_train = blin_train + lambda_hat[,k] * gamma_hat[,x_train[,'gen']]* delta_hat[,x_train[,'env']]
-    blin_test  = blin_test +  lambda_hat[,k] * gamma_hat[,x_test[,'gen']] * delta_hat[, x_test[,'env']]
+    blin_train = blin_train + lambda_hat[,k] * gamma_hat[,x_train[,'g']]* delta_hat[,x_train[,'e']]
+    blin_test  = blin_test +  lambda_hat[,k] * gamma_hat[,x_test[,'g']] * delta_hat[, x_test[,'e']]
   }
 
   # Compute the predicted response for the TRAINING data
-  mu_ij = mu_hat + alpha_hat[,x_train[,'gen']] + beta_hat[,x_train[,'env']] + blin_train
+  mu_ij = mu_hat + alpha_hat[,x_train[,'g']] + beta_hat[,x_train[,'e']] + blin_train
   colnames(mu_ij) = NULL
 
   # -------------------------------------------------------------
   # Start postprocessing
   # -------------------------------------------------------------
 
-  n_gen = length(unique(x_train[,'gen']))
-  n_env = length(unique(x_train[,'env']))
+  n_gen = length(unique(x_train[,'g']))
+  n_env = length(unique(x_train[,'e']))
 
   # Create matrices/lists to store the postprocessing results
   snew_mu_hat     = matrix(NA, nrow=npost, ncol=1)
@@ -262,13 +262,13 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   new_blin_test  = rep(0, length(y_test))
 
   for (k in 1:PC) {
-    new_blin_train = new_blin_train + new_lambda_hat[k]*new_gamma_hat[x_train[,'gen'],k]*new_delta_hat[x_train[,'env'],k]
-    new_blin_test  = new_blin_test + new_lambda_hat[k]*new_gamma_hat[x_test[,'gen'],k]*new_delta_hat[x_test[,'env'],k]
+    new_blin_train = new_blin_train + new_lambda_hat[k]*new_gamma_hat[x_train[,'g'],k]*new_delta_hat[x_train[,'e'],k]
+    new_blin_test  = new_blin_test + new_lambda_hat[k]*new_gamma_hat[x_test[,'g'],k]*new_delta_hat[x_test[,'e'],k]
   }
 
   # Compute the predicted values for the TRAINING and TEST data sets
-  new_mu_ij_train = new_mu_hat + new_alpha_hat[x_train[,'gen']] + new_beta_hat[x_train[,'env']] + new_blin_train
-  new_mu_ij_test = new_mu_hat + new_alpha_hat[x_test[,'gen']] + new_beta_hat[x_test[,'env']] + new_blin_test
+  new_mu_ij_train = new_mu_hat + new_alpha_hat[x_train[,'g']] + new_beta_hat[x_train[,'e']] + new_blin_train
+  new_mu_ij_test = new_mu_hat + new_alpha_hat[x_test[,'g']] + new_beta_hat[x_test[,'e']] + new_blin_test
 
   return(list(alpha_hat   = new_alpha_hat,
               beta_hat    = new_beta_hat,
@@ -306,7 +306,6 @@ organise_AMBARTI <- function(object, data){
 
   # Get test info
   x_test = data$x
-  names(x_test) = c('g', 'e')
   x_test$g = as.factor(x_test$g)
   x_test$e = as.factor(x_test$e)
   y_test = data$y_test
@@ -358,14 +357,14 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data){
   blin_test  = rep(0, length(y_test))
 
   for (k in 1:PC) {
-    blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'gen'],k]*delta_hat[x_train[,'env'],k]
-    blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'gen'],k]*delta_hat[x_test[,'env'],k]
+    blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
+    blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
   }
 
   # Compute the predicted response for the TRAINING data
-  y_hat_train = mu_hat + alpha_hat[x_train[,'gen']] + beta_hat[x_train[,'env']] + blin_train
+  y_hat_train = mu_hat + alpha_hat[x_train[,'g']] + beta_hat[x_train[,'e']] + blin_train
   # Compute the predicted response for the TEST data
-  y_hat_test = mu_hat + alpha_hat[x_test[,'gen']] + beta_hat[x_test[,'env']] + blin_test
+  y_hat_test = mu_hat + alpha_hat[x_test[,'g']] + beta_hat[x_test[,'e']] + blin_test
 
   return(list(alpha_hat  = alpha_hat,
               beta_hat    = beta_hat,
