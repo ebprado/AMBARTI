@@ -33,6 +33,8 @@ myplot <- function(varA, varB, varC){
   if(varB=='delta_rrmse'){varC = expression("RRMSE - "~delta[jq])}
 
   tab %>%
+    group_by(Q) %>%
+    filter((!!sym(varB)) < quantile(!!sym(varB), 0.9, na.rm = TRUE)) %>%
     ggplot(aes_string(x = varA , y = varB, colour='id')) +
     geom_boxplot(outlier.shape = 1) +
     labs(x = aux,
