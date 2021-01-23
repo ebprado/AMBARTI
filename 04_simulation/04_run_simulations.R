@@ -25,6 +25,7 @@ all_comb = expand.grid(I = I,
 
 # Get the number of combinations
 n_comb = nrow(all_comb)
+nseed      = 0 # start seed
 
 for (i in 1:n_comb){
 
@@ -36,13 +37,12 @@ for (i in 1:n_comb){
   s_y        = comb$s_y # standard deviation of y
   aux_lambda = as.character(comb$lambda)
   lambda     = as.numeric(unlist(strsplit(aux_lambda,','))) # values for lambda
-  nseed      = 0 # start seed
+  # nseed      = 0 # start seed
 
   for (j in 1:n_rep){
     # Set a seed to make it reproducible
     set.seed(nseed)
 
-    # generate the simulated data
     data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
 
     # run classical AMMI
@@ -52,7 +52,7 @@ for (i in 1:n_comb){
     bayesian_AMMI = run_bayesian_AMMI(data)
 
     # run AMBARTI
-    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 10, npost = 10)
+    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 1000, npost = 100)
 
     # Increment the seed number by 1
     nseed = nseed + 1
