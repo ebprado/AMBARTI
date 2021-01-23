@@ -104,114 +104,112 @@ load(paste(save_file, ambarti_filename,   sep=''))
 res_AMMI = organise_classical_AMMI(classical_AMMI, data)
 
 
-object = bayesian_AMMI
 
-# Get training info
-x_train = data$x
-y_train = data$y
+bAMMI_help_plot <- function(object, data){
+  # Get training info
+  x_train = data$x
+  y_train = data$y
 
-# Get test info
-x_test = data$x
-y_test = data$y_test
+  # Get test info
+  x_test = data$x
+  y_test = data$y_test
 
-# Get the number of PCs
-PC = length(data$lambda)
+  # Get the number of PCs
+  PC = length(data$lambda)
 
-# Get some MCMC info
-nburn      = object$BUGSoutput$n.burnin
-niter      = object$BUGSoutput$n.iter
-npost      = niter - nburn
-seq_burn   = seq(1, nburn, by=1)
+  # Get some MCMC info
+  nburn      = object$BUGSoutput$n.burnin
+  niter      = object$BUGSoutput$n.iter
+  npost      = niter - nburn
+  seq_burn   = seq(1, nburn, by=1)
 
-# Get estimates info
-estimate   = object$BUGSoutput$sims.matrix
-mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
-alpha_hat  = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
-beta_hat   = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
-delta_hat  = estimate[-seq_burn,colnames(estimate)[grepl('delta',  colnames(estimate))]]
-gamma_hat  = estimate[-seq_burn,colnames(estimate)[grepl('gamma',  colnames(estimate))]]
-lambda_hat = estimate[-seq_burn,colnames(estimate)[grepl('lambda', colnames(estimate))]]
-lambda_hat = as.matrix(lambda_hat)
+  # Get estimates info
+  estimate   = as.data.frame(object$BUGSoutput$sims.matrix)
+  estimate$id= 'Bayesian AMMI'
+  #mu_hat     = estimate[-seq_burn,c('id',colnames(estimate)[grepl('mu_all', colnames(estimate))])]
+  alpha_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('alpha', colnames(estimate))])]
+  beta_hat   = estimate[-seq_burn,c('id',colnames(estimate)[grepl('beta', colnames(estimate))])]
+  delta_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('delta', colnames(estimate))])]
+  gamma_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('gamma', colnames(estimate))])]
+  lambda_hat = estimate[-seq_burn,c('id',colnames(estimate)[grepl('lambda', colnames(estimate))])]
+  lambda_hat = as.matrix(lambda_hat)
 
-# Alpha ------------
-alpha_hat2 = melt(alpha_hat)
-names(alpha_hat2) <- c('id', 'Parameter', 'value')
-alpha_hat2$true = rep(data$alpha, each=npost)
-alpha_hat2 %>%
-  ggplot(aes(x=Parameter, y=value, group = Parameter, colour=Parameter)) +
-  geom_boxplot() +
-  geom_point(data=alpha_hat2, aes(y=true), shape=4) +
-  labs(title = expression(~'Comparison of '~alpha[i])) +
-  theme(axis.title = element_blank(),
-        plot.title = element_text(size = 15, hjust = 0.5)) +
-  scale_x_discrete(labels = c('alpha[1]' = expression(alpha[1]),
-                              'alpha[2]' = expression(alpha[2]),
-                              'alpha[3]' = expression(alpha[3]),
-                              'alpha[4]' = expression(alpha[4]),
-                              'alpha[5]' = expression(alpha[5]),
-                              'alpha[6]' = expression(alpha[6]),
-                              'alpha[7]' = expression(alpha[7]),
-                              'alpha[8]' = expression(alpha[8]),
-                              'alpha[9]' = expression(alpha[9]),
-                              'alpha[10]' = expression(alpha[10]))) +
-  scale_color_discrete(labels = c('alpha[1]' = expression(alpha[1]),
-                                'alpha[2]' = expression(alpha[2]),
-                                'alpha[3]' = expression(alpha[3]),
-                                'alpha[4]' = expression(alpha[4]),
-                                'alpha[5]' = expression(alpha[5]),
-                                'alpha[6]' = expression(alpha[6]),
-                                'alpha[7]' = expression(alpha[7]),
-                                'alpha[8]' = expression(alpha[8]),
-                                'alpha[9]' = expression(alpha[9]),
-                                'alpha[10]' = expression(alpha[10])))
+  return(list(alpha_hat  = alpha_hat,
+              beta_hat    = beta_hat,
+              delta_hat   = delta_hat,
+              gamma_hat   = gamma_hat,
+              lambda_hat  = lambda_hat))
+}
 
+bAMMI_save_info = bAMMI_help_plot(bayesian_AMMI, data)
 
+alpha_hat = bAMMI_save_info$alpha_hat
+beta_hat = bAMMI_save_info$beta_hat
+lambda_hat = bAMMI_save_info$lambda_hat
+gamma_hat = bAMMI_save_info$gamma_hat
+delta_hat = bAMMI_save_info$delta_hat
 
+organise_AMBARTI <- function(object, data){
 
+  # Get training info
+  x_train = data$x
+  y_train = data$y
 
+  # Get test info
+  x_test = data$x
+  x_test$g = as.factor(x_test$g)
+  x_test$e = as.factor(x_test$e)
+  y_test = data$y_test
 
+  # Get estimates info
+  estimate = as.data.frame(object$beta_hat)
+  alpha_hat = estimate[,grepl('g', names(estimate))]
+  beta_hat  = estimate[,grepl('e', names(estimate))]
+  alpha_hat$id = 'AMBARTI'
+  beta_hat$id = 'AMBARTI'
 
-mu_pos <- MCMCchains(bayesian_AMMI, params = 'mu_all') %>% data.frame()
-alpha_pos <- MCMCchains(bayesian_AMMI, params = 'alpha') %>% data.frame()
-beta_pos <- MCMCchains(bayesian_AMMI, params = 'beta') %>% data.frame()
-lambda_pos <- MCMCchains(bayesian_AMMI, params = 'lambda') %>% data.frame()
-gamma_pos <- MCMCchains(bayesian_AMMI, params = 'gamma') %>% data.frame()
-delta_pos <- MCMCchains(bayesian_AMMI, params = 'delta') %>% data.frame()
-sigma_E_pos <- MCMCchains(bayesian_AMMI, params = 'sigma_E') %>% data.frame()
-
-p_mu_all <- ggplot(data = melt(mu_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
-  geom_point(data = data.frame(x = names(mu_pos), y = 100), aes(x=x, y = y), color = 'red') +
-  theme(axis.title = element_blank())
-
-p_alpha <- ggplot(data = melt(alpha_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
-  geom_point(data = data.frame(x = names(alpha_pos), y = alpha), aes(x=x, y = y), color = 'red') +
-  theme(axis.title = element_blank())
-
-p_beta <- ggplot(data = melt(beta_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
-  geom_point(data = data.frame(x = names(beta_pos), y = beta), aes(x=x, y = y), color = 'red') +
-  theme(axis.title = element_blank())
-
-p_lambda <- ggplot(data = melt(lambda_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
-  geom_point(data = data.frame(x = names(lambda_pos), y = lambda), aes(x=x, y = y), color = 'red') +
-  theme(axis.title = element_blank())
-
-p_gamma <- ggplot(data = melt(gamma_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
-  geom_point(data = data.frame(x = names(gamma_pos), y = gamma), aes(x=x, y = y), color = 'red') +
-  theme(axis.title = element_blank())
-
-p_delta <- ggplot(data = melt(delta_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
-  geom_point(data = data.frame(x = names(delta_pos), y = delta), aes(x=x, y = y), color = 'red') +
-  theme(axis.title = element_blank())
-
-p_sigma_E <- ggplot(data = melt(sigma_E_pos), aes(x=variable, y=value)) + geom_boxplot(aes(fill=variable),fill = "gray93", color = "black") +
-  geom_point(data = data.frame(x = names(sigma_E_pos), y = sigma_E), aes(x=x, y = y), color = 'red') +
-  theme(axis.title = element_blank())
-
-all_par <- list(
-  p_alpha,
-  p_beta,
-  p_lambda,
-  p_gamma,
-  p_delta,
-  p_sigma_E
-)
+  return(list(alpha_hat   = alpha_hat,
+              beta_hat    = beta_hat))
+}
+
+new_parse_format <- function(text) {
+  out <- vector("expression", length(text))
+  for (i in seq_along(text)) {
+    expr <- parse(text = text[[i]])
+    out[[i]] <- if (length(expr) == 0)
+      NA
+    else expr[[1]]
+  }
+  out
+}
+
+plot_individual <- function(object, data){
+
+  db = melt(object)
+  names(db) = c('id', 'Parameter', 'value')
+  aux_name = strsplit(deparse(substitute(object)), split = '_')[[1]][1]
+  db$true = rep(data[[aux_name]], each=npost)
+  orig_labels = colnames(object)
+  fixed_labels = new_parse_format(gsub(',','', orig_labels))
+
+  db %>%
+    ggplot(aes(x=Parameter, y=value, group = Parameter, colour=Parameter)) +
+    geom_boxplot() +
+    geom_point(data=db, aes(y=true), shape=4, size=4) +
+    theme_bw() +
+    labs(title = bquote(Comparison~of~.(sym(aux_name)))) +
+    theme(axis.text.x = element_text(size=12),
+          axis.title = element_blank(),
+          plot.title = element_text(size = 18, hjust = 0.5),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 15),
+          legend.position = "bottom") +
+    scale_x_discrete(limit = orig_labels,
+                     labels = fixed_labels) +
+    scale_color_discrete(labels=fixed_labels)
+}
+plot_individual(alpha_hat, data)
+plot_individual(beta_hat, data)
+plot_individual(lambda_hat, data)
+plot_individual(gamma_hat, data)
+plot_individual(delta_hat, data)
