@@ -86,10 +86,9 @@ tab %>%
 #-------------------------------------------------
 # Individual plots
 #-------------------------------------------------
-library(MCMCvis)
 library(reshape2)
 setwd(save_file)
-filename = 'I10J10sa1sb1sy1L1012r1'
+filename = 'I10J10sa1sb1sy1L1012r10'
 
 data_filename    = paste(filename, '_data.RData',           sep='')
 ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
@@ -103,6 +102,74 @@ load(paste(save_file, ambarti_filename,   sep=''))
 
 # Get parameter estimates from the classical AMMI
 res_AMMI = organise_classical_AMMI(classical_AMMI, data)
+
+
+object = bayesian_AMMI
+
+# Get training info
+x_train = data$x
+y_train = data$y
+
+# Get test info
+x_test = data$x
+y_test = data$y_test
+
+# Get the number of PCs
+PC = length(data$lambda)
+
+# Get some MCMC info
+nburn      = object$BUGSoutput$n.burnin
+niter      = object$BUGSoutput$n.iter
+npost      = niter - nburn
+seq_burn   = seq(1, nburn, by=1)
+
+# Get estimates info
+estimate   = object$BUGSoutput$sims.matrix
+mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
+alpha_hat  = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
+beta_hat   = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
+delta_hat  = estimate[-seq_burn,colnames(estimate)[grepl('delta',  colnames(estimate))]]
+gamma_hat  = estimate[-seq_burn,colnames(estimate)[grepl('gamma',  colnames(estimate))]]
+lambda_hat = estimate[-seq_burn,colnames(estimate)[grepl('lambda', colnames(estimate))]]
+lambda_hat = as.matrix(lambda_hat)
+
+# Alpha ------------
+alpha_hat2 = melt(alpha_hat)
+names(alpha_hat2) <- c('id', 'Parameter', 'value')
+alpha_hat2$true = rep(data$alpha, each=npost)
+alpha_hat2 %>%
+  ggplot(aes(x=Parameter, y=value, group = Parameter, colour=Parameter)) +
+  geom_boxplot() +
+  geom_point(data=alpha_hat2, aes(y=true), shape=4) +
+  labs(title = expression(~'Comparison of '~alpha[i])) +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(size = 15, hjust = 0.5)) +
+  scale_x_discrete(labels = c('alpha[1]' = expression(alpha[1]),
+                              'alpha[2]' = expression(alpha[2]),
+                              'alpha[3]' = expression(alpha[3]),
+                              'alpha[4]' = expression(alpha[4]),
+                              'alpha[5]' = expression(alpha[5]),
+                              'alpha[6]' = expression(alpha[6]),
+                              'alpha[7]' = expression(alpha[7]),
+                              'alpha[8]' = expression(alpha[8]),
+                              'alpha[9]' = expression(alpha[9]),
+                              'alpha[10]' = expression(alpha[10]))) +
+  scale_color_discrete(labels = c('alpha[1]' = expression(alpha[1]),
+                                'alpha[2]' = expression(alpha[2]),
+                                'alpha[3]' = expression(alpha[3]),
+                                'alpha[4]' = expression(alpha[4]),
+                                'alpha[5]' = expression(alpha[5]),
+                                'alpha[6]' = expression(alpha[6]),
+                                'alpha[7]' = expression(alpha[7]),
+                                'alpha[8]' = expression(alpha[8]),
+                                'alpha[9]' = expression(alpha[9]),
+                                'alpha[10]' = expression(alpha[10])))
+
+
+
+
+
+
 
 mu_pos <- MCMCchains(bayesian_AMMI, params = 'mu_all') %>% data.frame()
 alpha_pos <- MCMCchains(bayesian_AMMI, params = 'alpha') %>% data.frame()
