@@ -132,9 +132,20 @@ bAMMI_help_plot <- function(object, data){
   delta_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('delta', colnames(estimate))])]
   gamma_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('gamma', colnames(estimate))])]
   lambda_hat = estimate[-seq_burn,c('id',colnames(estimate)[grepl('lambda', colnames(estimate))])]
-  lambda_hat = as.matrix(lambda_hat)
 
-  return(list(alpha_hat  = alpha_hat,
+  alpha_hat  = melt(alpha_hat, measure.vars = colnames(alpha_hat)[-1])
+  beta_hat   = melt(beta_hat, measure.vars = colnames(beta_hat)[-1])
+  delta_hat  = melt(delta_hat, measure.vars = colnames(delta_hat)[-1])
+  gamma_hat  = melt(gamma_hat, measure.vars = colnames(gamma_hat)[-1])
+  lambda_hat = melt(lambda_hat, measure.vars = colnames(lambda_hat)[-1])
+
+  alpha_hat$true  = rep(as.numeric(data[['alpha']]),  each=npost)
+  beta_hat$true   = rep(as.numeric(data[['beta']]),   each=npost)
+  delta_hat$true  = rep(as.numeric(data[['delta']]),  each=npost)
+  gamma_hat$true  = rep(as.numeric(data[['gamma']]),  each=npost)
+  lambda_hat$true = rep(as.numeric(data[['lambda']]), each=npost)
+
+  return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat,
               delta_hat   = delta_hat,
               gamma_hat   = gamma_hat,
@@ -149,7 +160,7 @@ lambda_hat = bAMMI_save_info$lambda_hat
 gamma_hat = bAMMI_save_info$gamma_hat
 delta_hat = bAMMI_save_info$delta_hat
 
-organise_AMBARTI <- function(object, data){
+AMBARTI_help_plot <- function(object, data){
 
   # Get training info
   x_train = data$x
@@ -165,12 +176,25 @@ organise_AMBARTI <- function(object, data){
   estimate = as.data.frame(object$beta_hat)
   alpha_hat = estimate[,grepl('g', names(estimate))]
   beta_hat  = estimate[,grepl('e', names(estimate))]
+  names(alpha_hat) <- paste(gsub('g','alpha[', names(alpha_hat)), ']', sep='')
+  names(beta_hat) <- paste(gsub('e','beta[', names(beta_hat)), ']', sep='')
   alpha_hat$id = 'AMBARTI'
   beta_hat$id = 'AMBARTI'
+
+  alpha_hat = melt(alpha_hat, measure.vars = colnames(alpha_hat)[grepl('alpha', colnames(alpha_hat))])
+  beta_hat = melt(beta_hat, measure.vars = colnames(beta_hat)[grepl('beta', colnames(beta_hat))])
+
+  alpha_hat$true = rep(as.numeric(data[['alpha']]), each=ambarti$npost)
+  beta_hat$true  = rep(as.numeric(data[['beta']]), each=ambarti$npost)
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat))
 }
+
+AMBARTI_save_info = AMBARTI_help_plot(ambarti, data)
+
+alpha_hat = rbind(alpha_hat, AMBARTI_save_info$alpha_hat)
+beta_hat = rbind(beta_hat, AMBARTI_save_info$beta_hat)
 
 new_parse_format <- function(text) {
   out <- vector("expression", length(text))
@@ -185,28 +209,27 @@ new_parse_format <- function(text) {
 
 plot_individual <- function(object, data){
 
-  db = melt(object)
-  names(db) = c('id', 'Parameter', 'value')
+  db = object
+  names(db) = c('Method', 'Parameter', 'value', 'true')
   aux_name = strsplit(deparse(substitute(object)), split = '_')[[1]][1]
-  db$true = rep(data[[aux_name]], each=npost)
-  orig_labels = colnames(object)
+  orig_labels = as.character(unique(object$variable))
   fixed_labels = new_parse_format(gsub(',','', orig_labels))
 
   db %>%
-    ggplot(aes(x=Parameter, y=value, group = Parameter, colour=Parameter)) +
-    geom_boxplot() +
-    geom_point(data=db, aes(y=true), shape=4, size=4) +
+    ggplot(aes(x=Parameter, y=value)) +
+    geom_boxplot(aes(colour=Method))+
+    geom_point(data=db, aes(y=true), colour='darkgray', shape=4, size=4) +
     theme_bw() +
     labs(title = bquote(Comparison~of~.(sym(aux_name)))) +
     theme(axis.text.x = element_text(size=12),
           axis.title = element_blank(),
           plot.title = element_text(size = 18, hjust = 0.5),
           legend.text = element_text(size = 12),
-          legend.title = element_text(size = 15),
+          legend.title = element_blank(),
           legend.position = "bottom") +
     scale_x_discrete(limit = orig_labels,
                      labels = fixed_labels) +
-    scale_color_discrete(labels=fixed_labels)
+    scale_color_discrete(labels=unique(db$Method))
 }
 plot_individual(alpha_hat, data)
 plot_individual(beta_hat, data)
