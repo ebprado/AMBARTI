@@ -691,8 +691,8 @@ AMBARTI_help_plot <- function(object, data){
   alpha_hat = melt(alpha_hat, measure.vars = colnames(alpha_hat)[grepl('alpha', colnames(alpha_hat))])
   beta_hat = melt(beta_hat, measure.vars = colnames(beta_hat)[grepl('beta', colnames(beta_hat))])
 
-  alpha_hat$true = rep(as.numeric(data[['alpha']]), each=ambarti$npost)
-  beta_hat$true  = rep(as.numeric(data[['beta']]), each=ambarti$npost)
+  alpha_hat$true = rep(as.numeric(data[['alpha']]), each=object$npost)
+  beta_hat$true  = rep(as.numeric(data[['beta']]), each=object$npost)
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat))
