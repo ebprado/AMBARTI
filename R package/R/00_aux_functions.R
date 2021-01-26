@@ -84,7 +84,7 @@ return(aux)
 }
 
 #' @export
-#' @importFrom stats 'aov' 'model.tables'
+#' @importFrom stats 'aov' 'model.tables' 'lm'
 organise_classical_AMMI <- function(object, data){
 
   # Get training info
@@ -510,7 +510,7 @@ return(list(alpha_hat   = alpha_hat,
 }
 
 #' @export
-#'
+#' @importFrom reshape2 'melt'
 bAMMI_help_plot_WITHPOS <- function(object, data){
 
   # Get training info
@@ -657,9 +657,9 @@ bAMMI_help_plot_WITHPOS <- function(object, data){
 
   return(list(alpha_hat   = snew_alpha_hat,
               beta_hat    = snew_beta_hat,
-              delta_hat   = snew_lambda_hat,
+              delta_hat   = snew_delta_hat,
               gamma_hat   = snew_gamma_hat,
-              lambda_hat  = snew_delta_hat,
+              lambda_hat  = snew_lambda_hat,
               y_hat_train = new_mu_ij_train,
               y_hat_test  = new_mu_ij_test,
               blinear_hat = new_blin_train,
