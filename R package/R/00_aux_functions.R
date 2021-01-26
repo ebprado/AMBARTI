@@ -96,17 +96,17 @@ organise_classical_AMMI <- function(object, data){
   x_test = data$x
   y_test = data$y_test
 
-  gen = as.factor(x_train[,"g"])
-  env = as.factor(x_train[,"e"])
+  g = as.factor(x_train[,"g"])
+  e = as.factor(x_train[,"e"])
 
   # Fit the linear model
-  linear_mod = aov(y_train ~ gen + env + gen:env)
-  # linear_mod = lm(y_train ~ gen + env)
+  linear_mod = aov(y_train ~ g + e + g:e)
+  # linear_mod = lm(y_train ~ g + e)
 
-  # Get the residuals for the interaction gen:env
-  #interaction_tab = matrix(residuals(linear_mod), ncol = length(unique(gen)), length(unique(env)))
-  interaction_tab = model.tables(linear_mod, type='effects', cterms = 'gen:env')
-  interaction_tab = interaction_tab$tables$`gen:env`
+  # Get the residuals for the interaction g:e
+  #interaction_tab = matrix(residuals(linear_mod), ncol = length(unique(g)), length(unique(env)))
+  interaction_tab = model.tables(linear_mod, type='effects', cterms = 'g:e')
+  interaction_tab = interaction_tab$tables$`g:e`
 
   # Get the number of PCs
   PC = length(data$lambda)
@@ -117,8 +117,8 @@ organise_classical_AMMI <- function(object, data){
   # Get parameter estimates
   # mu_hat     = linear_mod$coefficients[1] # slightly biased compared to mean(y_train)
   mu_hat     = mean(y_train)
-  alpha_hat  = aggregate(x = y_train - mu_hat, by = list(gen), FUN = "mean")[,2]
-  beta_hat   = aggregate(x = y_train - mu_hat, by = list(env), FUN = "mean")[,2]
+  alpha_hat  = aggregate(x = y_train - mu_hat, by = list(g), FUN = "mean")[,2]
+  beta_hat   = aggregate(x = y_train - mu_hat, by = list(e), FUN = "mean")[,2]
   lambda_hat = sv_dec$d[1:PC]
   gamma_hat  = -1*sv_dec$u
   delta_hat  = -1*sv_dec$v
