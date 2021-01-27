@@ -31,34 +31,46 @@ beta_hat   = res_AMMI$beta_hat
 lambda_hat = res_AMMI$lambda_hat
 gamma_hat  = res_AMMI$gamma_hat
 delta_hat  = res_AMMI$delta_hat
+blinear_hat = res_AMMI$blinear_hat
+y_train_hat = res_AMMI$y_hat_train
+y_test_hat = res_AMMI$y_hat_test
 
 # Get parameter estimates from Bayesian AMMI (WITHOUT postprocessing)
 bAMMI_save_info = bAMMI_help_plot(bayesian_AMMI, data)
 
-alpha_hat  = rbind(alpha_hat,  bAMMI_save_info$alpha_hat)
-beta_hat   = rbind(beta_hat,   bAMMI_save_info$beta_hat)
-lambda_hat = rbind(lambda_hat, bAMMI_save_info$lambda_hat)
-gamma_hat  = rbind(gamma_hat,  bAMMI_save_info$gamma_hat)
-delta_hat  = rbind(delta_hat,  bAMMI_save_info$delta_hat)
+alpha_hat   = rbind(alpha_hat,    bAMMI_save_info$alpha_hat)
+beta_hat    = rbind(beta_hat,     bAMMI_save_info$beta_hat)
+lambda_hat  = rbind(lambda_hat,   bAMMI_save_info$lambda_hat)
+gamma_hat   = rbind(gamma_hat,    bAMMI_save_info$gamma_hat)
+delta_hat   = rbind(delta_hat,    bAMMI_save_info$delta_hat)
+blinear_hat = rbind(blinear_hat,  bAMMI_save_info$blinear_hat)
+y_train_hat = rbind(y_train_hat,  bAMMI_save_info$y_hat_train)
+y_test_hat  = rbind(y_test_hat,   bAMMI_save_info$y_test_hat)
 
 # Get parameter estimates from Bayesian AMMI (WITH postprocessing)
 bAMMI_save_info_WITHPOS = bAMMI_help_plot_WITHPOS(bayesian_AMMI, data)
 
-alpha_hat  = rbind(alpha_hat,  bAMMI_save_info_WITHPOS$alpha_hat)
-beta_hat   = rbind(beta_hat,   bAMMI_save_info_WITHPOS$beta_hat)
-lambda_hat = rbind(lambda_hat, bAMMI_save_info_WITHPOS$lambda_hat)
-gamma_hat  = rbind(gamma_hat,  bAMMI_save_info_WITHPOS$gamma_hat)
-delta_hat  = rbind(delta_hat,  bAMMI_save_info_WITHPOS$delta_hat)
+alpha_hat   = rbind(alpha_hat,   bAMMI_save_info_WITHPOS$alpha_hat)
+beta_hat    = rbind(beta_hat,    bAMMI_save_info_WITHPOS$beta_hat)
+lambda_hat  = rbind(lambda_hat,  bAMMI_save_info_WITHPOS$lambda_hat)
+gamma_hat   = rbind(gamma_hat,   bAMMI_save_info_WITHPOS$gamma_hat)
+delta_hat   = rbind(delta_hat,   bAMMI_save_info_WITHPOS$delta_hat)
+blinear_hat = rbind(blinear_hat, bAMMI_save_info_WITHPOS$blinear_hat)
+y_train_hat = rbind(y_train_hat, bAMMI_save_info_WITHPOS$y_hat_train)
+y_test_hat  = rbind(y_test_hat,  bAMMI_save_info_WITHPOS$y_test_hat)
 
 # Get parameter estimates from AMBARTI
 AMBARTI_save_info = AMBARTI_help_plot(ambarti, data)
 
-alpha_hat = rbind(alpha_hat, AMBARTI_save_info$alpha_hat)
-beta_hat = rbind(beta_hat, AMBARTI_save_info$beta_hat)
+alpha_hat   = rbind(alpha_hat, AMBARTI_save_info$alpha_hat)
+beta_hat    = rbind(beta_hat, AMBARTI_save_info$beta_hat)
+blinear_hat = rbind(blinear_hat, AMBARTI_save_info$blinear_hat)
+y_train_hat = rbind(y_train_hat, AMBARTI_save_info$y_hat_train)
+y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_test_hat)
 
 # Plot ----------
 
-plot_individual <- function(object, data){
+plot_individual_boxplots <- function(object, data){
 
   db = object
   names(db) = c('Method', 'Parameter', 'value', 'true')
@@ -82,15 +94,36 @@ plot_individual <- function(object, data){
                      labels = fixed_labels) +
     scale_color_discrete(labels=unique(db$Method))
 }
-plot_individual(alpha_hat, data)
-plot_individual(beta_hat, data)
-plot_individual(lambda_hat, data)
-plot_individual(gamma_hat, data)
-plot_individual(delta_hat, data)
+plot_individual_boxplots(alpha_hat, data)
+plot_individual_boxplots(beta_hat, data)
+plot_individual_boxplots(lambda_hat, data)
+plot_individual_boxplots(gamma_hat, data)
+plot_individual_boxplots(delta_hat, data)
 
-##
+## ------------
 
-res_AMMI$blinear_hat
-bAMMI_save_info_WITHPOS$blinear_hat
-bAMMI_save_info$
-AMBARTI_save_info
+plot_individual_density <- function(object, data){
+
+  db = object
+  names(db) = c('Method', 'Parameter', 'value', 'true')
+
+  db %>%
+    ggplot(aes(x=value, colour=Method)) +
+    geom_density(alpha=0.4)+
+    theme_bw() +
+    labs(title = 'bla bla') +
+    theme(axis.text.x = element_text(size=12),
+          axis.title = element_blank(),
+          plot.title = element_text(size = 18, hjust = 0.5),
+          legend.text = element_text(size = 12),
+          legend.title = element_blank(),
+          legend.position = "bottom")  +
+    # scale_x_discrete(limit = orig_labels,
+                     # labels = fixed_labels) +
+    scale_color_discrete(labels=unique(db$Method))
+}
+plot_individual_density(blinear_hat, data)
+
+
+
+
