@@ -474,6 +474,29 @@ y_test = data$y_test
 # Get the number of PCs
 PC = length(data$lambda)
 
+# Get estimates info
+estimate   = object$BUGSoutput$mean
+mu_hat     = as.numeric(estimate$mu_all)
+alpha_hat  = estimate$alpha
+beta_hat   = estimate$beta
+delta_hat  = estimate$delta
+gamma_hat  = estimate$gamma
+lambda_hat = estimate$lambda
+
+# Set up the bilinear term
+blin_train = rep(0, length(y_train))
+blin_test  = rep(0, length(y_test))
+
+for (k in 1:PC) {
+  blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
+  blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
+}
+
+# Compute the predicted response for the TRAINING data
+y_hat_train = mu_hat + alpha_hat[x_train[,'g']] + beta_hat[x_train[,'e']] + blin_train
+# Compute the predicted response for the TEST data
+y_hat_test = mu_hat + alpha_hat[x_test[,'g']] + beta_hat[x_test[,'e']] + blin_test
+
 # Get some MCMC info
 nburn      = object$BUGSoutput$n.burnin
 niter      = object$BUGSoutput$n.iter
@@ -506,7 +529,9 @@ return(list(alpha_hat   = alpha_hat,
             beta_hat    = beta_hat,
             delta_hat   = delta_hat,
             gamma_hat   = gamma_hat,
-            lambda_hat  = lambda_hat))
+            lambda_hat  = lambda_hat,
+            y_hat_train = y_hat_train,
+            y_hat_test  = y_hat_test))
 }
 
 #' @export
@@ -680,22 +705,29 @@ AMBARTI_help_plot <- function(object, data){
   y_test = data$y_test
 
   # Get estimates info
-  estimate = as.data.frame(object$beta_hat)
-  alpha_hat = estimate[,grepl('g', names(estimate))]
-  beta_hat  = estimate[,grepl('e', names(estimate))]
-  names(alpha_hat) <- paste(gsub('g','alpha[', names(alpha_hat)), ']', sep='')
-  names(beta_hat) <- paste(gsub('e','beta[', names(beta_hat)), ']', sep='')
+  estimate    = as.data.frame(object$beta_hat)
+  alpha_hat   = estimate[,grepl('g', names(estimate))]
+  beta_hat    = estimate[,grepl('e', names(estimate))]
+  y_hat_train = apply(object$y_hat, 2, mean)
+  y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+  blinear_hat = apply(object$y_hat_bart,2,mean)
+  names(alpha_hat) = paste(gsub('g','alpha[', names(alpha_hat)), ']', sep='')
+  names(beta_hat) = paste(gsub('e','beta[', names(beta_hat)), ']', sep='')
   alpha_hat$id = 'AMBARTI'
   beta_hat$id = 'AMBARTI'
 
   alpha_hat = melt(alpha_hat, measure.vars = colnames(alpha_hat)[grepl('alpha', colnames(alpha_hat))])
-  beta_hat = melt(beta_hat, measure.vars = colnames(beta_hat)[grepl('beta', colnames(beta_hat))])
+  beta_hat  = melt(beta_hat, measure.vars = colnames(beta_hat)[grepl('beta', colnames(beta_hat))])
 
   alpha_hat$true = rep(as.numeric(data[['alpha']]), each=object$npost)
   beta_hat$true  = rep(as.numeric(data[['beta']]), each=object$npost)
 
   return(list(alpha_hat   = alpha_hat,
-              beta_hat    = beta_hat))
+              beta_hat    = beta_hat,
+              y_hat_train = y_hat_train,
+              y_hat_test  = y_hat_test,
+              blinear_hat = blinear_hat,
+              id          = 'AMBARTI'))
 }
 
 #' @export
