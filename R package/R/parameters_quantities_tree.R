@@ -66,6 +66,27 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
   return(tree)
 }
 
+simulate_mu_bart_prior = function(tree, mu_mu, sigma2_mu) {
+
+  # First find which rows are terminal nodes
+  which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
+
+  # Get node sizes for each terminal node
+  nj = tree$tree_matrix[which_terminal,'node_size']
+
+  # Now calculate mu values
+  mu = rnorm(length(nj) ,
+             mean = mu_mu,
+             sd = sqrt(sigma2_mu))
+
+  # Wipe all the old mus out for other nodes
+  tree$tree_matrix[,'mu'] = NA
+
+  # Put in just the ones that are useful
+  tree$tree_matrix[which_terminal,'mu'] = mu
+
+  return(tree)
+}
 # Update sigma2 -------------------------------------------------------------
 
 update_linear_component <- function(y, yhat_bart, x, sigma2, sigma2_psi_inv){

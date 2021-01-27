@@ -45,7 +45,7 @@ gamma_hat   = rbind(gamma_hat,    bAMMI_save_info$gamma_hat)
 delta_hat   = rbind(delta_hat,    bAMMI_save_info$delta_hat)
 blinear_hat = rbind(blinear_hat,  bAMMI_save_info$blinear_hat)
 y_train_hat = rbind(y_train_hat,  bAMMI_save_info$y_hat_train)
-y_test_hat  = rbind(y_test_hat,   bAMMI_save_info$y_test_hat)
+y_test_hat  = rbind(y_test_hat,   bAMMI_save_info$y_hat_test)
 
 # Get parameter estimates from Bayesian AMMI (WITH postprocessing)
 bAMMI_save_info_WITHPOS = bAMMI_help_plot_WITHPOS(bayesian_AMMI, data)
@@ -57,7 +57,7 @@ gamma_hat   = rbind(gamma_hat,   bAMMI_save_info_WITHPOS$gamma_hat)
 delta_hat   = rbind(delta_hat,   bAMMI_save_info_WITHPOS$delta_hat)
 blinear_hat = rbind(blinear_hat, bAMMI_save_info_WITHPOS$blinear_hat)
 y_train_hat = rbind(y_train_hat, bAMMI_save_info_WITHPOS$y_hat_train)
-y_test_hat  = rbind(y_test_hat,  bAMMI_save_info_WITHPOS$y_test_hat)
+y_test_hat  = rbind(y_test_hat,  bAMMI_save_info_WITHPOS$y_hat_test)
 
 # Get parameter estimates from AMBARTI
 AMBARTI_save_info = AMBARTI_help_plot(ambarti, data)
@@ -66,9 +66,9 @@ alpha_hat   = rbind(alpha_hat, AMBARTI_save_info$alpha_hat)
 beta_hat    = rbind(beta_hat, AMBARTI_save_info$beta_hat)
 blinear_hat = rbind(blinear_hat, AMBARTI_save_info$blinear_hat)
 y_train_hat = rbind(y_train_hat, AMBARTI_save_info$y_hat_train)
-y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_test_hat)
+y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_hat_test)
 
-# Plot ----------
+# Box plots for the parameter estimates ----------
 
 plot_individual_boxplots <- function(object, data){
 
@@ -100,9 +100,16 @@ plot_individual_boxplots(lambda_hat, data)
 plot_individual_boxplots(gamma_hat, data)
 plot_individual_boxplots(delta_hat, data)
 
-## ------------
+alpha_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
+beta_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
+
+## Density plots for the DIFFERENCE (true - predicted)
 
 plot_individual_density <- function(object, data){
+
+  if (deparse(substitute(object)) == 'blinear_hat') {aux_title = expression(Sigma[q]~lambda[q]~gamma[iq]~delta[jq]~-~Sigma[q]~hat(lambda)[q]~hat(gamma)[iq]~hat(delta)[jq])}
+  if (deparse(substitute(object)) == 'y_train_hat') {aux_title = expression('Training data:'~y - hat(y))}
+  if (deparse(substitute(object)) == 'y_test_hat') {aux_title = expression('Test data:'~y - hat(y))}
 
   db = object
   names(db) = c('Method', 'Parameter', 'value', 'true')
@@ -111,7 +118,7 @@ plot_individual_density <- function(object, data){
     ggplot(aes(x=value, colour=Method)) +
     geom_density(alpha=0.4)+
     theme_bw() +
-    labs(title = 'bla bla') +
+    labs(title = aux_title) +
     theme(axis.text.x = element_text(size=12),
           axis.title = element_blank(),
           plot.title = element_text(size = 18, hjust = 0.5),
@@ -123,7 +130,5 @@ plot_individual_density <- function(object, data){
     scale_color_discrete(labels=unique(db$Method))
 }
 plot_individual_density(blinear_hat, data)
-
-
-
-
+plot_individual_density(y_train_hat, data)
+plot_individual_density(y_test_hat, data)

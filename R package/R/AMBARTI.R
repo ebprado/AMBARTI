@@ -67,8 +67,8 @@ ambarti = function(x,
   ncov = length(ng) + length(ne)
 
   x <- model.matrix(~ -1 + g + e, data=x,
-                     contrasts.arg=list(g=contrasts(as.factor(x$g), contrasts=F),
-                                        e=contrasts(as.factor(x$e), contrasts=F)))
+                     contrasts.arg=list(g=contrasts(x$g, contrasts=F),
+                                        e=contrasts(x$e, contrasts=F)))
 
   ###########################################
   #### Genotype

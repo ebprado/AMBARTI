@@ -39,7 +39,7 @@ generate_data <- function(I, # Number of genotypes
   # Generate the interaction/bilinear part
   blin = rep(0, I*J)
   for (k in 1:length(lambda)) {
-    blin <- blin + lambda[k]*gamma[x[,1],k]*delta[x[,2],k]
+    blin <- blin + lambda[k]*gamma[x[,'g'],k]*delta[x[,'e'],k]
   }
 
   # Now simulate the response

@@ -48,7 +48,7 @@ myplot <- function(varA, varB, varC){
           legend.position = 'bottom',
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
-    facet_wrap(~ Q, scales='free', nrow=1) +
+    facet_wrap(~ Q, scales='free_x', nrow=1) +
     # facet_grid(I ~ Q) +
     labs(colour='') +
     guides(col = guide_legend(nrow=2))
