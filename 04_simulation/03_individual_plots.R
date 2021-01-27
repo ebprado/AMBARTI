@@ -87,3 +87,10 @@ plot_individual(beta_hat, data)
 plot_individual(lambda_hat, data)
 plot_individual(gamma_hat, data)
 plot_individual(delta_hat, data)
+
+##
+
+res_AMMI$blinear_hat
+bAMMI_save_info_WITHPOS$blinear_hat
+bAMMI_save_info$
+AMBARTI_save_info
