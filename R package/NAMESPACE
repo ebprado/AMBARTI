@@ -2,6 +2,7 @@
 
 export(AMBARTI_help_plot)
 export(AMMI_help_plot)
+export(I)
 export(ambarti)
 export(bAMMI_help_plot)
 export(bAMMI_help_plot_WITHPOS)
