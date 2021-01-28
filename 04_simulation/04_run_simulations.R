@@ -43,7 +43,7 @@ for (i in 1:n_comb){
     # Set a seed to make it reproducible
     set.seed(nseed)
 
-    data = generate_data(I, J, s_alpha, s_beta, s_y, lambda)
+    data = generate_data_AMMI(I, J, s_alpha, s_beta, s_y, lambda)
 
     # run classical AMMI
     classical_AMMI = run_classical_AMMI(data)

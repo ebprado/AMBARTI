@@ -5,6 +5,7 @@ install_github("ebprado/AMBARTI/R package",
 
 library(AMBARTI)
 save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
+
 #-------------------------------------------------
 # Individual plots
 #-------------------------------------------------
