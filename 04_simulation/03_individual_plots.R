@@ -1,4 +1,3 @@
-
 library(devtools)
 install_github("ebprado/AMBARTI/R package",
                ref = 'main',
