@@ -64,8 +64,7 @@ create_stump = function(num_trees,
 
 # Function to update trees ------------------------------------------------
 
-update_tree = function(y, # Target variable
-                       X, # Feature matrix
+update_tree = function(X, # Feature matrix
                        type = c('grow',   # Grow existing tree
                                 'prune',  # Prune existing tree
                                 'change', # Change existing tree - change split variable and value for an internal node
@@ -78,10 +77,10 @@ update_tree = function(y, # Target variable
 
   # Call the appropriate function to get the new tree
   new_tree = switch(type,
-                    grow = grow_tree(X, y, curr_tree, node_min_size, s, index),
-                    prune = prune_tree(X, y, curr_tree),
-                    change = change_tree(X, y, curr_tree, node_min_size),
-                    swap = swap_tree(X, y, curr_tree, node_min_size))
+                    grow = grow_tree(X, curr_tree, node_min_size, s, index),
+                    prune = prune_tree(X, curr_tree),
+                    change = change_tree(X, curr_tree, node_min_size),
+                    swap = swap_tree(X, curr_tree, node_min_size))
 
   # Return the new tree
   return(new_tree)
@@ -90,7 +89,7 @@ update_tree = function(y, # Target variable
 
 # Grow_tree function ------------------------------------------------------
 
-grow_tree = function(X, y, curr_tree, node_min_size, s, index) {
+grow_tree = function(X, curr_tree, node_min_size, s, index) {
 
   # Set up holder for new tree
   new_tree = curr_tree
@@ -173,7 +172,7 @@ grow_tree = function(X, y, curr_tree, node_min_size, s, index) {
 
 # Prune_tree function -----------------------------------------------------
 
-prune_tree = function(X, y, curr_tree) {
+prune_tree = function(X, curr_tree) {
 
   # Create placeholder for new tree
   new_tree = curr_tree
@@ -226,7 +225,7 @@ prune_tree = function(X, y, curr_tree) {
   # If we're back to a stump no need to call fill_tree_details
   if(nrow(new_tree$tree_matrix) == 1) {
     new_tree$var = var_pruned_nodes
-    new_tree$node_indices = rep(1, length(y))
+    new_tree$node_indices = rep(1, nrow(X))
   } else {
     # If we've removed some nodes from the middle we need to re-number all the child_left and child_right values - the parent values will still be correct
     if(node_to_prune <= nrow(new_tree$tree_matrix)) { # Only need do this if we've removed some observations from the middle of the tree matrix
@@ -260,7 +259,7 @@ prune_tree = function(X, y, curr_tree) {
 
 # change_tree function ----------------------------------------------------
 
-change_tree = function(X, y, curr_tree, node_min_size) {
+change_tree = function(X, curr_tree, node_min_size) {
 
   # Change a node means change out the split value and split variable of an internal node. Need to make sure that this does now produce a bad tree (i.e. zero terminal nodes)
 
@@ -350,7 +349,7 @@ change_tree = function(X, y, curr_tree, node_min_size) {
 
 # swap_tree function ------------------------------------------------------
 
-swap_tree = function(X, y, curr_tree, node_min_size) {
+swap_tree = function(X, curr_tree, node_min_size) {
 
   # Swap takes two neighbouring internal nodes and swaps around their split values and variables
 

@@ -2,11 +2,11 @@
 
 export(AMBARTI_help_plot)
 export(AMMI_help_plot)
-export(I)
 export(ambarti)
 export(bAMMI_help_plot)
 export(bAMMI_help_plot_WITHPOS)
-export(generate_data)
+export(generate_data_AMMI)
+export(generate_data_ambarti)
 export(get_metrics)
 export(new_parse_format)
 export(organise_AMBARTI)

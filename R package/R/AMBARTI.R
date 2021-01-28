@@ -221,22 +221,20 @@ ambarti = function(x,
           # add to the same tree an interaction of environment, otherwise we run the risk of allowing
           # confunding.
 
-          new_trees[[j]] = update_tree(y = y_scale,
-                                       X = x_g_e,
-                                       type = type,
-                                       curr_tree = curr_trees[[j]],
+          new_trees[[j]] = update_tree(X             = x_g_e,
+                                       type          = type,
+                                       curr_tree     = curr_trees[[j]],
                                        node_min_size = node_min_size,
-                                       s = s_g,
-                                       index = ind_x_g)
+                                       s             = s_g,
+                                       index         = ind_x_g)
           var1 = new_trees[[j]]$var
 
-          new_trees[[j]] = update_tree(y = y_scale,
-                                       X = x_g_e,
-                                       type = type,
-                                       curr_tree = new_trees[[j]],
+          new_trees[[j]] = update_tree(X             = x_g_e,
+                                       type          = type,
+                                       curr_tree     = new_trees[[j]],
                                        node_min_size = node_min_size,
-                                       s = s_e,
-                                       index = ind_x_e)
+                                       s             = s_e,
+                                       index         = ind_x_e)
           var2 = new_trees[[j]]$var
         } else {
 

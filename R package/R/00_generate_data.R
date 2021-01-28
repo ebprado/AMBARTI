@@ -1,7 +1,7 @@
 #' @export
 #' @importFrom truncnorm 'rtruncnorm'
 #'
-generate_data <- function(I, # Number of genotypes
+generate_data_AMMI <- function(I, # Number of genotypes
                           J, # Number of environments
                           s_alpha, # standard deviation of alpha
                           s_beta, # standard deviation of alpha
@@ -43,7 +43,7 @@ generate_data <- function(I, # Number of genotypes
   }
 
   # Now simulate the response
-  mu_ij = mu + alpha[x[,1]] + beta[x[,2]] + blin
+  mu_ij = mu + alpha[x[,'g']] + beta[x[,'e']] + blin
 
   # Compute the response for the TRAINING set
   y = rnorm(N, mu_ij, s_y)
@@ -73,25 +73,8 @@ generate_data <- function(I, # Number of genotypes
               blinear = blin))
 }
 
-##### TEST ########
-##### TEST ########
-##### TEST ########
-
 #' @export
-#' @importFrom mvtnorm 'rmvnorm'
-#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
-#' @importFrom MCMCpack 'rdirichlet'
-#' @importFrom truncnorm 'rtruncnorm'
-
-I = 10
-J = 10
-s_alpha = 1
-s_beta = 1
-s_y = 1
-ntrees = 200
-node_min_size = 5
-mu_mu = 0
-sigma2_mu = 3
+#' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
 
 generate_data_ambarti = function(I,
                                  J,
@@ -104,6 +87,7 @@ generate_data_ambarti = function(I,
                                  sigma2_mu = 3) {
 
   # Generate the "design matrix"
+  N = I*J
   x = expand.grid(1:I, 1:J)
   names(x) <- c('g', 'e') # g = genotype and e = envorinment
   x$g = as.factor(x$g)
@@ -179,7 +163,6 @@ generate_data_ambarti = function(I,
   ind_x_e = (ncol(x_g) + 1):ncol(x_g_e)
 
   # Extract control parameters
-  node_min_size = node_min_size
   tree_store = vector('list', 1)
   p_g = ncol(x_g)
   p_e = ncol(x_e)
@@ -187,8 +170,8 @@ generate_data_ambarti = function(I,
   s_e = rep(1/p_e, p_e)
 
   # Create a list of trees for the initial stump
-
   curr_trees = create_stump(num_trees = ntrees, y = 1:nrow(x))
+
   # Initialise the new trees as current one
   new_trees = curr_trees
 
@@ -226,23 +209,25 @@ generate_data_ambarti = function(I,
   } # End loop through trees
 
   bart_part = get_predictions(curr_trees, x_g_e, single_tree = ntrees == 1)
+  # hist(bart_part - mean(bart_part))
+  # We take the mean because we assume that the sum of BART predictions within g_i and e_j is zero.
+  bart_part = bart_part - mean(bart_part)
 
   tree_store[[1]] = curr_trees
 
   # Generate alpha_i and beta_j
   alpha = rnorm(I, 0, sd = s_alpha)
-  beta = rnorm(J, 0, sd = s_beta)
-  alpha_beta = c(alpha, beta)
-
-  random_effects = x%*%alpha_beta
+  beta  = rnorm(J, 0, sd = s_beta)
 
   # Generate y's
   mu = 100
-  y_train = rnorm(mu + random_effects + bart_part, sd=s_y)
-  y_test  = rnorm(mu + random_effects + bart_part, sd=s_y)
+  y_train = rnorm(N, mu + alpha[cov_g] + beta[cov_e] + bart_part, sd=s_y)
+  y_test  = rnorm(N, mu + alpha[cov_g] + beta[cov_e] + bart_part, sd=s_y)
 
-  return(list(y       = y,
+  return(list(y       = y_train,
               y_test  = y_test,
+              alpha   = alpha,
+              beta    = beta,
               blinear = bart_part,
               x       = x,
               I       = I,
@@ -254,4 +239,3 @@ generate_data_ambarti = function(I,
               trees   = tree_store))
 
 } # End main function
-

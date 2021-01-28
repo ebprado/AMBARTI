@@ -26,14 +26,14 @@ load(paste(save_file, ambarti_filename,   sep=''))
 # Get parameter estimates from classical AMMI
 res_AMMI = AMMI_help_plot(classical_AMMI, data)
 
-alpha_hat  = res_AMMI$alpha_hat
-beta_hat   = res_AMMI$beta_hat
-lambda_hat = res_AMMI$lambda_hat
-gamma_hat  = res_AMMI$gamma_hat
-delta_hat  = res_AMMI$delta_hat
+alpha_hat   = res_AMMI$alpha_hat
+beta_hat    = res_AMMI$beta_hat
+lambda_hat  = res_AMMI$lambda_hat
+gamma_hat   = res_AMMI$gamma_hat
+delta_hat   = res_AMMI$delta_hat
 blinear_hat = res_AMMI$blinear_hat
 y_train_hat = res_AMMI$y_hat_train
-y_test_hat = res_AMMI$y_hat_test
+y_test_hat  = res_AMMI$y_hat_test
 
 # Get parameter estimates from Bayesian AMMI (WITHOUT postprocessing)
 bAMMI_save_info = bAMMI_help_plot(bayesian_AMMI, data)
