@@ -9,42 +9,12 @@ In addition, it provides an implementation of AMBARTI in the format of an R pack
 library(devtools)
 install_github("ebprado/AMBARTI/R package")
 ```
-Below, we generate a simulated example of the Bayesian Additive Main effects and Multiplicative Interaction (AMMI) effects model presented in [Josse et al (JABES, 2014)](https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf). The simulation code was written by [Andrew Parnell](https://github.com/andrewcparnell) and [Danilo Sarti](https://github.com/danilosarti).
+Below, we generate a simulated example of the Bayesian Additive Main effects and Multiplicative Interaction (AMMI) effects model presented in [Josse et al (JABES, 2014)](https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf).
 
 ## Example
 ``` r
 library(AMBARTI)
 rm(list = ls())
-
-# Maths -------------------------------------------------------------------
-
-# Description of the Bayesian model fitted in this file
-
-# Likelihood
-# Y_{ij} ~ N(mu_{ij}, sigma^2_E)
-# with
-# mu_{ij} = mu + alpha_i + beta_j + sum_{q=1}^Q lambda_q*gamma_iq*delta_jq
-# Our idea is to estimate alpha_i + beta_j parametrically and the component 
-# "sum_{q=1}^Q lambda_q*gamma_iq*delta_jq" via BART.
-
-# Notation
-# Y_ij = response (e.g. yield) for genotype i and environment j, i = 1, ..., I
-# genotypes and j = 1, ..., J environments
-# mu is the grand mean
-# alpha_i is the genotype effect
-# beta_j is the environment effect
-# lambda_q is the q-th eigenvalue q = 1,.., Q of the interaction matrix
-# Q is the number of components used to model the interaction. Usually Q is fixed 
-# at a small number, e.g. 2
-# gamma_{iq} is the interaction effect for the q-th eigenvector for genotype i
-# delta_{iq} is the interaction effect for the q-th eigenvector for environment j
-# E_{ij} is a residual term with E_{ij} ~ N(0, sigma^2_E)
-# Usually these models have quite complicated restrictions on the gamma/delta/lambda
-# values but Josse et al show that these are not fully necessary
-
-# Priors
-# alpha_i ~ N(0, s_alpha^2)
-# beta_j ~ N(0, s_beta^2)
 
 # Simulate data -----------------------------------------------------------
 
@@ -54,11 +24,11 @@ rm(list = ls())
 # Specify fixed values
 Q = 1 # Number of components
 I = 10 # Number of genotypes
-J = 10# Number of environments
+J = 10 # Number of environments
 N = I*J # Total number of obs
 
 # Some further fixed values
-mu = 10
+mu = 10 # Grand mean
 sigma_E = 1
 sigma_alpha = 2
 sigma_beta = 2
