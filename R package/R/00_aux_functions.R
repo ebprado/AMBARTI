@@ -18,6 +18,7 @@ get_metrics = function(object, data, rep){
   y_hat_train = object$y_hat_train
   y_hat_test  = object$y_hat_test
   blinear_hat = object$blinear_hat
+  Q           = object$Q
 
   rmse_y_train = RMSE(y_train, y_hat_train)
   rmse_y_test  = RMSE(y_test, y_hat_test)
@@ -69,6 +70,7 @@ aux = data.frame(
                  sa           = sa,
                  sb           = sb,
                  sy           = sy,
+                 Q            = Q,
                  lambda       = lambda,
                  y_train_rmse = rmse_y_train,
                  y_test_rmse  = rmse_y_test,
