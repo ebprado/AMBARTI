@@ -18,9 +18,6 @@ rm(list = ls())
 
 # Simulate data -----------------------------------------------------------
 
-# We will follow the simulation strategy detailed in Section 3.1 of the
-# Josse et al paper
-
 # Specify fixed values
 Q = 1 # Number of components
 I = 10 # Number of genotypes
