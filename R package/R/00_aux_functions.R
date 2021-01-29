@@ -85,7 +85,7 @@ return(aux)
 
 #' @export
 #' @importFrom stats 'aov' 'model.tables' 'lm'
-organise_classical_AMMI <- function(object, data){
+organise_classical_AMMI <- function(object, data, Q = NULL){
 
   # Get training info
   x_train = data$x
@@ -131,7 +131,7 @@ organise_classical_AMMI <- function(object, data){
 
 #' @export
 #'
-organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
+organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
 
   # Get training info
   x_train = data$x
@@ -142,7 +142,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   y_test = data$y_test
 
   # Get the number of PCs
-  PC = length(data$lambda)
+  if (is.null(data$Q) == FALSE) {Q = data$Q}
 
   # Get some MCMC info
   nburn      = object$BUGSoutput$n.burnin
@@ -164,7 +164,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   blin_train = matrix(0, nrow = npost, ncol = nrow(x_train))
   blin_test  = matrix(0, nrow = npost, ncol = nrow(x_test))
 
-  for (k in 1:PC) {
+  for (k in 1:Q) {
     blin_train = blin_train + lambda_hat[,k] * gamma_hat[,x_train[,'g']]* delta_hat[,x_train[,'e']]
     blin_test  = blin_test +  lambda_hat[,k] * gamma_hat[,x_test[,'g']] * delta_hat[, x_test[,'e']]
   }
@@ -184,7 +184,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   snew_mu_hat     = matrix(NA, nrow=npost, ncol=1)
   snew_alpha_hat  = matrix(NA, nrow=npost, ncol=n_gen)
   snew_beta_hat   = matrix(NA, nrow=npost, ncol=n_env)
-  snew_lambda_hat = matrix(NA, nrow=npost, ncol=PC)
+  snew_lambda_hat = matrix(NA, nrow=npost, ncol=Q)
   snew_gamma_hat  = list()
   snew_delta_hat  = list()
 
@@ -203,10 +203,10 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
     res_double_centered = matrix_mu_ij - resA - resB + new_mu_hat # sum zero by row and column
 
     # Run the Singular Value Decomposition (SVD) to compute lambda, gamma, and delta
-    sv_dec <- svd(res_double_centered, nu = PC, nv = PC)
+    sv_dec <- svd(res_double_centered, nu = Q, nv = Q)
 
     # Get new parameter estimates
-    new_lambda_hat = sv_dec$d[1:PC]
+    new_lambda_hat = sv_dec$d[1:Q]
     new_gamma_hat  = -1*sv_dec$u
     new_delta_hat  = -1*sv_dec$v
 
@@ -236,7 +236,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data){
   new_blin_train = rep(0, length(y_train))
   new_blin_test  = rep(0, length(y_test))
 
-  for (k in 1:PC) {
+  for (k in 1:Q) {
     new_blin_train = new_blin_train + new_lambda_hat[k]*new_gamma_hat[x_train[,'g'],k]*new_delta_hat[x_train[,'e'],k]
     new_blin_test  = new_blin_test + new_lambda_hat[k]*new_gamma_hat[x_test[,'g'],k]*new_delta_hat[x_test[,'e'],k]
   }
@@ -280,19 +280,18 @@ organise_AMBARTI <- function(object, data){
   y_train = data$y
 
   # Get test info
-  x_test = data$x
+  x_test   = data$x
   x_test$g = as.factor(x_test$g)
   x_test$e = as.factor(x_test$e)
-  y_test = data$y_test
+  y_test   = data$y_test
 
   # Get estimates info
-  estimate = apply(object$beta_hat, 2, mean)
-  alpha_hat = estimate[grepl('g', names(estimate))]
-  beta_hat = estimate[grepl('e', names(estimate))]
+  estimate    = apply(object$beta_hat, 2, mean)
+  alpha_hat   = estimate[grepl('g', names(estimate))]
+  beta_hat    = estimate[grepl('e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
-  y_hat_test = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+  y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
   blinear_hat = apply(object$y_hat_bart,2,mean)
-
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat,
@@ -305,7 +304,7 @@ organise_AMBARTI <- function(object, data){
 
 #' @export
 #'
-organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data){
+organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data, Q = NULL){
 
   # Get training info
   x_train = data$x
@@ -316,7 +315,7 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data){
   y_test = data$y_test
 
   # Get the number of PCs
-  PC = length(data$lambda)
+  if (is.null(data$Q) == FALSE) {Q = data$Q}
 
   # Get estimates info
   estimate   = object$BUGSoutput$mean
@@ -331,7 +330,7 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data){
   blin_train = rep(0, length(y_train))
   blin_test  = rep(0, length(y_test))
 
-  for (k in 1:PC) {
+  for (k in 1:Q) {
     blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
     blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
   }
@@ -390,17 +389,17 @@ AMMI_help_plot <- function(object, data){
   interaction_tab = interaction_tab$tables$`g:e`
 
   # Get the number of PCs
-  PC = length(data$lambda)
+  Q = data$Q
 
   # Run the Singular Value Decomposition (SVD) to compute lambda, gamma, and delta
-  sv_dec <- svd(interaction_tab, nu = PC, nv = PC)
+  sv_dec <- svd(interaction_tab, nu = Q, nv = Q)
 
   # Get parameter estimates
   # mu_hat     = linear_mod$coefficients[1] # slightly biased compared to mean(y_train)
   mu_hat     = mean(y_train)
   alpha_hat  = aggregate(x = y_train - mu_hat, by = list(g), FUN = "mean")[,2]
   beta_hat   = aggregate(x = y_train - mu_hat, by = list(e), FUN = "mean")[,2]
-  lambda_hat = sv_dec$d[1:PC]
+  lambda_hat = sv_dec$d[1:Q]
   gamma_hat  = -1*sv_dec$u
   delta_hat  = -1*sv_dec$v
 
@@ -408,7 +407,7 @@ AMMI_help_plot <- function(object, data){
   blin_train = rep(0, length(y_train))
   blin_test  = rep(0, length(y_test))
 
-  for (k in 1:PC) {
+  for (k in 1:Q) {
     blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
     blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
   }
@@ -426,9 +425,9 @@ AMMI_help_plot <- function(object, data){
   id = 'AMMI'
   alpha_hat  = data.frame(id = id, variable = paste('alpha[',g_names ,']', sep=''), value=alpha_hat, true=data$alpha)
   beta_hat   = data.frame(id = id, variable = paste('beta[',e_names ,']', sep=''), value=beta_hat, true=data$beta)
-  lambda_hat = data.frame(id = id, variable = paste('lambda[',1:PC,']',sep=''), value=lambda_hat, true=data$lambda)
-  gamma_hat  = data.frame(id = id, variable = paste('gamma[',g_names,',',rep(1:PC, each=length(g_names)),']',sep=''), value=as.numeric(gamma_hat), true=as.numeric(data$gamma))
-  delta_hat  = data.frame(id = id, variable = paste('delta[',g_names,',',rep(1:PC, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(data$delta))
+  lambda_hat = data.frame(id = id, variable = paste('lambda[',1:Q,']',sep=''), value=lambda_hat, true=data$lambda)
+  gamma_hat  = data.frame(id = id, variable = paste('gamma[',g_names,',',rep(1:Q, each=length(g_names)),']',sep=''), value=as.numeric(gamma_hat), true=as.numeric(data$gamma))
+  delta_hat  = data.frame(id = id, variable = paste('delta[',g_names,',',rep(1:Q, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(data$delta))
 
   aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - blin_train, true = data$blinear)
   aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = data$y)
@@ -457,7 +456,7 @@ x_test = data$x
 y_test = data$y_test
 
 # Get the number of PCs
-PC = length(data$lambda)
+Q = data$Q
 
 # Get estimates info
 estimate   = object$BUGSoutput$mean
@@ -472,7 +471,7 @@ lambda_hat = estimate$lambda
 blin_train = rep(0, length(y_train))
 blin_test  = rep(0, length(y_test))
 
-for (k in 1:PC) {
+for (k in 1:Q) {
   blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
   blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
 }
@@ -538,7 +537,7 @@ bAMMI_help_plot_WITHPOS <- function(object, data){
   y_test = data$y_test
 
   # Get the number of PCs
-  PC = length(data$lambda)
+  Q = data$Q
 
   # Get some MCMC info
   nburn      = object$BUGSoutput$n.burnin
@@ -560,7 +559,7 @@ bAMMI_help_plot_WITHPOS <- function(object, data){
   blin_train = matrix(0, nrow = npost, ncol = nrow(x_train))
   blin_test  = matrix(0, nrow = npost, ncol = nrow(x_test))
 
-  for (k in 1:PC) {
+  for (k in 1:Q) {
     blin_train = blin_train + lambda_hat[,k] * gamma_hat[,x_train[,'g']]* delta_hat[,x_train[,'e']]
     blin_test  = blin_test +  lambda_hat[,k] * gamma_hat[,x_test[,'g']] * delta_hat[, x_test[,'e']]
   }
@@ -580,9 +579,9 @@ bAMMI_help_plot_WITHPOS <- function(object, data){
   snew_mu_hat     = matrix(NA, nrow=npost, ncol=1)
   snew_alpha_hat  = matrix(NA, nrow=npost, ncol=n_gen)
   snew_beta_hat   = matrix(NA, nrow=npost, ncol=n_env)
-  snew_lambda_hat = matrix(NA, nrow=npost, ncol=PC)
-  snew_gamma_hat  = matrix(NA, nrow=npost, ncol=PC*n_gen)
-  snew_delta_hat  = matrix(NA, nrow=npost, ncol=PC*n_env)
+  snew_lambda_hat = matrix(NA, nrow=npost, ncol=Q)
+  snew_gamma_hat  = matrix(NA, nrow=npost, ncol=Q*n_gen)
+  snew_delta_hat  = matrix(NA, nrow=npost, ncol=Q*n_env)
 
   for (i in 1:nrow(mu_ij)){
 
@@ -599,10 +598,10 @@ bAMMI_help_plot_WITHPOS <- function(object, data){
     res_double_centered = matrix_mu_ij - resA - resB + new_mu_hat # sum zero by row and column
 
     # Run the Singular Value Decomposition (SVD) to compute lambda, gamma, and delta
-    sv_dec <- svd(res_double_centered, nu = PC, nv = PC)
+    sv_dec <- svd(res_double_centered, nu = Q, nv = Q)
 
     # Get new parameter estimates
-    new_lambda_hat = sv_dec$d[1:PC]
+    new_lambda_hat = sv_dec$d[1:Q]
     new_gamma_hat  = -1*sv_dec$u
     new_delta_hat  = -1*sv_dec$v
 
@@ -634,10 +633,10 @@ bAMMI_help_plot_WITHPOS <- function(object, data){
   new_blin_train = rep(0, length(y_train))
   new_blin_test  = rep(0, length(y_test))
 
-  aux_new_gamma_hat = matrix(new_gamma_hat,ncol=PC)
-  aux_new_delta_hat = matrix(new_delta_hat,ncol=PC)
+  aux_new_gamma_hat = matrix(new_gamma_hat,ncol=Q)
+  aux_new_delta_hat = matrix(new_delta_hat,ncol=Q)
 
-  for (k in 1:PC) {
+  for (k in 1:Q) {
     new_blin_train = new_blin_train + new_lambda_hat[k]*aux_new_gamma_hat[x_train[,'g'],k]*aux_new_delta_hat[x_train[,'e'],k]
     new_blin_test  = new_blin_test + new_lambda_hat[k]*aux_new_gamma_hat[x_test[,'g'],k]*aux_new_delta_hat[x_test[,'e'],k]
   }
