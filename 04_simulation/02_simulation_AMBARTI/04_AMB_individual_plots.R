@@ -31,19 +31,19 @@ load(paste(save_file, bammi_filenameQ2, sep=''))
 load(paste(save_file, bammi_filenameQ3, sep=''))
 load(paste(save_file, ambarti_filename, sep=''))
 
-alpha_hat = NULL
-beta_hat = NULL
-lambda_hat = NULL
-gamma_hat = NULL
-delta_hat = NULL
+alpha_hat   = NULL
+beta_hat    = NULL
+lambda_hat  = NULL
+gamma_hat   = NULL
+delta_hat   = NULL
 blinear_hat = NULL
 y_train_hat = NULL
-y_test_hat = NULL
+y_test_hat  = NULL
 
 # Get parameter estimates from classical AMMI
 for (Q in 1:3){
-
-  res_AMMI = AMMI_help_plot(classical_AMMI, data, Q = Q)
+  aux_AMMI    = get(paste('classical_AMMI_Q',Q, sep=''))
+  res_AMMI    = AMMI_help_plot(aux_AMMI, data, Q = Q)
 
   alpha_hat   = rbind(alpha_hat,    res_AMMI$alpha_hat)
   beta_hat    = rbind(beta_hat,     res_AMMI$beta_hat)
@@ -55,35 +55,36 @@ for (Q in 1:3){
   y_test_hat  = rbind(y_test_hat,   res_AMMI$y_hat_test)
 
 # Get parameter estimates from Bayesian AMMI (WITHOUT postprocessing)
-bAMMI_save_info = bAMMI_help_plot(bayesian_AMMI, data, Q = Q)
+aux_bAMMI    = get(paste('bayesian_AMMI_Q',Q, sep=''))
+res_bAMMI    = bAMMI_help_plot(aux_bAMMI, data, Q = Q)
 
-alpha_hat   = rbind(alpha_hat,    bAMMI_save_info$alpha_hat)
-beta_hat    = rbind(beta_hat,     bAMMI_save_info$beta_hat)
-lambda_hat  = rbind(lambda_hat,   bAMMI_save_info$lambda_hat)
-gamma_hat   = rbind(gamma_hat,    bAMMI_save_info$gamma_hat)
-delta_hat   = rbind(delta_hat,    bAMMI_save_info$delta_hat)
-blinear_hat = rbind(blinear_hat,  bAMMI_save_info$blinear_hat)
-y_train_hat = rbind(y_train_hat,  bAMMI_save_info$y_hat_train)
-y_test_hat  = rbind(y_test_hat,   bAMMI_save_info$y_hat_test)
+alpha_hat   = rbind(alpha_hat,    res_bAMMI$alpha_hat)
+beta_hat    = rbind(beta_hat,     res_bAMMI$beta_hat)
+lambda_hat  = rbind(lambda_hat,   res_bAMMI$lambda_hat)
+gamma_hat   = rbind(gamma_hat,    res_bAMMI$gamma_hat)
+delta_hat   = rbind(delta_hat,    res_bAMMI$delta_hat)
+blinear_hat = rbind(blinear_hat,  res_bAMMI$blinear_hat)
+y_train_hat = rbind(y_train_hat,  res_bAMMI$y_hat_train)
+y_test_hat  = rbind(y_test_hat,   res_bAMMI$y_hat_test)
 
 # Get parameter estimates from Bayesian AMMI (WITH postprocessing)
-bAMMI_save_info_WITHPOS = bAMMI_help_plot_WITHPOS(bayesian_AMMI, data, Q = Q)
+res_bAMMI_WITHPOS = bAMMI_help_plot_WITHPOS(aux_bAMMI, data, Q = Q)
 
-alpha_hat   = rbind(alpha_hat,   bAMMI_save_info_WITHPOS$alpha_hat)
-beta_hat    = rbind(beta_hat,    bAMMI_save_info_WITHPOS$beta_hat)
-lambda_hat  = rbind(lambda_hat,  bAMMI_save_info_WITHPOS$lambda_hat)
-gamma_hat   = rbind(gamma_hat,   bAMMI_save_info_WITHPOS$gamma_hat)
-delta_hat   = rbind(delta_hat,   bAMMI_save_info_WITHPOS$delta_hat)
-blinear_hat = rbind(blinear_hat, bAMMI_save_info_WITHPOS$blinear_hat)
-y_train_hat = rbind(y_train_hat, bAMMI_save_info_WITHPOS$y_hat_train)
-y_test_hat  = rbind(y_test_hat,  bAMMI_save_info_WITHPOS$y_hat_test)
+alpha_hat   = rbind(alpha_hat,   res_bAMMI_WITHPOS$alpha_hat)
+beta_hat    = rbind(beta_hat,    res_bAMMI_WITHPOS$beta_hat)
+lambda_hat  = rbind(lambda_hat,  res_bAMMI_WITHPOS$lambda_hat)
+gamma_hat   = rbind(gamma_hat,   res_bAMMI_WITHPOS$gamma_hat)
+delta_hat   = rbind(delta_hat,   res_bAMMI_WITHPOS$delta_hat)
+blinear_hat = rbind(blinear_hat, res_bAMMI_WITHPOS$blinear_hat)
+y_train_hat = rbind(y_train_hat, res_bAMMI_WITHPOS$y_hat_train)
+y_test_hat  = rbind(y_test_hat,  res_bAMMI_WITHPOS$y_hat_test)
 }
 
 # Get parameter estimates from AMBARTI
 AMBARTI_save_info = AMBARTI_help_plot(ambarti, data)
 
-alpha_hat   = rbind(alpha_hat, AMBARTI_save_info$alpha_hat)
-beta_hat    = rbind(beta_hat, AMBARTI_save_info$beta_hat)
+alpha_hat   = rbind(alpha_hat,   AMBARTI_save_info$alpha_hat)
+beta_hat    = rbind(beta_hat,    AMBARTI_save_info$beta_hat)
 blinear_hat = rbind(blinear_hat, AMBARTI_save_info$blinear_hat)
 y_train_hat = rbind(y_train_hat, AMBARTI_save_info$y_hat_train)
 y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_hat_test)

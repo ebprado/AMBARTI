@@ -419,15 +419,15 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   e_names = unique(x_train$e)
 
   id = 'AMMI'
-  alpha_hat  = data.frame(id = id, variable = paste('alpha[',g_names ,']', sep=''), value=alpha_hat, true=alpha_true)
-  beta_hat   = data.frame(id = id, variable = paste('beta[',e_names ,']', sep=''), value=beta_hat, true=beta_true)
-  lambda_hat = data.frame(id = id, variable = paste('lambda[',1:Q,']',sep=''), value=lambda_hat, true=lambda_true)
-  gamma_hat  = data.frame(id = id, variable = paste('gamma[',g_names,',',rep(1:Q, each=length(g_names)),']',sep=''), value=as.numeric(gamma_hat), true=as.numeric(gamma_true))
-  delta_hat  = data.frame(id = id, variable = paste('delta[',g_names,',',rep(1:Q, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(delta_true))
+  alpha_hat  = data.frame(id = id, Q = Q, variable = paste('alpha[',g_names ,']', sep=''), value=alpha_hat, true=alpha_true)
+  beta_hat   = data.frame(id = id, Q = Q, variable = paste('beta[',e_names ,']', sep=''), value=beta_hat, true=beta_true)
+  lambda_hat = data.frame(id = id, Q = Q, variable = paste('lambda[',1:Q,']',sep=''), value=lambda_hat, true=lambda_true)
+  gamma_hat  = data.frame(id = id, Q = Q, variable = paste('gamma[',g_names,',',rep(1:Q, each=length(g_names)),']',sep=''), value=as.numeric(gamma_hat), true=as.numeric(gamma_true))
+  delta_hat  = data.frame(id = id, Q = Q, variable = paste('delta[',g_names,',',rep(1:Q, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(delta_true))
 
-  aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
-  aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
-  aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
+  aux_blinear_hat   = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
+  aux_y_hat_train   = data.frame(id = id, Q = Q, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
+  aux_y_hat_test    = data.frame(id = id, Q = Q, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat,
@@ -437,6 +437,7 @@ AMMI_help_plot <- function(object, data, Q = NULL){
               y_hat_train = aux_y_hat_train,
               y_hat_test  = aux_y_hat_test,
               blinear_hat = aux_blinear_hat,
+              Q           = Q,
               id          = id))
 }
 
@@ -494,19 +495,28 @@ seq_burn   = seq(1, nburn, by=1)
 # Get estimates info
 id = 'Bayesian AMMI (no postproc)'
 estimate   = as.data.frame(object$BUGSoutput$sims.matrix)
-estimate$id= id
+estimate$id = id
+estimate$Q  = Q
 #mu_hat     = estimate[-seq_burn,c('id',colnames(estimate)[grepl('mu_all', colnames(estimate))])]
-alpha_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('alpha', colnames(estimate))])]
-beta_hat   = estimate[-seq_burn,c('id',colnames(estimate)[grepl('beta', colnames(estimate))])]
-gamma_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('gamma', colnames(estimate))])]
-delta_hat  = estimate[-seq_burn,c('id',colnames(estimate)[grepl('delta', colnames(estimate))])]
-lambda_hat = estimate[-seq_burn,c('id',colnames(estimate)[grepl('lambda', colnames(estimate))])]
+alpha_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('alpha', colnames(estimate))])]
+beta_hat   = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('beta', colnames(estimate))])]
+gamma_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('gamma', colnames(estimate))])]
+delta_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('delta', colnames(estimate))])]
+lambda_hat = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('lambda', colnames(estimate))])]
 
-alpha_hat  = melt(alpha_hat, measure.vars = colnames(alpha_hat)[-1])
-beta_hat   = melt(beta_hat, measure.vars = colnames(beta_hat)[-1])
-lambda_hat = melt(lambda_hat, measure.vars = colnames(lambda_hat)[-1])
-gamma_hat  = melt(gamma_hat, measure.vars = colnames(gamma_hat)[-1])
-delta_hat  = melt(delta_hat, measure.vars = colnames(delta_hat)[-1])
+
+# Remove columns id and Q
+m_vars_alpha  = colnames(alpha_hat)[-which(colnames(alpha_hat) %in% c('id', 'Q'))]
+m_vars_beta   = colnames(beta_hat)[-which(colnames(beta_hat) %in% c('id', 'Q'))]
+m_vars_lambda = colnames(lambda_hat)[-which(colnames(lambda_hat) %in% c('id', 'Q'))]
+m_vars_gamma  = colnames(gamma_hat)[-which(colnames(gamma_hat) %in% c('id', 'Q'))]
+m_vars_delta  = colnames(delta_hat)[-which(colnames(delta_hat) %in% c('id', 'Q'))]
+
+alpha_hat  = melt(alpha_hat,  measure.vars = m_vars_alpha)
+beta_hat   = melt(beta_hat,   measure.vars = m_vars_beta)
+lambda_hat = melt(lambda_hat, measure.vars = m_vars_lambda)
+gamma_hat  = melt(gamma_hat,  measure.vars = m_vars_gamma)
+delta_hat  = melt(delta_hat,  measure.vars = m_vars_delta)
 
 alpha_hat$true  = rep(alpha_true,  each=npost)
 beta_hat$true   = rep(beta_true,   each=npost)
@@ -514,9 +524,9 @@ lambda_hat$true = rep(lambda_true, each=npost)
 gamma_hat$true  = rep(gamma_true,  each=npost)
 delta_hat$true  = rep(delta_true,  each=npost)
 
-aux_blinear_hat = data.frame(id = id, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
-aux_y_hat_train = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
-aux_y_hat_test  = data.frame(id = id, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
+aux_blinear_hat = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
+aux_y_hat_train = data.frame(id = id, Q = Q, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
+aux_y_hat_test  = data.frame(id = id, Q = Q, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
 
 return(list(alpha_hat   = alpha_hat,
             beta_hat    = beta_hat,
@@ -525,7 +535,9 @@ return(list(alpha_hat   = alpha_hat,
             lambda_hat  = lambda_hat,
             blinear_hat = aux_blinear_hat,
             y_hat_train = aux_y_hat_train,
-            y_hat_test  = aux_y_hat_test))
+            y_hat_test  = aux_y_hat_test,
+            Q           = Q,
+            id          = id))
 }
 
 #' @export
@@ -668,21 +680,36 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   snew_gamma_hat$id  = id
   snew_delta_hat$id  = id
 
-  snew_alpha_hat  = melt(snew_alpha_hat,  measure.vars  = colnames(snew_alpha_hat)[-length(colnames(snew_alpha_hat))])
-  snew_beta_hat   = melt(snew_beta_hat,   measure.vars  = colnames(snew_beta_hat)[-length(colnames(snew_beta_hat))])
-  snew_lambda_hat = melt(snew_lambda_hat, measure.vars  = colnames(snew_lambda_hat)[-length(colnames(snew_lambda_hat))])
-  snew_gamma_hat  = melt(snew_gamma_hat,  measure.vars  = colnames(snew_gamma_hat)[-length(colnames(snew_gamma_hat))])
-  snew_delta_hat  = melt(snew_delta_hat,  measure.vars  = colnames(snew_delta_hat)[-length(colnames(snew_delta_hat))])
+  snew_alpha_hat$Q  = Q
+  snew_beta_hat$Q   = Q
+  snew_lambda_hat$Q = Q
+  snew_gamma_hat$Q  = Q
+  snew_delta_hat$Q  = Q
 
+  # Remove columns id and Q
+  m_vars_alpha  = colnames(snew_alpha_hat)[-which(colnames(snew_alpha_hat) %in% c('id', 'Q'))]
+  m_vars_beta   = colnames(snew_beta_hat)[-which(colnames(snew_beta_hat) %in% c('id', 'Q'))]
+  m_vars_lambda = colnames(snew_lambda_hat)[-which(colnames(snew_lambda_hat) %in% c('id', 'Q'))]
+  m_vars_gamma  = colnames(snew_gamma_hat)[-which(colnames(snew_gamma_hat) %in% c('id', 'Q'))]
+  m_vars_delta  = colnames(snew_delta_hat)[-which(colnames(snew_delta_hat) %in% c('id', 'Q'))]
+
+  # Transpose the data
+  snew_alpha_hat  = melt(snew_alpha_hat,  measure.vars  = m_vars_alpha)
+  snew_beta_hat   = melt(snew_beta_hat,   measure.vars  = m_vars_beta)
+  snew_lambda_hat = melt(snew_lambda_hat, measure.vars  = m_vars_lambda)
+  snew_gamma_hat  = melt(snew_gamma_hat,  measure.vars  = m_vars_gamma)
+  snew_delta_hat  = melt(snew_delta_hat,  measure.vars  = m_vars_delta)
+
+  # Add true values
   snew_alpha_hat$true   = rep(alpha_true,  each=npost)
   snew_beta_hat$true    = rep(beta_true,   each=npost)
   snew_lambda_hat$true  = rep(lambda_true, each=npost)
   snew_gamma_hat$true   = rep(gamma_true,  each=npost)
   snew_delta_hat$true   = rep(delta_true,  each=npost)
 
-  aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - new_blin_train, true = blinear_true)
-  aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - new_mu_ij_train, true = y_train)
-  aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - new_mu_ij_test, true = y_test)
+  aux_blinear_hat   = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - new_blin_train, true = blinear_true)
+  aux_y_hat_train   = data.frame(id = id, Q = Q, variable = 'blinear', value = y_train - new_mu_ij_train, true = y_train)
+  aux_y_hat_test    = data.frame(id = id, Q = Q, variable = 'blinear', value = y_test - new_mu_ij_test, true = y_test)
 
   return(list(alpha_hat   = snew_alpha_hat,
               beta_hat    = snew_beta_hat,
@@ -692,6 +719,7 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
               y_hat_train = aux_y_hat_train,
               y_hat_test  = aux_y_hat_test,
               blinear_hat = aux_blinear_hat,
+              Q           = Q,
               id          = id))
 }
 #' @export
@@ -719,7 +747,9 @@ AMBARTI_help_plot <- function(object, data){
   names(alpha_hat) = paste(gsub('g','alpha[', names(alpha_hat)), ']', sep='')
   names(beta_hat) = paste(gsub('e','beta[', names(beta_hat)), ']', sep='')
   alpha_hat$id = id
+  alpha_hat$Q = NA
   beta_hat$id = id
+  beta_hat$Q = NA
 
   alpha_hat = melt(alpha_hat, measure.vars = colnames(alpha_hat)[grepl('alpha', colnames(alpha_hat))])
   beta_hat  = melt(beta_hat, measure.vars = colnames(beta_hat)[grepl('beta', colnames(beta_hat))])
@@ -727,9 +757,9 @@ AMBARTI_help_plot <- function(object, data){
   alpha_hat$true = rep(as.numeric(data[['alpha']]), each=object$npost)
   beta_hat$true  = rep(as.numeric(data[['beta']]), each=object$npost)
 
-  aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - blinear_hat, true = data$blinear)
-  aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = data$y)
-  aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - y_hat_test, true = data$y_test)
+  aux_blinear_hat   = data.frame(id = id, Q = NA, variable = 'blinear', value = data$blinear - blinear_hat, true = data$blinear)
+  aux_y_hat_train   = data.frame(id = id, Q = NA, variable = 'blinear', value = y_train - y_hat_train, true = data$y)
+  aux_y_hat_test    = data.frame(id = id, Q = NA, variable = 'blinear', value = y_test - y_hat_test, true = data$y_test)
 
 
   return(list(alpha_hat   = alpha_hat,
@@ -737,6 +767,7 @@ AMBARTI_help_plot <- function(object, data){
               y_hat_train = aux_y_hat_train,
               y_hat_test  = aux_y_hat_test,
               blinear_hat = aux_blinear_hat,
+              Q           = NA,
               id          = 'AMBARTI'))
 }
 
