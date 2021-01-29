@@ -5,7 +5,7 @@ install_github("ebprado/AMBARTI/R package",
 
 library(AMBARTI)
 
-save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/results/"
+save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/02_simulation_AMBARTI/results/"
 
 I = c(10) # c(5, 15, 30) # Number of genotypes
 J = c(10) # c(5, 15, 30) # Number of environments

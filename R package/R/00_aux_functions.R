@@ -25,9 +25,9 @@ get_metrics = function(object, data, rep){
 
   alpha  = data$alpha
   beta   = data$beta
-  lambda = data$lambda
-  gamma  = data$gamma
-  delta  = data$delta
+  if (is.null(data$lambda) == FALSE) {lambda = data$lambda}
+  if (is.null(data$gamma) == FALSE) {gamma   = data$gamma}
+  if (is.null(data$delta) == FALSE) {delta   = data$delta}
 
   alpha_hat  = object$alpha_hat
   beta_hat   = object$beta_hat
@@ -35,7 +35,7 @@ get_metrics = function(object, data, rep){
   rrmse_alpha = RRMSE(alpha, alpha_hat)
   rrmse_beta  = RRMSE(beta, beta_hat)
 
-  if (id != 'AMBARTI') {
+  if (id != 'AMBARTI' && is.null(data$lambda) == FALSE) {
 
     lambda_hat = object$lambda_hat
     gamma_hat  = object$gamma_hat
@@ -44,12 +44,14 @@ get_metrics = function(object, data, rep){
     rrmse_lambda = RRMSE(lambda, lambda_hat)
     rrmse_gamma  = RRMSE(gamma, gamma_hat)
     rrmse_delta  = RRMSE(delta, delta_hat)
+    lambda = gsub(', ', ' ', toString(data$lambda))
 
   } else{
 
     rrmse_lambda = NA
     rrmse_gamma = NA
     rrmse_delta = NA
+    lambda = NA
 
   }
 
@@ -58,7 +60,6 @@ get_metrics = function(object, data, rep){
   sa = data$s_alpha
   sb = data$s_beta
   sy = data$s_y
-  lambda = gsub(', ', ' ', toString(data$lambda))
 
 aux = data.frame(
                  id           = id,
