@@ -35,6 +35,8 @@ generate_data_AMMI <- function(I, # Number of genotypes
   # Generate the "design matrix"
   x = expand.grid(1:I, 1:J)
   names(x) <- c('g', 'e') # g = genotype and e = envorinment
+  x$g = as.factor(x$g)
+  x$e = as.factor(x$e)
 
   # Generate the interaction/bilinear part
   blin = rep(0, I*J)
@@ -91,15 +93,16 @@ generate_data_AMBARTI = function(I,
   N = I*J
   x = expand.grid(1:I, 1:J)
   names(x) <- c('g', 'e') # g = genotype and e = envorinment
-  x_orig = x
   x$g = as.factor(x$g)
   x$e = as.factor(x$e)
+  x_orig = x
+
   # Extract the categories for genotype and environment
   cov_g = x[,'g']
   cov_e = x[,'e']
 
-  classes_g = sort(unique(cov_g))
-  classes_e = sort(unique(cov_e))
+  classes_g = unique(cov_g)
+  classes_e = unique(cov_e)
 
   ng = as.numeric(tapply(cov_g, cov_g, length)) # the number of obs within each g_i
   ne = as.numeric(tapply(cov_e, cov_e, length)) # the number of obs within each e_j

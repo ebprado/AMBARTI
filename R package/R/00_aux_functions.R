@@ -381,6 +381,14 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   x_test = data$x
   y_test = data$y_test
 
+  alpha_true   = data$alpha
+  beta_true    = data$beta
+  if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
+  if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
+  if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
+  blinear_true = data$blinear
+
+  # Get parameter estimates
   mu_hat     = object$mu_hat
   alpha_hat  = object$alpha_hat
   beta_hat   = object$beta_hat
@@ -407,8 +415,8 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   y_hat_test = mu_hat + alpha_hat[x_test[,'g']] + beta_hat[x_test[,'e']] + blin_test
 
   #
-  g_names = rownames(interaction_tab)
-  e_names = colnames(interaction_tab)
+  g_names = unique(x_train$g)
+  e_names = unique(x_train$e)
 
   id = 'AMMI'
   alpha_hat  = data.frame(id = id, variable = paste('alpha[',g_names ,']', sep=''), value=alpha_hat, true=alpha_true)
