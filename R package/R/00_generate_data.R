@@ -91,6 +91,7 @@ generate_data_AMBARTI = function(I,
   N = I*J
   x = expand.grid(1:I, 1:J)
   names(x) <- c('g', 'e') # g = genotype and e = envorinment
+  x_orig = x
   x$g = as.factor(x$g)
   x$e = as.factor(x$e)
   # Extract the categories for genotype and environment
@@ -228,7 +229,7 @@ generate_data_AMBARTI = function(I,
               alpha   = alpha,
               beta    = beta,
               blinear = bart_part,
-              x       = x,
+              x       = x_orig,
               I       = I,
               J       = J,
               s_alpha = s_alpha,
