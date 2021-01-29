@@ -15,6 +15,7 @@ tab$id = factor(tab$id, levels = c('classical AMMI', 'Bayesian AMMI (postproc)',
 tab$Q = factor(tab$Q, levels=c('1', '2', '3'), labels=c('Q=1', 'Q=2', 'Q=3'))
 tab$id = paste(tab$id,' (',tab$Q, ')', sep='')
 tab$id = gsub(' (NA)','', tab$id, fixed = TRUE)
+tab$id = factor(tab$id, levels=sort(unique(tab$id)), labels = sort(unique(tab$id)))
 tab$I = factor(tab$I, levels=c('10'), labels=c('I = 10'))
 tab$J = factor(tab$J, levels=c('10'), labels=c('J = 10'))
 tab$lambda = as.factor(tab$lambda)

@@ -89,12 +89,32 @@ blinear_hat = rbind(blinear_hat, AMBARTI_save_info$blinear_hat)
 y_train_hat = rbind(y_train_hat, AMBARTI_save_info$y_hat_train)
 y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_hat_test)
 
+# Some postprocessing
+
+alpha_hat$id   = factor(alpha_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+beta_hat$id    = factor(beta_hat$id,    levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+blinear_hat$id = factor(blinear_hat$id, levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+y_train_hat$id = factor(y_train_hat$id, levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+y_test_hat$id  = factor(y_test_hat$id,  levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+
+alpha_hat$id   = ifelse(alpha_hat$id   != 'AMBARTI', paste(alpha_hat$id,   ' (Q = ', alpha_hat$Q, ')',    sep=''),as.character(alpha_hat$id))
+beta_hat$id    = ifelse(beta_hat$id    != 'AMBARTI', paste(beta_hat$id,    ' (Q = ', beta_hat$Q, ')',     sep=''),as.character(beta_hat$id))
+blinear_hat$id = ifelse(blinear_hat$id != 'AMBARTI', paste(blinear_hat$id, ' (Q = ', blinear_hat$Q, ')',  sep=''),as.character(blinear_hat$id))
+y_train_hat$id = ifelse(y_train_hat$id != 'AMBARTI', paste(y_train_hat$id, ' (Q = ', y_train_hat$Q, ')',  sep=''),as.character(y_train_hat$id))
+y_test_hat$id  = ifelse(y_test_hat$id  != 'AMBARTI', paste(y_test_hat$id,  ' (Q = ', y_test_hat$Q, ')',   sep=''),as.character(y_test_hat$id))
+
+alpha_hat$id   = factor(alpha_hat$id,   levels = sort(as.character(unique(alpha_hat$id))),   labels = sort(as.character(unique(alpha_hat$id))))
+beta_hat$id    = factor(beta_hat$id,    levels = sort(as.character(unique(beta_hat$id))),    labels = sort(as.character(unique(beta_hat$id))))
+blinear_hat$id = factor(blinear_hat$id, levels = sort(as.character(unique(blinear_hat$id))), labels = sort(as.character(unique(blinear_hat$id))))
+y_train_hat$id = factor(y_train_hat$id, levels = sort(as.character(unique(y_train_hat$id))), labels = sort(as.character(unique(y_train_hat$id))))
+y_test_hat$id  = factor(y_test_hat$id,  levels = sort(as.character(unique(y_test_hat$id))),  labels = sort(as.character(unique(y_test_hat$id))))
+
 # Box plots for the parameter estimates ----------
 
-plot_individual_boxplots <- function(object, data){
+plot_individual_boxplots <- function(object){
 
   db = object
-  names(db) = c('Method', 'Parameter', 'value', 'true')
+  names(db) = c('Method', 'Q', 'Parameter', 'value', 'true')
   aux_name = strsplit(deparse(substitute(object)), split = '_')[[1]][1]
   orig_labels = as.character(unique(object$variable))
   fixed_labels = new_parse_format(gsub(',','', orig_labels))
@@ -112,14 +132,13 @@ plot_individual_boxplots <- function(object, data){
           legend.title = element_blank(),
           legend.position = "bottom") +
     scale_x_discrete(limit = orig_labels,
-                     labels = fixed_labels) +
-    scale_color_discrete(labels=unique(db$Method))
+                     labels = fixed_labels)
 }
-plot_individual_boxplots(alpha_hat, data)
-plot_individual_boxplots(beta_hat, data)
-plot_individual_boxplots(lambda_hat, data)
-plot_individual_boxplots(gamma_hat, data)
-plot_individual_boxplots(delta_hat, data)
+plot_individual_boxplots(alpha_hat)
+plot_individual_boxplots(beta_hat)
+plot_individual_boxplots(lambda_hat)
+plot_individual_boxplots(gamma_hat)
+plot_individual_boxplots(delta_hat)
 
 alpha_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
 beta_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0

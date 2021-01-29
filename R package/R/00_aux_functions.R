@@ -503,7 +503,7 @@ beta_hat   = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('beta', coln
 gamma_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('gamma', colnames(estimate))])]
 delta_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('delta', colnames(estimate))])]
 lambda_hat = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('lambda', colnames(estimate))])]
-
+if(Q==1) {colnames(lambda_hat)[3] = 'lambda[1]'}
 
 # Remove columns id and Q
 m_vars_alpha  = colnames(alpha_hat)[-which(colnames(alpha_hat) %in% c('id', 'Q'))]
@@ -639,7 +639,7 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   colnames(snew_mu_hat)     = colnames(mu_hat)
   colnames(snew_alpha_hat)  = colnames(alpha_hat)
   colnames(snew_beta_hat)   = colnames(beta_hat)
-  colnames(snew_lambda_hat) = colnames(lambda_hat)
+  if(Q==1) {colnames(snew_lambda_hat) = 'lambda[1]'} else{colnames(snew_lambda_hat) = colnames(lambda_hat)}
   colnames(snew_gamma_hat)  = colnames(gamma_hat)
   colnames(snew_delta_hat)  = colnames(delta_hat)
 
