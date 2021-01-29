@@ -31,7 +31,6 @@ load(paste(save_file, bammi_filenameQ2, sep=''))
 load(paste(save_file, bammi_filenameQ3, sep=''))
 load(paste(save_file, ambarti_filename, sep=''))
 
-
 alpha_hat = NULL
 beta_hat = NULL
 lambda_hat = NULL
