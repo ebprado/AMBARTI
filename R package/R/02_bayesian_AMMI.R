@@ -3,6 +3,7 @@
 #'
 
 run_bayesian_AMMI <- function(data,
+                              Q,
                               s_mu = 20,
                               s_lambda = 10,
                               s_alpha_hyperpar = 10,
@@ -57,7 +58,7 @@ run_bayesian_AMMI <- function(data,
   Y = data$y
   I = data$I
   J = data$J
-  Q = length(data$lambda)
+  if (is.null(data$Q) == FALSE) {Q = data$Q}
   genotype = data$x[,'g']
   environment = data$x[,'e']
 

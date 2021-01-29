@@ -62,6 +62,7 @@ generate_data_AMMI <- function(I, # Number of genotypes
               x       = x,
               I       = I,
               J       = J,
+              Q       = Q,
               s_alpha = s_alpha,
               s_beta  = s_beta,
               s_y     = s_y,
@@ -76,7 +77,7 @@ generate_data_AMMI <- function(I, # Number of genotypes
 #' @export
 #' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
 
-generate_data_ambarti = function(I,
+generate_data_AMBARTI = function(I,
                                  J,
                                  s_alpha, # standard deviation of alpha
                                  s_beta, # standard deviation of alpha
@@ -185,16 +186,14 @@ generate_data_ambarti = function(I,
     # add to the same tree an interaction of environment, otherwise we run the risk of allowing
     # confunding.
 
-    new_trees[[j]] = update_tree(y = y_scale,
-                                 X = x_g_e,
+    new_trees[[j]] = update_tree(X = x_g_e,
                                  type = type,
                                  curr_tree = curr_trees[[j]],
                                  node_min_size = node_min_size,
                                  s = s_g,
                                  index = ind_x_g)
 
-    new_trees[[j]] = update_tree(y = y_scale,
-                                 X = x_g_e,
+    new_trees[[j]] = update_tree(X = x_g_e,
                                  type = type,
                                  curr_tree = new_trees[[j]],
                                  node_min_size = node_min_size,
