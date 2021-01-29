@@ -18,8 +18,7 @@ all_comb = expand.grid(I = I,
                        J = J,
                        s_alpha = s_alpha,
                        s_beta = s_beta,
-                       s_y = s_y,
-                       lambda = lambda)
+                       s_y = s_y)
 
 # Get the number of combinations
 n_comb = nrow(all_comb)
@@ -64,29 +63,51 @@ for (i in 1:n_comb){
     load(paste(save_file, ambarti_filename, sep=''))
 
     # Get parameter estimates from the classical AMMI
-    res_AMMI = organise_classical_AMMI(classical_AMMI, data)
+    res_AMMI_Q1 = organise_classical_AMMI(classical_AMMI_Q1, data, Q=1)
+    res_AMMI_Q2 = organise_classical_AMMI(classical_AMMI_Q2, data, Q=2)
+    res_AMMI_Q3 = organise_classical_AMMI(classical_AMMI_Q3, data, Q=3)
 
     # Get parameter estimates from the Bayesian AMMI
-    res_bAMMI_with_post = organise_bayesian_AMMI_WITH_postprocessing(bayesian_AMMI, data)
-    res_bAMMI_without_post = organise_bayesian_AMMI_WITHOUT_postprocessing(bayesian_AMMI, data)
+    res_bAMMI_with_post_Q1 = organise_bayesian_AMMI_WITH_postprocessing(bayesian_AMMI_Q1, data, Q=1)
+    res_bAMMI_with_post_Q2 = organise_bayesian_AMMI_WITH_postprocessing(bayesian_AMMI_Q2, data, Q=2)
+    res_bAMMI_with_post_Q3 = organise_bayesian_AMMI_WITH_postprocessing(bayesian_AMMI_Q3, data, Q=3)
+
+    res_bAMMI_without_post_Q1 = organise_bayesian_AMMI_WITHOUT_postprocessing(bayesian_AMMI_Q1, data, Q=1)
+    res_bAMMI_without_post_Q2 = organise_bayesian_AMMI_WITHOUT_postprocessing(bayesian_AMMI_Q2, data, Q=2)
+    res_bAMMI_without_post_Q3 = organise_bayesian_AMMI_WITHOUT_postprocessing(bayesian_AMMI_Q3, data, Q=3)
 
     # Get parameter estimates from AMBARTI
     res_ambarti = organise_AMBARTI(ambarti, data)
 
     # Compute the RMSE and RRMSE
-    metrics_AMMI       = get_metrics(res_AMMI, data, j)
-    metrics_bAMMI_post = get_metrics(res_bAMMI_with_post, data, j)
-    metrics_bAMMI      = get_metrics(res_bAMMI_without_post, data, j)
+    metrics_AMMI_Q1 = get_metrics(res_AMMI_Q1, data, j)
+    metrics_AMMI_Q2 = get_metrics(res_AMMI_Q2, data, j)
+    metrics_AMMI_Q3 = get_metrics(res_AMMI_Q3, data, j)
+
+    metrics_bAMMI_post_Q1 = get_metrics(res_bAMMI_with_post_Q1, data, j)
+    metrics_bAMMI_post_Q2 = get_metrics(res_bAMMI_with_post_Q2, data, j)
+    metrics_bAMMI_post_Q3 = get_metrics(res_bAMMI_with_post_Q3, data, j)
+
+    metrics_bAMMI_Q1 = get_metrics(res_bAMMI_without_post_Q1, data, j)
+    metrics_bAMMI_Q2 = get_metrics(res_bAMMI_without_post_Q2, data, j)
+    metrics_bAMMI_Q3 = get_metrics(res_bAMMI_without_post_Q3, data, j)
+
     metrics_ambarti    = get_metrics(res_ambarti, data, j)
 
     save_results = rbind(save_results,
-                         metrics_AMMI,
-                         metrics_bAMMI_post,
-                         metrics_bAMMI,
+                         res_AMMI_Q1,
+                         res_AMMI_Q2,
+                         res_AMMI_Q3,
+                         metrics_bAMMI_post_Q1,
+                         metrics_bAMMI_post_Q2,
+                         metrics_bAMMI_post_Q3,
+                         metrics_bAMMI_Q1,
+                         metrics_bAMMI_Q2,
+                         metrics_bAMMI_Q3,
                          metrics_ambarti)
 
     print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
   }
 }
 
-save(save_results, file = paste(save_file, '00_results_consolidated.RData',    sep=''))
+save(save_results, file = paste(save_file, '00_AMB_results_consolidated.RData',    sep=''))
