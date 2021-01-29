@@ -371,8 +371,14 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data, Q = NULL
 AMMI_help_plot <- function(object, data, Q = NULL){
 
   # Get training info
-  x_train = data$x
-  y_train = data$y
+  x_train      = data$x
+  y_train      = data$y
+  alpha_true   = data$alpha
+  beta_true    = data$beta
+  if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
+  if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
+  if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
+  blinear_true = data$blinear
 
   # Get test info
   x_test = data$x
@@ -384,10 +390,10 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   # Fit the linear model
   linear_mod = aov(y_train ~ g + e + g:e)
 
-  aux_mod = lm(y_train ~ g + e)
+  aux_mod    = lm(y_train ~ g + e)
   aux_mod_sd = summary(aux_mod)$coefficients[,'Std. Error'][-1]
-  alpha_sd = max(aux_mod_sd[grepl('g', names(aux_mod_sd))])# if there's no repetition, they'll be the same
-  beta_sd = max(aux_mod_sd[grepl('e', names(aux_mod_sd))])
+  alpha_sd   = max(aux_mod_sd[grepl('g', names(aux_mod_sd))])# if there's no repetition, they'll be the same
+  beta_sd    = max(aux_mod_sd[grepl('e', names(aux_mod_sd))])
 
   # Get the residuals for the interaction gen:env
   #interaction_tab = matrix(residuals(linear_mod), ncol = length(unique(gen)), length(unique(env)))
@@ -398,7 +404,7 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   if(is.null(data$Q) == FALSE){Q = data$Q}
 
   # Run the Singular Value Decomposition (SVD) to compute lambda, gamma, and delta
-  sv_dec <- svd(interaction_tab, nu = Q, nv = Q)
+  sv_dec = svd(interaction_tab, nu = Q, nv = Q)
 
   # Get parameter estimates
   # mu_hat     = linear_mod$coefficients[1] # slightly biased compared to mean(y_train)
@@ -429,15 +435,15 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   e_names = colnames(interaction_tab)
 
   id = 'AMMI'
-  alpha_hat  = data.frame(id = id, variable = paste('alpha[',g_names ,']', sep=''), value=alpha_hat, true=data$alpha)
-  beta_hat   = data.frame(id = id, variable = paste('beta[',e_names ,']', sep=''), value=beta_hat, true=data$beta)
-  lambda_hat = data.frame(id = id, variable = paste('lambda[',1:Q,']',sep=''), value=lambda_hat, true=data$lambda)
-  gamma_hat  = data.frame(id = id, variable = paste('gamma[',g_names,',',rep(1:Q, each=length(g_names)),']',sep=''), value=as.numeric(gamma_hat), true=as.numeric(data$gamma))
-  delta_hat  = data.frame(id = id, variable = paste('delta[',g_names,',',rep(1:Q, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(data$delta))
+  alpha_hat  = data.frame(id = id, variable = paste('alpha[',g_names ,']', sep=''), value=alpha_hat, true=alpha_true)
+  beta_hat   = data.frame(id = id, variable = paste('beta[',e_names ,']', sep=''), value=beta_hat, true=beta_true)
+  lambda_hat = data.frame(id = id, variable = paste('lambda[',1:Q,']',sep=''), value=lambda_hat, true=lambda_true)
+  gamma_hat  = data.frame(id = id, variable = paste('gamma[',g_names,',',rep(1:Q, each=length(g_names)),']',sep=''), value=as.numeric(gamma_hat), true=as.numeric(gamma_true))
+  delta_hat  = data.frame(id = id, variable = paste('delta[',g_names,',',rep(1:Q, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(delta_true))
 
-  aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - blin_train, true = data$blinear)
-  aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = data$y)
-  aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - y_hat_test, true = data$y_test)
+  aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
+  aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
+  aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
 
   return(list(alpha_hat   = alpha_hat,
               beta_hat    = beta_hat,
@@ -453,9 +459,17 @@ AMMI_help_plot <- function(object, data, Q = NULL){
 #' @export
 #'
 bAMMI_help_plot <- function(object, data, Q = NULL){
+
 # Get training info
 x_train = data$x
 y_train = data$y
+
+alpha_true   = data$alpha
+beta_true    = data$beta
+if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
+if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
+if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
+blinear_true = data$blinear
 
 # Get test info
 x_test = data$x
@@ -510,15 +524,15 @@ lambda_hat = melt(lambda_hat, measure.vars = colnames(lambda_hat)[-1])
 gamma_hat  = melt(gamma_hat, measure.vars = colnames(gamma_hat)[-1])
 delta_hat  = melt(delta_hat, measure.vars = colnames(delta_hat)[-1])
 
-alpha_hat$true  = rep(as.numeric(data[['alpha']]),  each=npost)
-beta_hat$true   = rep(as.numeric(data[['beta']]),   each=npost)
-lambda_hat$true = rep(as.numeric(data[['lambda']]), each=npost)
-gamma_hat$true  = rep(as.numeric(data[['gamma']]),  each=npost)
-delta_hat$true  = rep(as.numeric(data[['delta']]),  each=npost)
+alpha_hat$true  = rep(alpha_true,  each=npost)
+beta_hat$true   = rep(beta_true,   each=npost)
+lambda_hat$true = rep(lambda_true, each=npost)
+gamma_hat$true  = rep(gamma_true,  each=npost)
+delta_hat$true  = rep(delta_true,  each=npost)
 
-aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - blin_train, true = data$blinear)
-aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = data$y)
-aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - y_hat_test, true = data$y_test)
+aux_blinear_hat = data.frame(id = id, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
+aux_y_hat_train = data.frame(id = id, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
+aux_y_hat_test  = data.frame(id = id, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
 
 return(list(alpha_hat   = alpha_hat,
             beta_hat    = beta_hat,
@@ -537,6 +551,12 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   # Get training info
   x_train = data$x
   y_train = data$y
+  alpha_true   = data$alpha
+  beta_true    = data$beta
+  if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
+  if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
+  if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
+  blinear_true = data$blinear
 
   # Get test info
   x_test = data$x
@@ -670,16 +690,15 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   snew_gamma_hat  = melt(snew_gamma_hat,  measure.vars  = colnames(snew_gamma_hat)[-length(colnames(snew_gamma_hat))])
   snew_delta_hat  = melt(snew_delta_hat,  measure.vars  = colnames(snew_delta_hat)[-length(colnames(snew_delta_hat))])
 
-  snew_alpha_hat$true   = rep(as.numeric(data[['alpha']]),  each=npost)
-  snew_beta_hat$true    = rep(as.numeric(data[['beta']]),   each=npost)
-  snew_lambda_hat$true  = rep(as.numeric(data[['lambda']]),  each=npost)
-  snew_gamma_hat$true   = rep(as.numeric(data[['gamma']]),  each=npost)
-  snew_delta_hat$true   = rep(as.numeric(data[['delta']]), each=npost)
+  snew_alpha_hat$true   = rep(alpha_true,  each=npost)
+  snew_beta_hat$true    = rep(beta_true,   each=npost)
+  snew_lambda_hat$true  = rep(lambda_true, each=npost)
+  snew_gamma_hat$true   = rep(gamma_true,  each=npost)
+  snew_delta_hat$true   = rep(delta_true,  each=npost)
 
-  aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - new_blin_train, true = data$blinear)
-  aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - new_mu_ij_train, true = data$y)
-  aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - new_mu_ij_test, true = data$y_test)
-
+  aux_blinear_hat   = data.frame(id = id, variable = 'blinear', value = data$blinear - new_blin_train, true = blinear_true)
+  aux_y_hat_train   = data.frame(id = id, variable = 'blinear', value = y_train - new_mu_ij_train, true = y_train)
+  aux_y_hat_test    = data.frame(id = id, variable = 'blinear', value = y_test - new_mu_ij_test, true = y_test)
 
   return(list(alpha_hat   = snew_alpha_hat,
               beta_hat    = snew_beta_hat,
