@@ -127,6 +127,7 @@ organise_classical_AMMI <- function(object, data, Q = NULL){
               y_hat_train = y_hat_train,
               y_hat_test  = y_hat_test,
               blinear_hat = blin_train,
+              Q           = Q,
               id          = 'classical AMMI'))
 }
 
@@ -254,6 +255,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
               y_hat_train = new_mu_ij_train,
               y_hat_test  = new_mu_ij_test,
               blinear_hat = new_blin_train,
+              Q           = Q,
               id          = 'Bayesian AMMI (postproc)'))
 }
 
@@ -349,6 +351,7 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data, Q = NULL
               y_hat_train = y_hat_train,
               y_hat_test  = y_hat_test,
               blinear_hat = blin_train,
+              Q           = Q,
               id          = 'Bayesian AMMI (NO postproc)'))
 }
 

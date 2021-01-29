@@ -92,12 +92,12 @@ for (i in 1:n_comb){
     metrics_bAMMI_Q2 = get_metrics(res_bAMMI_without_post_Q2, data, j)
     metrics_bAMMI_Q3 = get_metrics(res_bAMMI_without_post_Q3, data, j)
 
-    metrics_ambarti    = get_metrics(res_ambarti, data, j)
+    metrics_ambarti = get_metrics(res_ambarti, data, j)
 
     save_results = rbind(save_results,
-                         res_AMMI_Q1,
-                         res_AMMI_Q2,
-                         res_AMMI_Q3,
+                         metrics_AMMI_Q1,
+                         metrics_AMMI_Q2,
+                         metrics_AMMI_Q3,
                          metrics_bAMMI_post_Q1,
                          metrics_bAMMI_post_Q2,
                          metrics_bAMMI_post_Q3,
