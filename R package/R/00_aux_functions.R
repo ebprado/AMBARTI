@@ -368,10 +368,9 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data, Q = NULL
 
 #' @export
 #'
-AMMI_help_plot <- function(object, data){
+AMMI_help_plot <- function(object, data, Q = NULL){
 
   # Get training info
-
   x_train = data$x
   y_train = data$y
 
@@ -396,7 +395,7 @@ AMMI_help_plot <- function(object, data){
   interaction_tab = interaction_tab$tables$`g:e`
 
   # Get the number of PCs
-  Q = data$Q
+  if(is.null(data$Q) == FALSE){Q = data$Q}
 
   # Run the Singular Value Decomposition (SVD) to compute lambda, gamma, and delta
   sv_dec <- svd(interaction_tab, nu = Q, nv = Q)
@@ -453,7 +452,7 @@ AMMI_help_plot <- function(object, data){
 
 #' @export
 #'
-bAMMI_help_plot <- function(object, data){
+bAMMI_help_plot <- function(object, data, Q = NULL){
 # Get training info
 x_train = data$x
 y_train = data$y
@@ -463,7 +462,7 @@ x_test = data$x
 y_test = data$y_test
 
 # Get the number of PCs
-Q = data$Q
+if(is.null(data$Q) == FALSE){Q = data$Q}
 
 # Get estimates info
 estimate   = object$BUGSoutput$mean
@@ -533,7 +532,7 @@ return(list(alpha_hat   = alpha_hat,
 
 #' @export
 #' @importFrom reshape2 'melt'
-bAMMI_help_plot_WITHPOS <- function(object, data){
+bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
 
   # Get training info
   x_train = data$x
@@ -544,7 +543,7 @@ bAMMI_help_plot_WITHPOS <- function(object, data){
   y_test = data$y_test
 
   # Get the number of PCs
-  Q = data$Q
+  if(is.null(data$Q) == FALSE){Q = data$Q}
 
   # Get some MCMC info
   nburn      = object$BUGSoutput$n.burnin

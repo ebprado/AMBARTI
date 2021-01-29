@@ -34,6 +34,9 @@ myplot <- function(varA, varB, varC){
   if(varB=='gamma_rrmse'){varC = expression("RRMSE - "~gamma[iq])}
   if(varB=='delta_rrmse'){varC = expression("RRMSE - "~delta[jq])}
 
+  if (varB %in% c('rrmse_alpha','rrmse_beta','lambda_rrmse','gamma_rrmse','delta_rrmse')){aux_y = 'RRMSE'}
+  if (varB %in% c('rmse_blinear','y_test_rmse','y_train_rmse')){aux_y = 'RMSE'}
+
   xxx = tab %>%
     group_by(Q) %>%
     filter((!!sym(varB)) < quantile(!!sym(varB), 0.9, na.rm = TRUE)) %>%
@@ -42,7 +45,7 @@ myplot <- function(varA, varB, varC){
     labs(x = aux,
       title = varC,
       colour = '',
-      y = 'RRMSE') +
+      y = aux_y) +
     theme_bw(base_size = 12) +
     theme(plot.title = element_text(size = 15, hjust = 0.5),
           legend.position = 'bottom',

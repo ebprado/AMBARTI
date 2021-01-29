@@ -4,24 +4,32 @@ install_github("ebprado/AMBARTI/R package",
                auth_token = '363d4ad84eaa25d3eb26752732cc208f7e698086')
 
 library(AMBARTI)
-save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/01_simulation_AMMI/results/"
+save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/02_simulation_AMBARTI/results/"
 
 #-------------------------------------------------
 # Individual plots
 #-------------------------------------------------
 library(reshape2)
 setwd(save_file)
-filename = 'I10J10sa1sb1sy1L1012r10'
+filename = 'AMBARTII10J10sa1sb1sy1r10'
 
-data_filename    = paste(filename, '_data.RData',           sep='')
-ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
-bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
-ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
+data_filename    = paste(filename, '_data.RData',              sep='')
+ammi_filenameQ1  = paste(filename, '_classical_AMMI_Q1.RData', sep='')
+ammi_filenameQ2  = paste(filename, '_classical_AMMI_Q2.RData', sep='')
+ammi_filenameQ3  = paste(filename, '_classical_AMMI_Q3.RData', sep='')
+bammi_filenameQ1 = paste(filename, '_bayesian_AMMI_Q1.RData',  sep='')
+bammi_filenameQ2 = paste(filename, '_bayesian_AMMI_Q2.RData',  sep='')
+bammi_filenameQ3 = paste(filename, '_bayesian_AMMI_Q3.RData',  sep='')
+ambarti_filename = paste(filename, '_AMBARTI.RData',           sep='')
 
-load(paste(save_file, data_filename,      sep=''))
-load(paste(save_file, ammi_filename,      sep=''))
-load(paste(save_file, bammi_filename,     sep=''))
-load(paste(save_file, ambarti_filename,   sep=''))
+load(paste(save_file, data_filename,    sep=''))
+load(paste(save_file, ammi_filenameQ1,  sep=''))
+load(paste(save_file, ammi_filenameQ2,  sep=''))
+load(paste(save_file, ammi_filenameQ3,  sep=''))
+load(paste(save_file, bammi_filenameQ1, sep=''))
+load(paste(save_file, bammi_filenameQ2, sep=''))
+load(paste(save_file, bammi_filenameQ3, sep=''))
+load(paste(save_file, ambarti_filename, sep=''))
 
 # Get parameter estimates from classical AMMI
 res_AMMI = AMMI_help_plot(classical_AMMI, data)
