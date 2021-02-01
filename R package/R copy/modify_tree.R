@@ -148,7 +148,7 @@ grow_tree = function(X, curr_tree, node_min_size, s, index) {
     new_tree$tree_matrix[nrow(new_tree$tree_matrix)-1,'parent'] = node_to_split
 
     # Now call the fill function on this tree
-    new_tree = fill_tree_details(new_tree, X)
+    new_tree = fill_tree_details(new_tree, X, node_to_split)
 
     # Store the covariate name to use it to update the Dirichlet prior of Linero (2016).
     new_tree$var = split_variable
@@ -195,7 +195,7 @@ prune_tree = function(X, curr_tree) {
 
     # Find the parent of this terminal node
     parent_pick = as.numeric(new_tree$tree_matrix[node_to_prune, 'parent'])
-    var_pruned_nodes = as.numeric(new_tree$tree_matrix[parent_pick, 'split_variable'])
+    var_pruned_nodes = new_tree$tree_matrix[parent_pick, 'split_variable']
 
     # Get the two children of this parent
     child_left = as.numeric(new_tree$tree_matrix[parent_pick, 'child_left'])
@@ -245,7 +245,11 @@ prune_tree = function(X, curr_tree) {
     } # End if statement to fill in tree details
 
     # Call the fill function on this tree
-    new_tree = fill_tree_details(new_tree, X)
+    # new_tree = fill_tree_details(new_tree, X, node_to_prune)
+    # Get the old indices
+    get_old_indices = which(new_tree$node_indices == c(child_left, child_right))
+    # Replace the old node indices by the indice of their parent node
+    new_tree$node_indices[get_old_indices] = parent_pick
 
     # Store the covariate name that was used in the splitting rule of the terminal nodes that were just pruned
     new_tree$var = var_pruned_nodes

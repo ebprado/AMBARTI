@@ -24,7 +24,7 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
 
   # Get node sizes for each terminal node
-  nj = tree$tree_matrix[which_terminal,'node_size']
+  nj = as.numeric(tree$tree_matrix[which_terminal,'node_size'])
 
   # Get sum of residuals and sum of residuals squared within each terminal node
   sumRsq_j = aggregate(R, by = list(tree$node_indices), function(x) sum(x^2))[,2]
@@ -47,7 +47,7 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
 
   # Get node sizes for each terminal node
-  nj = tree$tree_matrix[which_terminal,'node_size']
+  nj = as.numeric(tree$tree_matrix[which_terminal,'node_size'])
 
   # Get sum of residuals in each terminal node
   sumR = aggregate(R, by = list(tree$node_indices), sum)[,2]
