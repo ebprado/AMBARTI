@@ -93,12 +93,18 @@ y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_hat_test)
 
 alpha_hat$id   = factor(alpha_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 beta_hat$id    = factor(beta_hat$id,    levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+lambda_hat$id  = factor(lambda_hat$id,  levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+gamma_hat$id   = factor(gamma_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+delta_hat$id   = factor(delta_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 blinear_hat$id = factor(blinear_hat$id, levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 y_train_hat$id = factor(y_train_hat$id, levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 y_test_hat$id  = factor(y_test_hat$id,  levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 
 alpha_hat$id   = ifelse(alpha_hat$id   != 'AMBARTI', paste(alpha_hat$id,   ' (Q = ', alpha_hat$Q, ')',    sep=''),as.character(alpha_hat$id))
 beta_hat$id    = ifelse(beta_hat$id    != 'AMBARTI', paste(beta_hat$id,    ' (Q = ', beta_hat$Q, ')',     sep=''),as.character(beta_hat$id))
+lambda_hat$id  = ifelse(lambda_hat$id  != 'AMBARTI', paste(lambda_hat$id,   ' (Q = ', lambda_hat$Q, ')',    sep=''),as.character(lambda_hat$id))
+gamma_hat$id   = ifelse(gamma_hat$id   != 'AMBARTI', paste(gamma_hat$id,    ' (Q = ', gamma_hat$Q, ')',     sep=''),as.character(gamma_hat$id))
+delta_hat$id   = ifelse(delta_hat$id   != 'AMBARTI', paste(delta_hat$id,    ' (Q = ', delta_hat$Q, ')',     sep=''),as.character(delta_hat$id))
 blinear_hat$id = ifelse(blinear_hat$id != 'AMBARTI', paste(blinear_hat$id, ' (Q = ', blinear_hat$Q, ')',  sep=''),as.character(blinear_hat$id))
 y_train_hat$id = ifelse(y_train_hat$id != 'AMBARTI', paste(y_train_hat$id, ' (Q = ', y_train_hat$Q, ')',  sep=''),as.character(y_train_hat$id))
 y_test_hat$id  = ifelse(y_test_hat$id  != 'AMBARTI', paste(y_test_hat$id,  ' (Q = ', y_test_hat$Q, ')',   sep=''),as.character(y_test_hat$id))
@@ -106,6 +112,11 @@ y_test_hat$id  = ifelse(y_test_hat$id  != 'AMBARTI', paste(y_test_hat$id,  ' (Q 
 alpha_hat$id   = factor(alpha_hat$id,   levels = sort(as.character(unique(alpha_hat$id))),   labels = sort(as.character(unique(alpha_hat$id))))
 beta_hat$id    = factor(beta_hat$id,    levels = sort(as.character(unique(beta_hat$id))),    labels = sort(as.character(unique(beta_hat$id))))
 blinear_hat$id = factor(blinear_hat$id, levels = sort(as.character(unique(blinear_hat$id))), labels = sort(as.character(unique(blinear_hat$id))))
+
+lambda_hat$id = factor(lambda_hat$id,   levels = sort(as.character(unique(lambda_hat$id))),   labels = sort(as.character(unique(lambda_hat$id))))
+gamma_hat$id  = factor(gamma_hat$id,    levels = sort(as.character(unique(gamma_hat$id))),    labels = sort(as.character(unique(gamma_hat$id))))
+delta_hat$id  = factor(delta_hat$id,    levels = sort(as.character(unique(delta_hat$id))), labels = sort(as.character(unique(delta_hat$id))))
+
 y_train_hat$id = factor(y_train_hat$id, levels = sort(as.character(unique(y_train_hat$id))), labels = sort(as.character(unique(y_train_hat$id))))
 y_test_hat$id  = factor(y_test_hat$id,  levels = sort(as.character(unique(y_test_hat$id))),  labels = sort(as.character(unique(y_test_hat$id))))
 
@@ -152,7 +163,7 @@ plot_individual_density <- function(object, data){
   if (deparse(substitute(object)) == 'y_test_hat') {aux_title = expression('Test data:'~y - hat(y))}
 
   db = object
-  names(db) = c('Method', 'Parameter', 'value', 'true')
+  names(db) = c('Method', 'Q', 'Parameter', 'value', 'true')
 
   db %>%
     ggplot(aes(x=value, colour=Method)) +
@@ -164,10 +175,7 @@ plot_individual_density <- function(object, data){
           plot.title = element_text(size = 18, hjust = 0.5),
           legend.text = element_text(size = 12),
           legend.title = element_blank(),
-          legend.position = "bottom")  +
-    # scale_x_discrete(limit = orig_labels,
-                     # labels = fixed_labels) +
-    scale_color_discrete(labels=unique(db$Method))
+          legend.position = "bottom")
 }
 plot_individual_density(blinear_hat, data)
 plot_individual_density(y_train_hat, data)

@@ -52,7 +52,7 @@ for (i in 1:n_comb){
     bayesian_AMMI = run_bayesian_AMMI(data)
 
     # run AMBARTI
-    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 1000, npost = 100)
+    ambarti = run_AMBARTI(data, ntrees = 50, nburn = 2000, npost = 1000)
 
     # Increment the seed number by 1
     nseed = nseed + 1

@@ -21,7 +21,7 @@ tab$sb = as.factor(tab$sb)
 tab$sy = as.factor(tab$sy)
 
 # Generate plots
-save_plots = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/"
+save_plots = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/01_simulation_AMMI/"
 myplot <- function(varA, varB, varC){
 
   pdf(paste(save_plots, varB, varA, '.pdf', sep=''), width = 8, height = 6)
