@@ -86,14 +86,6 @@ ambarti = function(x,
   num_comb_g  = choose(n_class_g, aux_comb_g) # total of combinations 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
   prob_comb_g = num_comb_g/sum(num_comb_g) # probability of observating a combination 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
 
-  create_interaction = function(X, nclass, aux_comb, prob){
-    num_cov = sample(aux_comb, 1, prob = prob) # number of covariates to be sampled
-    s_covs  = sample(x = 1:nclass, size = num_cov, replace = FALSE) # sampled covariates
-    new_cov = matrix(apply(X[,s_covs], 1,sum), ncol=1) # create the interaction from the sampled covariates
-    colnames(new_cov) = paste(sort(colnames(X)[s_covs]), collapse = ':')
-  return(new_cov)
-  }
-
   # Extract MCMC details
   TotIter = nburn + npost*nthin # Total of iterations
 
@@ -152,8 +144,6 @@ ambarti = function(x,
       sigma2_store[curr] = sigma2
       bart_store[curr,] = yhat_bart
       y_hat_store[curr,] = y_hat
-      # var_count_store[curr,] = var_count
-      # s_prob_store[curr,] = s
       beta_hat_store[curr,] = beta_hat
     }
 
@@ -254,18 +244,17 @@ ambarti = function(x,
 
   cat('\n') # Make sure progress bar ends on a new line
 
-  return(list(trees = tree_store,
-              sigma2 = sigma2_store*y_sd^2,
-              y_hat = y_hat_store*y_sd + y_mean,
+  return(list(trees      = tree_store,
+              sigma2     = sigma2_store*y_sd^2,
+              y_hat      = y_hat_store*y_sd + y_mean,
               y_hat_bart = bart_store*y_sd,
-              npost = npost,
-              nburn = nburn,
-              nthin = nthin,
-              ntrees = ntrees,
-              y_mean = y_mean,
-              y_sd = y_sd,
-              # var_count_store = var_count_store,
-              beta_hat = beta_hat_store*y_sd,
-              x = x))
+              npost      = npost,
+              nburn      = nburn,
+              nthin      = nthin,
+              ntrees     = ntrees,
+              y_mean     = y_mean,
+              y_sd       = y_sd,
+              beta_hat   = beta_hat_store*y_sd,
+              x          = x))
 
 } # End main function

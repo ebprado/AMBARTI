@@ -7,17 +7,14 @@
 # 2. get_predictions: gets the predicted values from a current set of trees
 # 3. get_children: it's a function that takes a node and, if the node is terminal, returns the node. If not, returns the children and calls the function again on the children
 # 4. resample: an auxiliar function
-# 5. get_ancestors: get the ancestors of all terminal nodes in a tree
-# 6. update_s: full conditional of the vector of splitting probability.
-# 7. update_vars_intercepts_slopes: updates the variances of the intercepts and slopes
+# 5. create_interactions: create a new column that represents an interaction between two columns of a given X.
 
 # Fill_tree_details -------------------------------------------------------
 
-fill_tree_details = function(curr_tree, X, node_to_split) {
+fill_tree_details = function(curr_tree, X, node_to_split = NULL) {
 
   # Collect right bits of tree
   tree_matrix = curr_tree$tree_matrix
-  node_indices = curr_tree$node_indices
 
   # tree_matrix = curr_tree$tree_matrix
 
@@ -25,12 +22,16 @@ fill_tree_details = function(curr_tree, X, node_to_split) {
   new_tree_matrix = tree_matrix
 
   # Start with dummy node indices
-  # node_indices = rep(1, nrow(X))
 
-  loop_indices = which(tree_matrix[,'parent'] == node_to_split) # only nodes that were just created
+  if (is.null(node_to_split)== FALSE) {
+    loop_indices = which(tree_matrix[,'parent'] == node_to_split) # only nodes that were just created
+    node_indices = curr_tree$node_indices
+  } else {
+    loop_indices = 2:nrow(tree_matrix)
+    node_indices = rep(1, nrow(X))
+  }
 
   # For all but the top row, find the number of observations falling into each one
-  # for(i in 2:nrow(tree_matrix)) {
   for(i in loop_indices) {
 
     # Get the parent
@@ -76,8 +77,8 @@ get_predictions = function(trees, X, single_tree = FALSE) {
       predictions = rep(NA, nrow(X))
       unique_node_indices = unique(trees$node_indices)
       # Get the node indices for the current X matrix
-      # curr_X_node_indices = fill_tree_details(trees, X)$node_indices
-      curr_X_node_indices = trees$node_indices
+      curr_X_node_indices = fill_tree_details(trees, X)$node_indices
+
       # Now loop through all node indices to fill in details
       for(i in 1:length(unique_node_indices)) {
         predictions[curr_X_node_indices == unique_node_indices[i]] =
@@ -122,7 +123,12 @@ get_children = function(tree_mat, parent) {
 
 resample <- function(x, ...) x[sample.int(length(x), size=1), ...]
 
-update_s = function(var_count, p, alpha_s){
-  s_ = rdirichlet(1, alpha_s/p + var_count)
-  return(s_)
+# Create interactions -------
+
+create_interaction = function(X, nclass, aux_comb, prob){
+  num_cov = sample(aux_comb, 1, prob = prob) # number of covariates to be sampled
+  s_covs  = sample(x = 1:nclass, size = num_cov, replace = FALSE) # sampled covariates
+  new_cov = matrix(apply(X[,s_covs], 1,sum), ncol=1) # create the interaction from the sampled covariates
+  colnames(new_cov) = paste(sort(colnames(X)[s_covs]), collapse = ':')
+  return(new_cov)
 }
