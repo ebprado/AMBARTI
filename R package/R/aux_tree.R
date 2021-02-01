@@ -13,19 +13,22 @@
 
 # Fill_tree_details -------------------------------------------------------
 
-fill_tree_details = function(curr_tree, X) {
+fill_tree_details = function(curr_tree, X, new_nodes) {
 
   # Collect right bits of tree
   tree_matrix = curr_tree$tree_matrix
+  node_indices = curr_tree$node_indices
 
   # Create a new tree matrix to overwrite
   new_tree_matrix = tree_matrix
 
   # Start with dummy node indices
-  node_indices = rep(1, nrow(X))
+  # node_indices = rep(1, nrow(X))
+  loop_indices = which(tree_matrix[,'parent'] == new_nodes) # only nodes that were just created
 
   # For all but the top row, find the number of observations falling into each one
-  for(i in 2:nrow(tree_matrix)) {
+  # for(i in 2:nrow(tree_matrix)) {
+  for(i in loop_indices) {
 
     # Get the parent
     curr_parent = as.numeric(tree_matrix[i,'parent'])
@@ -70,7 +73,8 @@ get_predictions = function(trees, X, single_tree = FALSE) {
       predictions = rep(NA, nrow(X))
       unique_node_indices = unique(trees$node_indices)
       # Get the node indices for the current X matrix
-      curr_X_node_indices = fill_tree_details(trees, X)$node_indices
+      # curr_X_node_indices = fill_tree_details(trees, X)$node_indices
+      curr_X_node_indices = trees$node_indices
       # Now loop through all node indices to fill in details
       for(i in 1:length(unique_node_indices)) {
         predictions[curr_X_node_indices == unique_node_indices[i]] =

@@ -78,9 +78,7 @@ update_tree = function(X, # Feature matrix
   # Call the appropriate function to get the new tree
   new_tree = switch(type,
                     grow = grow_tree(X, curr_tree, node_min_size, s, index),
-                    prune = prune_tree(X, curr_tree),
-                    change = change_tree(X, curr_tree, node_min_size),
-                    swap = swap_tree(X, curr_tree, node_min_size))
+                    prune = prune_tree(X, curr_tree))
 
   # Return the new tree
   return(new_tree)
@@ -148,7 +146,8 @@ grow_tree = function(X, curr_tree, node_min_size, s, index) {
     new_tree$tree_matrix[nrow(new_tree$tree_matrix)-1,'parent'] = node_to_split
 
     # Now call the fill function on this tree
-    new_tree = fill_tree_details(new_tree, X)
+    #new_tree = fill_tree_details(new_tree, X)
+    new_tree = fill_tree_details(new_tree, X, node_to_split)
 
     # Store the covariate name to use it to update the Dirichlet prior of Linero (2016).
     new_tree$var = split_variable
@@ -245,7 +244,11 @@ prune_tree = function(X, curr_tree) {
     } # End if statement to fill in tree details
 
     # Call the fill function on this tree
-    new_tree = fill_tree_details(new_tree, X)
+    # new_tree = fill_tree_details(new_tree, X, node_to_prune)
+    # Get the old indices
+    get_old_indices = which(new_tree$node_indices == c(child_left, child_right))
+    # Replace the old node indices by the indice of their parent node
+    new_tree$node_indices[get_old_indices] = parent_pick
 
     # Store the covariate name that was used in the splitting rule of the terminal nodes that were just pruned
     new_tree$var = var_pruned_nodes
@@ -256,160 +259,3 @@ prune_tree = function(X, curr_tree) {
   return(new_tree)
 
 } # End of prune_tree function
-
-# change_tree function ----------------------------------------------------
-
-change_tree = function(X, curr_tree, node_min_size) {
-
-  # Change a node means change out the split value and split variable of an internal node. Need to make sure that this does now produce a bad tree (i.e. zero terminal nodes)
-
-  # If current tree is a stump nothing to change
-  if(nrow(curr_tree$tree_matrix) == 1) {
-    curr_tree$var = c(0, 0)
-    return(curr_tree)
-  }
-
-  # Create a holder for the new tree
-  new_tree = curr_tree
-
-  # Need to get the internal nodes
-  internal_nodes = which(as.numeric(new_tree$tree_matrix[,'terminal']) == 0)
-  terminal_nodes = which(as.numeric(new_tree$tree_matrix[,'terminal']) == 1)
-
-  # Create a while loop to get good trees
-  # Create a counter to stop after a certain number of bad trees
-  max_bad_trees = 2
-  count_bad_trees = 0
-  bad_trees = TRUE
-  while(bad_trees) {
-    # Re-set the tree
-    new_tree = curr_tree
-
-    # choose an internal node to change
-    node_to_change = sample(internal_nodes, 1)
-
-    # Get the covariate that will be changed
-    var_changed_node = as.numeric(new_tree$tree_matrix[node_to_change, 'split_variable'])
-
-    # Use the get_children function to get all the children of this node
-    all_children = get_children(new_tree$tree_matrix, node_to_change)
-
-    # Now find all the nodes which match these children
-    use_node_indices = !is.na(match(new_tree$node_indices, all_children))
-
-    # Create new split variable and value based on ignorance
-    # then check this doesn't give a bad tree
-
-    available_values = NULL
-
-    new_split_variable = sample(1:ncol(X), 1)
-
-    available_values = sort(unique(X[use_node_indices,
-                                     new_split_variable]))
-
-    if (length(available_values) == 1){
-      new_split_value = available_values[1]
-      new_tree$var = c(var_changed_node, new_split_variable)
-    } else if (length(available_values) == 2){
-      new_split_value = available_values[2]
-      new_tree$var = c(var_changed_node, new_split_variable)
-    } else {
-      # new_split_value = sample(available_values[-c(1,length(available_values))], 1)
-      new_split_value = resample(available_values[-c(1,length(available_values))])
-    }
-    # Update the tree details
-    new_tree$tree_matrix[node_to_change,
-                         c('split_variable',
-                           'split_value')] = c(new_split_variable,
-                                               new_split_value)
-
-    # Update the tree node indices
-    new_tree = fill_tree_details(new_tree, X)
-
-    # Store the covariate name that was used in the splitting rule of the terminal node that was just changed
-    new_tree$var = c(var_changed_node, new_split_variable)
-
-    # Check for bad tree
-    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) <= node_min_size)) {
-      count_bad_trees = count_bad_trees + 1
-    } else {
-      bad_trees = FALSE
-    }
-    if(count_bad_trees == max_bad_trees){
-      curr_tree$var = c(0, 0)
-      return(curr_tree)
-    }
-
-  } # end of while loop
-
-  # Return new_tree
-  return(new_tree)
-
-} # End of change_tree function
-
-# swap_tree function ------------------------------------------------------
-
-swap_tree = function(X, curr_tree, node_min_size) {
-
-  # Swap takes two neighbouring internal nodes and swaps around their split values and variables
-
-  # If current tree is a stump nothing to change
-  if(nrow(curr_tree$tree_matrix) == 1) return(curr_tree)
-
-  # Create a holder for the new tree
-  new_tree = curr_tree
-
-  # Need to get the internal nodes
-  internal_nodes = which(as.numeric(new_tree$tree_matrix[,'terminal']) == 0)
-  terminal_nodes = which(as.numeric(new_tree$tree_matrix[,'terminal']) == 1)
-
-  # If less than 3 internal nodes return curr_tree
-  if(length(internal_nodes) < 3) return(curr_tree)
-
-  # Find pairs of neighbouring internal nodes
-  parent_of_internal = as.numeric(new_tree$tree_matrix[internal_nodes,'parent'])
-  pairs_of_internal = cbind(internal_nodes, parent_of_internal)[-1,]
-
-  # Create a while loop to get good trees
-  # Create a counter to stop after a certain number of bad trees
-  max_bad_trees = 2
-  count_bad_trees = 0
-  bad_trees = TRUE
-  while(bad_trees) {
-    # Re-set the tree
-    new_tree = curr_tree
-
-    # Pick a random pair
-    nodes_to_swap = sample(1:nrow(pairs_of_internal), 1)
-
-    # Get the split variables and values for this pair
-    swap_1_parts = as.numeric(new_tree$tree_matrix[pairs_of_internal[nodes_to_swap,1],
-                                                   c('split_variable', 'split_value')])
-    swap_2_parts = as.numeric(new_tree$tree_matrix[pairs_of_internal[nodes_to_swap,2],
-                                                   c('split_variable', 'split_value')])
-
-    # Update the tree details - swap them over
-    new_tree$tree_matrix[pairs_of_internal[nodes_to_swap,1],
-                         c('split_variable',
-                           'split_value')] = swap_2_parts
-    new_tree$tree_matrix[pairs_of_internal[nodes_to_swap,2],
-                         c('split_variable',
-                           'split_value')] = swap_1_parts
-
-    # Update the tree node indices
-    new_tree = fill_tree_details(new_tree, X)
-
-    # Check for bad tree
-    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) <= node_min_size)) {
-      count_bad_trees = count_bad_trees + 1
-    } else {
-      bad_trees = FALSE
-    }
-    if(count_bad_trees == max_bad_trees) return(curr_tree)
-
-  } # end of while loop
-
-  # Return new_tree
-  return(new_tree)
-
-} # End of swap_tree function
