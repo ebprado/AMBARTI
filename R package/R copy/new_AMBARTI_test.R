@@ -30,12 +30,14 @@ x$g <- as.factor(x$g)
 x$e <- as.factor(x$e)
 y = data$y
 
+ambarti = new_ambarti(x,y,ntrees=10, nburn=100, npost=100)
+newdata = data$x
+object = ambarti
+bb = predict_ambarti(object, newdata, type = 'mean')
+aa = apply(ambarti$y_hat,2,mean)
 
-# user  system elapsed
-# 81.225   0.334  81.998
-ambarti = function(x,
+new_ambarti = function(x,
                    y,
-                   sparse = FALSE,
                    ntrees = 10,
                    node_min_size = 5,
                    alpha = 0.95,
@@ -225,7 +227,7 @@ ambarti = function(x,
                                     sigma2,
                                     sigma2_mu)
 
-      current_fit = get_predictions(curr_trees[[j]], x_e_g_inter, single_tree = TRUE)
+      current_fit = get_predictions(curr_trees[[j]], x_e_g_inter, single_tree = TRUE, internal=TRUE)
       yhat_bart = yhat_bart - tree_fits_store[,j] # subtract the old fit
       yhat_bart = yhat_bart + current_fit # add the new fit
       tree_fits_store[,j] = current_fit # update the new fit

@@ -135,6 +135,8 @@ ambarti = function(x,
   store_size = npost
   tree_store = vector('list', store_size)
   sigma2_store = rep(NA, store_size)
+  sigma2_g_store = rep(NA, store_size)
+  sigma2_e_store = rep(NA, store_size)
   bart_store = matrix(NA, ncol = length(y), nrow = store_size)
   y_hat_store = matrix(NA, ncol = length(y), nrow = store_size)
   var_count = rep(0, ncol(x))
@@ -184,6 +186,8 @@ ambarti = function(x,
       curr = (i - nburn)/nthin
       tree_store[[curr]] = curr_trees
       sigma2_store[curr] = sigma2
+      sigma2_g_store[curr] = sigma2_g
+      sigma2_e_store[curr] = sigma2_e
       bart_store[curr,] = yhat_bart
       y_hat_store[curr,] = y_hat
       beta_hat_store[curr,] = beta_hat
@@ -277,9 +281,18 @@ ambarti = function(x,
     y_hat = yhat_linear_comp + yhat_bart
 
     sum_of_squares = sum((y_scale - y_hat)^2)
+    gi = yhat_linear_comp[grepl('g', colnames(yhat_linear_comp))]
+    ej = yhat_linear_comp[grepl('e', colnames(yhat_linear_comp))]
+
+    sum_of_squares_g = sum((gi - mu_g)^2)
+    sum_of_squares_e = sum((ej - mu_e)^2)
 
     # Update sigma2 (variance of the residuals)
-    sigma2 = update_sigma2(sum_of_squares, n = length(y_scale), nu, lambda)
+    sigma2   = update_sigma2(sum_of_squares, n = length(y_scale), nu, lambda)
+    sigma2_g = update_sigma2_g(sum_of_squares_g, length(gi), a_g, b_g)
+    sigma2_e = update_sigma2_e(sum_of_squares_e, length(ej), a_e, b_e)
+    aux_s2eg = c(rep(1/sigma2_g, length(gi)), rep(1/sigma2_e, length(ej)))
+    sigma2_psi_inv = diag(aux_s2egs)
 
   } # End iterations loop
 
@@ -287,6 +300,8 @@ ambarti = function(x,
 
   return(list(trees = tree_store,
               sigma2 = sigma2_store*y_sd^2,
+              sigma2_g = sigma2_g_store,
+              sigma2_e = sigma2_e_store,
               y_hat = y_hat_store*y_sd + y_mean,
               y_hat_bart = bart_store*y_sd,
               npost = npost,

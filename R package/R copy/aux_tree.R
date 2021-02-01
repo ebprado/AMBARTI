@@ -8,7 +8,7 @@
 # 3. get_children: it's a function that takes a node and, if the node is terminal, returns the node. If not, returns the children and calls the function again on the children
 # 4. resample: an auxiliar function
 # 5. create_interactions: create a new column that represents an interaction between two columns of a given X.
-
+# 5. create_covariates_prediction: for each MCMC iteration, it creates the covariates needed for each tree.
 # Fill_tree_details -------------------------------------------------------
 
 fill_tree_details = function(curr_tree, X, node_to_split = NULL) {
@@ -60,9 +60,10 @@ fill_tree_details = function(curr_tree, X, node_to_split = NULL) {
 
 } # End of function
 
+
 # Get predictions ---------------------------------------------------------
 
-get_predictions = function(trees, X, single_tree = FALSE) {
+get_predictions = function(trees, X, single_tree = FALSE, internal) {
 
   # Stop nesting problems in case of multiple trees
   if(is.null(names(trees)) & (length(trees) == 1)) trees = trees[[1]]
@@ -77,7 +78,11 @@ get_predictions = function(trees, X, single_tree = FALSE) {
       predictions = rep(NA, nrow(X))
       unique_node_indices = unique(trees$node_indices)
       # Get the node indices for the current X matrix
-      curr_X_node_indices = fill_tree_details(trees, X)$node_indices
+      if (internal==TRUE) {
+        curr_X_node_indices = trees$node_indices
+      } else{
+        curr_X_node_indices = fill_tree_details(trees, X)$node_indices
+        }
 
       # Now loop through all node indices to fill in details
       for(i in 1:length(unique_node_indices)) {
@@ -90,9 +95,9 @@ get_predictions = function(trees, X, single_tree = FALSE) {
     # Do a recursive call to the function
     partial_trees = trees
     partial_trees[[1]] = NULL # Blank out that element of the list
-    predictions = get_predictions(trees[[1]], X, single_tree = TRUE)  +
+    predictions = get_predictions(trees[[1]], X, single_tree = TRUE, internal)  +
       get_predictions(partial_trees, X,
-                      single_tree = length(partial_trees) == 1)
+                      single_tree = length(partial_trees) == 1, internal)
     #single_tree = !is.null(names(partial_trees)))
     # The above only sets single_tree to if the names of the object is not null (i.e. is a list of lists)
   }
@@ -131,4 +136,19 @@ create_interaction = function(X, nclass, aux_comb, prob){
   new_cov = matrix(apply(X[,s_covs], 1,sum), ncol=1) # create the interaction from the sampled covariates
   colnames(new_cov) = paste(sort(colnames(X)[s_covs]), collapse = ':')
   return(new_cov)
+}
+
+create_covariates_prediction = function(variables, data){
+  if (length(variables)) {
+    mat_covs = matrix(NA, nrow=nrow(data), ncol=length(variables))
+    colnames(mat_covs) = variables
+    for (k in 1:length(variables)){
+      columns = unlist(strsplit(variables[k], ':'))
+      mat_covs[,k] = apply(data[,columns],1,sum)
+    }
+    return(mat_covs)
+  }
+  mat_covs = matrix(NA, nrow=nrow(data), ncol=1)
+  return(mat_covs)
+
 }

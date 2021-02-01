@@ -1,12 +1,10 @@
-newdata = data$x
-object = ambarti
 #' @export
 predict_ambarti = function(object, newdata,
                            type = c('all', 'median', 'mean')) {
 
   x_train_names = colnames(object$x)
-  x_e_train_names = x_train_names[grepl('e', colnames(x_train))]
-  x_g_train_names = x_train_names[grepl('g', colnames(x_train))]
+  x_e_train_names = x_train_names[grepl('e', colnames(x_train_names))]
+  x_g_train_names = x_train_names[grepl('g', colnames(x_train_names))]
 
   new_x <- model.matrix(~ -1 + g + e, data=newdata,
                     contrasts.arg=list(g=contrasts(newdata$g, contrasts=F),
@@ -23,11 +21,16 @@ predict_ambarti = function(object, newdata,
   for (i in 1:n_its) {
     # Get current set of trees
     curr_trees = object$trees[[i]]
-    new_x_g_e =
+    # Create all covariates that were used in the training
+    get_cov = unlist(lapply(curr_trees, function(x) x$tree_matrix[,'split_variable']))
+    get_cov = get_cov[!is.na(get_cov)]
+    new_x_g_e = create_covariates_prediction(get_cov, new_x)
+
     # Use get_predictions function to get predictions
     y_hat_mat[i,] = get_predictions(curr_trees,
                                     new_x_g_e,
-                                    single_tree = length(curr_trees) == 2)
+                                    single_tree = length(curr_trees) == 2,
+                                    internal=FALSE)
   }
 
   # Sort out what to return
