@@ -242,3 +242,59 @@ generate_data_AMBARTI = function(I,
               trees   = tree_store))
 
 } # End main function
+
+
+#' @export
+#' @importFrom truncnorm 'rtruncnorm'
+#'
+generate_data_full_model <- function(I, # Number of genotypes
+                               J, # Number of environments
+                               s_alpha, # standard deviation of alpha
+                               s_beta, # standard deviation of alpha
+                               s_y # standard deviation of y
+){
+
+  # Total number of observations
+  N = I*J
+
+  # Number of components in the bilinear part
+  Q = length(lambda)
+
+  # Generate alpha (genotypes)
+  alpha = rnorm(I, 0, s_alpha)
+
+  # Generate beta (environments)
+  beta = rnorm(J, 0, s_beta)
+
+  # Set the grand mean
+  mu = 100
+
+  # Generate the "design matrix"
+  x = expand.grid(1:I, 1:J)
+  names(x) <- c('g', 'e') # g = genotype and e = envorinment
+  x$g = as.factor(x$g)
+  x$e = as.factor(x$e)
+
+  # Now simulate the response
+  inter = alpha[x[,'g']] * beta[x[,'e']]
+  mu_ij = mu + alpha[x[,'g']] + beta[x[,'e']] + inter
+
+  # Compute the response for the TRAINING set
+  y = rnorm(N, mu_ij, s_y)
+
+  # Compute the response for the TEST set
+  y_test = rnorm(N, mu_ij, s_y)
+
+  return(list(y       = y,
+              y_test  = y_test,
+              x       = x,
+              I       = I,
+              J       = J,
+              Q       = Q,
+              s_alpha = s_alpha,
+              s_beta  = s_beta,
+              s_y     = s_y,
+              alpha   = alpha,
+              beta    = beta,
+              blinear = inter))
+}

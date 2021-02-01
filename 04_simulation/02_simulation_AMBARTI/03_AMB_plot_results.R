@@ -70,4 +70,4 @@ myplot <- function(varA, varB, varC){
 myplot('sa','rrmse_alpha', 'RRMSE - alpha')
 myplot('sa','rrmse_beta',  'RRMSE - beta')
 myplot('sa','rmse_blinear', 'RMSE - Interaction')
-myplot('sb','y_test_rmse', 'RMSE - y test')
+myplot('sa','y_test_rmse', 'RMSE - y test')

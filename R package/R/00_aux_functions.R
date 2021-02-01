@@ -284,6 +284,7 @@ organise_AMBARTI <- function(object, data){
   # Get training info
   x_train = data$x
   y_train = data$y
+  if(is.null(data$Q)==FALSE){Q = data$Q} else {Q = NA}
 
   # Get test info
   x_test   = data$x
@@ -304,7 +305,7 @@ organise_AMBARTI <- function(object, data){
               y_hat_train = y_hat_train,
               y_hat_test  = y_hat_test,
               blinear_hat = blinear_hat,
-              Q           = NA,
+              Q           = Q,
               id          = 'AMBARTI'))
 
 }

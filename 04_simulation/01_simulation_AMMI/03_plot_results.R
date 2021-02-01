@@ -24,7 +24,7 @@ tab$sy = as.factor(tab$sy)
 save_plots = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/01_simulation_AMMI/"
 myplot <- function(varA, varB, varC){
 
-  pdf(paste(save_plots, varB, varA, '.pdf', sep=''), width = 8, height = 6)
+  # pdf(paste(save_plots, varB, varA, '.pdf', sep=''), width = 8, height = 6)
   if (varA == 'sa'){aux = expression(sigma[alpha])}
   if (varA == 'sb'){aux = expression(sigma[beta])}
 
@@ -58,7 +58,7 @@ myplot <- function(varA, varB, varC){
 
   print(xxx)
 
-  dev.off()
+  # dev.off()
 }
 
 myplot('sa','rrmse_alpha', 'RRMSE - alpha')
