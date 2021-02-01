@@ -292,7 +292,7 @@ ambarti = function(x,
     sigma2_g = update_sigma2_g(sum_of_squares_g, length(gi), a_g, b_g)
     sigma2_e = update_sigma2_e(sum_of_squares_e, length(ej), a_e, b_e)
     aux_s2eg = c(rep(1/sigma2_g, length(gi)), rep(1/sigma2_e, length(ej)))
-    sigma2_psi_inv = diag(aux_s2egs)
+    sigma2_psi_inv = diag(aux_s2eg)
 
   } # End iterations loop
 
