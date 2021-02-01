@@ -186,22 +186,12 @@ ambarti = function(x,
       sigma2_store[curr] = sigma2
       bart_store[curr,] = yhat_bart
       y_hat_store[curr,] = y_hat
-      # var_count_store[curr,] = var_count
-      # s_prob_store[curr,] = s
       beta_hat_store[curr,] = beta_hat
     }
 
-    ##### TEST #######
-    ##### TEST #######
-    ##### TEST #######
-
+      # Update the random effects
       beta_hat = update_linear_component(y_scale, 0, x, sigma2, sigma2_psi_inv)
-      # beta_hat = update_linear_component(y_scale, yhat_bart, x, sigma2, sigma2_psi_inv)
       yhat_linear_comp = x%*%beta_hat
-
-    ##### TEST #######
-    ##### TEST #######
-    ##### TEST #######
 
       # Start looping through trees
       for (j in 1:ntrees) {
@@ -268,12 +258,6 @@ ambarti = function(x,
 
         if(a > runif(1)) {
           curr_trees[[j]] = new_trees[[j]]
-
-          # if (type=='grow'){
-          #   var_count[c(var1,var2)] = var_count[c(var1,var2)] + 1}
-          #
-          # if (type=='prune'){
-          #   var_count[curr_trees[[j]]$var] = var_count[curr_trees[[j]]$var] - 1 } # -1 because of the intercept in X
         }
 
         # Update mu whether tree accepted or not
@@ -282,17 +266,12 @@ ambarti = function(x,
                                       sigma2,
                                       sigma2_mu)
 
-      current_fit = get_predictions(curr_trees[j], x_g_e, single_tree = TRUE)
+      current_fit = get_predictions(curr_trees[[j]], x_g_e, single_tree = TRUE)
       yhat_bart = yhat_bart - tree_fits_store[,j] # subtract the old fit
       yhat_bart = yhat_bart + current_fit # add the new fit
       tree_fits_store[,j] = current_fit # update the new fit
 
       } # End loop through trees
-
-    # beta_hat = update_linear_component(y_scale, yhat_bart, x, sigma2, sigma2_psi_inv)
-    #
-    # # Updating predictions from the linear component
-    # yhat_linear_comp = x%*%beta_hat
 
     # Updating the final predictions
     y_hat = yhat_linear_comp + yhat_bart
@@ -302,10 +281,6 @@ ambarti = function(x,
     # Update sigma2 (variance of the residuals)
     sigma2 = update_sigma2(sum_of_squares, n = length(y_scale), nu, lambda)
 
-    # Update s = (s_1, ..., s_p), where s_p is the probability that predictor p is used to create new terminal nodes
-    # if (sparse == 'TRUE' & i > floor(TotIter*0.1)){
-    #   s = update_s(var_count, p, 1)
-    # }
   } # End iterations loop
 
     cat('\n') # Make sure progress bar ends on a new line
