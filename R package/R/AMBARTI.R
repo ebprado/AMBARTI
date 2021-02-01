@@ -4,32 +4,31 @@
 #' @importFrom MCMCpack 'rdirichlet'
 #' @importFrom truncnorm 'rtruncnorm'
 
-# sparse = FALSE
-# skip_trees = FALSE
-# ntrees = 10
-# node_min_size = 5
-# alpha = 0.95
-# beta = 2
-# nu = 3
-# lambda = 0.1
-# mu_mu = 0
-# mu_g = 0
-# mu_e = 0
-# sigma2 = 1
-# sigma2_mu = 1
-# sigma2_psi = 1
-# nburn = 1000
-# npost = 1000
-# nthin = 1
-# a_g = 1
-# b_g = 1
-# a_e = 1
-# b_e = 1
-# x = data$x
-# names(x) <- c('g','e')
-# x$g <- as.factor(x$g)
-# x$e <- as.factor(x$e)
-# y = data$y
+ntrees = 10
+node_min_size = 5
+alpha = 0.95
+beta = 2
+nu = 3
+lambda = 0.1
+mu_mu = 0
+mu_g = 0
+mu_e = 0
+sigma2 = 1
+sigma2_mu = 1
+sigma2_psi = 1
+nburn = 1000
+npost = 1000
+nthin = 1
+a_g = 1
+b_g = 1
+a_e = 1
+b_e = 1
+data = generate_data_AMMI(10, 8, 1,1,1,10)
+x = data$x
+names(x) <- c('g','e')
+x$g <- as.factor(x$g)
+x$e <- as.factor(x$e)
+y = data$y
 
 ambarti = function(x,
                    y,
@@ -279,11 +278,10 @@ ambarti = function(x,
 
     # Updating the final predictions
     y_hat = yhat_linear_comp + yhat_bart
+    gi    = beta_hat[grepl('g', colnames(x))]
+    ej    = beta_hat[grepl('e', colnames(x))]
 
     sum_of_squares = sum((y_scale - y_hat)^2)
-    gi = yhat_linear_comp[grepl('g', colnames(yhat_linear_comp))]
-    ej = yhat_linear_comp[grepl('e', colnames(yhat_linear_comp))]
-
     sum_of_squares_g = sum((gi - mu_g)^2)
     sum_of_squares_e = sum((ej - mu_e)^2)
 
