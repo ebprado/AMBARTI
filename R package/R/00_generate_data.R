@@ -256,9 +256,6 @@ generate_data_full_model <- function(I, # Number of genotypes
   # Total number of observations
   N = I*J
 
-  # Number of components in the bilinear part
-  Q = length(lambda)
-
   # Generate alpha (genotypes)
   alpha = rnorm(I, 0, s_alpha)
 
@@ -289,7 +286,6 @@ generate_data_full_model <- function(I, # Number of genotypes
               x       = x,
               I       = I,
               J       = J,
-              Q       = Q,
               s_alpha = s_alpha,
               s_beta  = s_beta,
               s_y     = s_y,
