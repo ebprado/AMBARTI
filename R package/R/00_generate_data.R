@@ -245,8 +245,7 @@ generate_data_AMBARTI = function(I,
 
 
 #' @export
-#' @importFrom truncnorm 'rtruncnorm'
-#'
+#' @importFrom stats 'rnorm'
 generate_data_full_model <- function(I, # Number of genotypes
                                J, # Number of environments
                                s_alpha, # standard deviation of alpha
