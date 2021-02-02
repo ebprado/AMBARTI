@@ -23,6 +23,8 @@ tab$sa = factor(tab$sa, levels=c('1','5'), labels=c(expression(paste(sigma[alpha
                 tab$sb = factor(tab$sb, levels=c('1','5'), labels=c(expression(paste(sigma[beta],' = 1')), expression(paste(sigma[beta],' = 5'))))
 tab$sy = as.factor(tab$sy)
 
+tab = tab %>% filter(id %in% c('AMMI (Q=1)', 'AMMI (Q=2)', 'AMMI (Q=3)', 'AMBARTI'))
+
 # Generate plots
 save_plots = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/02_simulation_AMBARTI/"
 myplot <- function(varA, varB, varC){
