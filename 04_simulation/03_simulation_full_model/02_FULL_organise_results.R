@@ -11,7 +11,6 @@ J = c(10) # c(5, 15, 30) # Number of environments
 s_alpha = c(1, 5) # c(1, 5) # standard deviation of alpha
 s_beta = c(1,5) # c(1, 5) # standard deviation of beta
 s_y = 1 # c(1, 5) # standard deviation of y
-lambda = c('8', '12', '8, 12', '10, 12','8, 10, 12')
 n_rep = 10 # Number of Monte Carlo repetition
 
 # Get all combinations of the quantities above
@@ -34,8 +33,6 @@ for (i in 1:n_comb){
   s_alpha = comb$s_alpha # standard deviation of alpha
   s_beta = comb$s_beta # standard deviation of alpha
   s_y = comb$s_y # standard deviation of y
-  aux_lambda = as.character(comb$lambda)
-  lambda = as.numeric(unlist(strsplit(aux_lambda,','))) # values for lambda
 
   for (j in 1:n_rep){
     # load files
