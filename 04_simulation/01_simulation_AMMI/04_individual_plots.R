@@ -120,14 +120,14 @@ beta_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postp
 
 ## Density plots for the DIFFERENCE (true - predicted)
 
-plot_individual_density <- function(object, data){
+plot_individual_density <- function(object){
 
   if (deparse(substitute(object)) == 'blinear_hat') {aux_title = expression(Sigma[q]~lambda[q]~gamma[iq]~delta[jq]~-~Sigma[q]~hat(lambda)[q]~hat(gamma)[iq]~hat(delta)[jq])}
   if (deparse(substitute(object)) == 'y_train_hat') {aux_title = expression('Training data:'~y - hat(y))}
   if (deparse(substitute(object)) == 'y_test_hat') {aux_title = expression('Test data:'~y - hat(y))}
 
   db = object
-  names(db) = c('Method', 'Parameter', 'value', 'true')
+  names(db) = c('Method', 'Q', 'Parameter', 'value', 'true')
 
   db %>%
     ggplot(aes(x=value, colour=Method)) +
@@ -139,11 +139,8 @@ plot_individual_density <- function(object, data){
           plot.title = element_text(size = 18, hjust = 0.5),
           legend.text = element_text(size = 12),
           legend.title = element_blank(),
-          legend.position = "bottom")  +
-    # scale_x_discrete(limit = orig_labels,
-                     # labels = fixed_labels) +
-    scale_color_discrete(labels=unique(db$Method))
+          legend.position = "bottom")
 }
-plot_individual_density(blinear_hat, data)
-plot_individual_density(y_train_hat, data)
-plot_individual_density(y_test_hat, data)
+plot_individual_density(blinear_hat)
+plot_individual_density(y_train_hat)
+plot_individual_density(y_test_hat)

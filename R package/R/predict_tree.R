@@ -24,53 +24,55 @@ predict_ambarti = function(object, newdata,
   ###########################################
   #### Genotype
   ###########################################
-  number_geno = length(ng)
-  num_comb_g = max(2,floor(number_geno/2))
-  formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
-  x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = y_aux, new_x[, grepl("g", colnames(new_x))]))
-  individual_g = (1:(number_geno + 1))
-  name_all_comb_g = colnames(x_all_iter_g)
-  name_all_comb_g = name_all_comb_g[-c(individual_g)] # remove the individual effects
-
-  if (number_geno%%2 == 0){ #even
-    repeated_comb_g = choose(number_geno, num_comb_g)/2
-    name_all_comb_g = name_all_comb_g[-c(repeated_comb_g)] # remove some equivalent columns
-  }
-
-  new_x_g = matrix(NA, ncol=length(name_all_comb_g), nrow=nrow(new_x))
-  colnames(new_x_g) = name_all_comb_g
-
-  for (k in 1:ncol(new_x_g)){
-    name_col_g = unlist(strsplit(name_all_comb_g[k],':'))
-    new_x_g[,k] = apply(new_x[,name_col_g],1,sum)
-  }
+  # number_geno = length(ng)
+  # num_comb_g = max(2,floor(number_geno/2))
+  # formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
+  # x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = y_aux, new_x[, grepl("g", colnames(new_x))]))
+  # individual_g = (1:(number_geno + 1))
+  # name_all_comb_g = colnames(x_all_iter_g)
+  # name_all_comb_g = name_all_comb_g[-c(individual_g)] # remove the individual effects
+  #
+  # if (number_geno%%2 == 0){ #even
+  #   repeated_comb_g = choose(number_geno, num_comb_g)/2
+  #   name_all_comb_g = name_all_comb_g[-c(repeated_comb_g)] # remove some equivalent columns
+  # }
+  #
+  # new_x_g = matrix(NA, ncol=length(name_all_comb_g), nrow=nrow(new_x))
+  # colnames(new_x_g) = name_all_comb_g
+  #
+  # for (k in 1:ncol(new_x_g)){
+  #   name_col_g = unlist(strsplit(name_all_comb_g[k],':'))
+  #   new_x_g[,k] = apply(new_x[,name_col_g],1,sum)
+  # }
 
   ###########################################
   #### Environment
   ###########################################
 
-  number_env = length(ne)
-  num_comb_e = max(2,floor(number_env/2))
-  formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
-  x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = y_aux, new_x[, grepl("e", colnames(new_x))]))
-  individual_e = (1:(number_env + 1))
-  repeated_comb_e = choose(number_env, num_comb_e)/2
-  name_all_comb_e = colnames(x_all_iter_e)
-  name_all_comb_e = name_all_comb_e[-c(individual_e)] # remove individual effects
-
-  if (length(ne)%%2 == 0){ #even
-    repeated_comb_e = choose(number_env, num_comb_e)/2
-    name_all_comb_e = name_all_comb_e[-c(repeated_comb_e)] # remove some equivalent columns
-  }
-
-  new_x_e = matrix(NA, ncol=length(name_all_comb_e), nrow=nrow(new_x))
-  colnames(new_x_e) = name_all_comb_e
-
-  for (k in 1:ncol(new_x_e)){
-    name_col_e = unlist(strsplit(name_all_comb_e[k],':'))
-    new_x_e[,k] = apply(new_x[,name_col_e],1,sum)
-  }
+  # number_env = length(ne)
+  # num_comb_e = max(2,floor(number_env/2))
+  # formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
+  # x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = y_aux, new_x[, grepl("e", colnames(new_x))]))
+  # individual_e = (1:(number_env + 1))
+  # repeated_comb_e = choose(number_env, num_comb_e)/2
+  # name_all_comb_e = colnames(x_all_iter_e)
+  # name_all_comb_e = name_all_comb_e[-c(individual_e)] # remove individual effects
+  #
+  # if (length(ne)%%2 == 0){ #even
+  #   repeated_comb_e = choose(number_env, num_comb_e)/2
+  #   name_all_comb_e = name_all_comb_e[-c(repeated_comb_e)] # remove some equivalent columns
+  # }
+  #
+  # new_x_e = matrix(NA, ncol=length(name_all_comb_e), nrow=nrow(new_x))
+  # colnames(new_x_e) = name_all_comb_e
+  #
+  # for (k in 1:ncol(new_x_e)){
+  #   name_col_e = unlist(strsplit(name_all_comb_e[k],':'))
+  #   new_x_e[,k] = apply(new_x[,name_col_e],1,sum)
+  # }
   # Put x_g and x_e into a data frame and get the column indices
+  new_x_g = new_x[, grepl("g", colnames(new_x))]
+  new_x_e = new_x[, grepl("e", colnames(new_x))]
   new_x_g_e = as.data.frame(cbind(new_x_g, new_x_e))
 
   # Make sure the columns in the train and test data are in the same order due to the main effects

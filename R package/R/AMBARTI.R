@@ -4,36 +4,39 @@
 #' @importFrom MCMCpack 'rdirichlet'
 #' @importFrom truncnorm 'rtruncnorm'
 
-ntrees = 10
-node_min_size = 5
-alpha = 0.95
-beta = 2
-nu = 3
-lambda = 0.1
-mu_mu = 0
-mu_g = 0
-mu_e = 0
-sigma2 = 1
-sigma2_mu = 1
-sigma2_psi = 1
-nburn = 1000
-npost = 1000
-nthin = 1
-a_g = 1
-b_g = 1
-a_e = 1
-b_e = 1
-data = generate_data_AMMI(10, 8, 1,1,1,10)
-x = data$x
-names(x) <- c('g','e')
-x$g <- as.factor(x$g)
-x$e <- as.factor(x$e)
-y = data$y
+# ntrees = 50
+# node_min_size = 5
+# alpha = 0.95
+# beta = 2
+# nu = 3
+# lambda = 0.1
+# mu_mu = 0
+# mu_g = 0
+# mu_e = 0
+# sigma2 = 1
+# sigma2_mu = 1
+# sigma2_psi = 1
+# nburn = 1000
+# npost = 1000
+# nthin = 1
+# a_g = 1
+# b_g = 1
+# a_e = 1
+# b_e = 1
+# data = generate_data_AMMI(10, 10, 1,1,1,10)
+# x = data$x
+# names(x) <- c('g','e')
+# x$g <- as.factor(x$g)
+# x$e <- as.factor(x$e)
+# y = data$y
+# oi = test_ambarti(x,y, ntrees=50, nburn=1000, npost=1000)
+# plot(apply(oi$y_hat,2,mean), y);abline(0,1)
+# cor(apply(oi$y_hat,2,mean), y);
+# bb = predict_ambarti(oi,x,'mean')
 
 ambarti = function(x,
                    y,
-                   sparse = FALSE,
-                   ntrees = 10,
+                   ntrees = 50,
                    node_min_size = 5,
                    alpha = 0.95,
                    beta = 2,
@@ -72,54 +75,56 @@ ambarti = function(x,
   ###########################################
   #### Genotype
   ###########################################
-  number_geno = length(ng)
-  num_comb_g = max(2, floor(number_geno/2))
-  formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
-  x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = y, x[, grepl("g", colnames(x))]))
-  individual_g = (1:(number_geno + 1))
-  name_all_comb_g = colnames(x_all_iter_g)
-  name_all_comb_g = name_all_comb_g[-c(individual_g)] # remove the individual effects
-
-  if (number_geno%%2 == 0){ #even
-    repeated_comb_g = choose(number_geno, num_comb_g)/2
-    name_all_comb_g = name_all_comb_g[-c(repeated_comb_g)] # remove some equivalent columns
-  }
-
-  x_g = matrix(NA, ncol=length(name_all_comb_g), nrow=length(y))
-  colnames(x_g) = name_all_comb_g
-
-  for (k in 1:ncol(x_g)){
-    name_col_g = unlist(strsplit(name_all_comb_g[k],':'))
-    x_g[,k] = apply(x[,name_col_g],1,sum)
-  }
+  # number_geno = length(ng)
+  # num_comb_g = max(2, floor(number_geno/2))
+  # formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
+  # x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = y, x[, grepl("g", colnames(x))]))
+  # individual_g = (1:(number_geno + 1))
+  # name_all_comb_g = colnames(x_all_iter_g)
+  # name_all_comb_g = name_all_comb_g[-c(individual_g)] # remove the individual effects
+  #
+  # if (number_geno%%2 == 0){ #even
+  #   repeated_comb_g = choose(number_geno, num_comb_g)/2
+  #   name_all_comb_g = name_all_comb_g[-c(repeated_comb_g)] # remove some equivalent columns
+  # }
+  #
+  # x_g = matrix(NA, ncol=length(name_all_comb_g), nrow=length(y))
+  # colnames(x_g) = name_all_comb_g
+  #
+  # for (k in 1:ncol(x_g)){
+  #   name_col_g = unlist(strsplit(name_all_comb_g[k],':'))
+  #   x_g[,k] = apply(x[,name_col_g],1,sum)
+  # }
+  x_g = x[, grepl("g", colnames(x))]
 
   ###########################################
   #### Environment
   ###########################################
 
-  number_env = length(ne)
-  num_comb_e = max(2, floor(number_env/2))
-  formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
-  x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = y, x[, grepl("e", colnames(x))]))
-  individual_e = (1:(number_env + 1))
-  repeated_comb_e = choose(number_env, num_comb_e)/2
-  name_all_comb_e = colnames(x_all_iter_e)
-  name_all_comb_e = name_all_comb_e[-c(individual_e)] # remove individual effects
-
-  if (number_env%%2 == 0){ #even
-    repeated_comb_e = choose(number_env, num_comb_e)/2
-    name_all_comb_e = name_all_comb_e[-c(repeated_comb_e)] # remove some equivalent columns
-  }
-
-  x_e = matrix(NA, ncol=length(name_all_comb_e), nrow=length(y))
-  colnames(x_e) = name_all_comb_e
-
-  for (k in 1:ncol(x_e)){
-    name_col_e = unlist(strsplit(name_all_comb_e[k],':'))
-    x_e[,k] = apply(x[,name_col_e],1,sum)
-  }
+  # number_env = length(ne)
+  # num_comb_e = max(2, floor(number_env/2))
+  # formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
+  # x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = y, x[, grepl("e", colnames(x))]))
+  # individual_e = (1:(number_env + 1))
+  # repeated_comb_e = choose(number_env, num_comb_e)/2
+  # name_all_comb_e = colnames(x_all_iter_e)
+  # name_all_comb_e = name_all_comb_e[-c(individual_e)] # remove individual effects
+  #
+  # if (number_env%%2 == 0){ #even
+  #   repeated_comb_e = choose(number_env, num_comb_e)/2
+  #   name_all_comb_e = name_all_comb_e[-c(repeated_comb_e)] # remove some equivalent columns
+  # }
+  #
+  # x_e = matrix(NA, ncol=length(name_all_comb_e), nrow=length(y))
+  # colnames(x_e) = name_all_comb_e
+  #
+  # for (k in 1:ncol(x_e)){
+  #   name_col_e = unlist(strsplit(name_all_comb_e[k],':'))
+  #   # x_e[,k] = apply(x[,name_col_e],1,sum)
+  # }
+  x_e = x[, grepl("e", colnames(x))]
   # Put x_g and x_e into a data frame and get the column indices
-  if (number_env <= 2 || number_geno <= 2) {stop('Number of genotypes and environments needs to be >= 3.')}
+  # if (number_env <= 2 || number_geno <= 2) {stop('Number of genotypes and environments needs to be >= 3.')}
   x_g_e = as.data.frame(cbind(x_g, x_e))
   ind_x_g = 1:ncol(x_g)
   ind_x_e = (ncol(x_g) + 1):ncol(x_g_e)
@@ -317,3 +322,4 @@ ambarti = function(x,
               x_g_e = x_g_e))
 
 } # End main function
+
