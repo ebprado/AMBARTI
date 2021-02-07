@@ -25,13 +25,14 @@ generate_data_AMMI <- function(I, # Number of genotypes
   mu = 100
 
   # Generate gamma
-  gamma <- matrix(NA, nrow = I ,ncol = Q)
-  gamma[1,] <- truncnorm::rtruncnorm(Q, a=0)
-  gamma[-1,] <- rnorm((I-1)*Q)
+  # gamma <- matrix(NA, nrow = I ,ncol = Q)
+  # gamma[1,] <- truncnorm::rtruncnorm(Q, a=0)
+  # gamma[-1,] <- rnorm((I-1)*Q)
+  gamma = generate_gamma_delta(I, Q)
 
   # Generate delta
-  delta <- matrix(rnorm(J*Q), nrow = J ,ncol = Q)
-
+  # delta <- matrix(rnorm(J*Q), nrow = J ,ncol = Q)
+  delta = generate_gamma_delta(J, Q)
   # Generate the "design matrix"
   x = expand.grid(1:I, 1:J)
   names(x) <- c('g', 'e') # g = genotype and e = envorinment
@@ -76,6 +77,51 @@ generate_data_AMMI <- function(I, # Number of genotypes
               blinear = blin))
 }
 
+square_root_matrix <- function(x){
+  # Jordan normal form
+  X = eigen(x)
+  P = X$vectors
+  A = diag(X$values)
+
+  A_sqrt = diag(sqrt(X$values))
+  P_inv = solve(P)
+  x_sqrt = P %*% A_sqrt %*%  P_inv
+  return(x_sqrt)
+}
+
+generate_gamma_delta <- function(INDEX, Q) {
+
+  first_row = TRUE
+
+  while(first_row) {
+    raw_par = matrix(rnorm(INDEX*Q), ncol=Q)
+    par_mean  = matrix(rep(apply(raw_par,2,mean), each = nrow(raw_par)), ncol=Q)
+    par_aux  = raw_par - par_mean
+
+    # Constraints ----
+    # apply(par_aux,2,sum)
+    parTpar = solve(t(par_aux)%*%(par_aux))
+    A = square_root_matrix(parTpar)
+    samples = par_aux%*%A
+
+    # Force the first to be positive
+    for (i in 1:nrow(samples)){
+      row1 = samples[1, ]
+      if (all(samples[i, ] > 0)) {
+        aux = samples[i, ]
+        samples[1,] = aux
+        samples[i,] = row1
+        return(samples)
+      }
+    }
+    # t(samples)%*%samples
+    # apply(samples,2,sum)
+  }
+}
+set.seed(001)
+aa = generate_gamma_delta(10,3)
+
+
 #' @export
 #' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
 
@@ -112,55 +158,12 @@ generate_data_AMBARTI = function(I,
                     contrasts.arg=list(g=contrasts(x$g, contrasts=F),
                                        e=contrasts(x$e, contrasts=F)))
 
-  ###########################################
-  #### Genotype
-  ###########################################
+  x_g <- x[, grepl('g',colnames(x))]
+  x_e <- x[, grepl('e',colnames(x))]
+
   number_geno = length(ng)
-  num_comb_g = max(2, floor(number_geno/2))
-  formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
-  x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = rep(0, nrow(x)), x[, grepl("g", colnames(x))]))
-  individual_g = (1:(number_geno + 1))
-  name_all_comb_g = colnames(x_all_iter_g)
-  name_all_comb_g = name_all_comb_g[-c(individual_g)] # remove the individual effects
-
-  if (number_geno%%2 == 0){ #even
-    repeated_comb_g = choose(number_geno, num_comb_g)/2
-    name_all_comb_g = name_all_comb_g[-c(repeated_comb_g)] # remove some equivalent columns
-  }
-
-  x_g = matrix(NA, ncol=length(name_all_comb_g), nrow=nrow(x))
-  colnames(x_g) = name_all_comb_g
-
-  for (k in 1:ncol(x_g)){
-    name_col_g = unlist(strsplit(name_all_comb_g[k],':'))
-    x_g[,k] = apply(x[,name_col_g],1,sum)
-  }
-
-  ###########################################
-  #### Environment
-  ###########################################
-
   number_env = length(ne)
-  num_comb_e = max(2, floor(number_env/2))
-  formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
-  x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = rep(0, nrow(x)), x[, grepl("e", colnames(x))]))
-  individual_e = (1:(number_env + 1))
-  repeated_comb_e = choose(number_env, num_comb_e)/2
-  name_all_comb_e = colnames(x_all_iter_e)
-  name_all_comb_e = name_all_comb_e[-c(individual_e)] # remove individual effects
 
-  if (number_env%%2 == 0){ #even
-    repeated_comb_e = choose(number_env, num_comb_e)/2
-    name_all_comb_e = name_all_comb_e[-c(repeated_comb_e)] # remove some equivalent columns
-  }
-
-  x_e = matrix(NA, ncol=length(name_all_comb_e), nrow=nrow(x))
-  colnames(x_e) = name_all_comb_e
-
-  for (k in 1:ncol(x_e)){
-    name_col_e = unlist(strsplit(name_all_comb_e[k],':'))
-    x_e[,k] = apply(x[,name_col_e],1,sum)
-  }
   # Put x_g and x_e into a data frame and get the column indices
   if (number_env <= 2 || number_geno <= 2) {stop('Number of genotypes and environments needs to be >= 3.')}
   x_g_e = as.data.frame(cbind(x_g, x_e))
@@ -212,9 +215,13 @@ generate_data_AMBARTI = function(I,
   } # End loop through trees
 
   bart_part = get_predictions(curr_trees, x_g_e, single_tree = ntrees == 1)
-  # hist(bart_part - mean(bart_part))
-  # We take the mean because we assume that the sum of BART predictions within g_i and e_j is zero.
+
+  # We do that because we assume that the sum of BART predictions within g_i and e_j is zero.
   bart_part = bart_part - mean(bart_part)
+  mean_by_g = aggregate(bart_part, by=list(x_orig[,'g']), mean)[,2]
+  mean_by_e = aggregate(bart_part, by=list(x_orig[,'e']), mean)[,2]
+  bart_part = bart_part - mean_by_g[x_orig[,'g']]
+  bart_part = bart_part - mean_by_e[x_orig[,'e']]
 
   tree_store[[1]] = curr_trees
 
