@@ -78,15 +78,22 @@ generate_data_AMMI <- function(I, # Number of genotypes
 }
 
 square_root_matrix <- function(x){
-  # Jordan normal form
-  X = eigen(x)
-  P = X$vectors
-  A = diag(X$values)
 
-  A_sqrt = diag(sqrt(X$values))
-  P_inv = solve(P)
-  x_sqrt = P %*% A_sqrt %*%  P_inv
-  return(x_sqrt)
+  # When Q = 1, x will be a scalar
+  if (nrow(x) == 1) {return(sqrt(x))}
+
+  # When Q > 1, then x will be a matrix
+  if (nrow(x) > 1) {
+    # Jordan normal form
+    X = eigen(x)
+    P = X$vectors
+    A = diag(X$values)
+
+    A_sqrt = diag(sqrt(X$values))
+    P_inv = solve(P)
+    x_sqrt = P %*% A_sqrt %*%  P_inv
+    return(x_sqrt)
+  }
 }
 
 generate_gamma_delta <- function(INDEX, Q) {
@@ -114,13 +121,10 @@ generate_gamma_delta <- function(INDEX, Q) {
         return(samples)
       }
     }
-    # t(samples)%*%samples
-    # apply(samples,2,sum)
+    # t(samples)%*%samples == 0
+    # apply(samples,2,sum) == diag(Q)
   }
 }
-set.seed(001)
-aa = generate_gamma_delta(10,3)
-
 
 #' @export
 #' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
