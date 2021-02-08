@@ -212,9 +212,13 @@ generate_data_AMBARTI = function(I,
   } # End loop through trees
 
   bart_part = get_predictions(curr_trees, x_g_e, single_tree = ntrees == 1)
-  # hist(bart_part - mean(bart_part))
-  # We take the mean because we assume that the sum of BART predictions within g_i and e_j is zero.
+
+  # We do that because we assume that the sum of BART predictions within g_i and e_j is zero.
   bart_part = bart_part - mean(bart_part)
+  mean_by_g = aggregate(bart_part, by=list(x_orig[,'g']), mean)[,2]
+  mean_by_e = aggregate(bart_part, by=list(x_orig[,'e']), mean)[,2]
+  bart_part = bart_part - mean_by_g[x_orig[,'g']]
+  bart_part = bart_part - mean_by_e[x_orig[,'e']]
 
   tree_store[[1]] = curr_trees
 
