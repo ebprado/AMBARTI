@@ -151,3 +151,31 @@ p(\mathcal{T}_{t}| R_{t}, \sigma^{2}) &  \propto p(\mathcal{T}_{t}) \int p(R_{t}
 \end{aligned}
 $$
 where $\bar{R}_{\ell} = \sum_{(i,j) \in \mathcal{P}_{t \ell}} (r_{ij}^{(t)} - g_{i} - e_{j}) / n_{t \ell}$, $r_{ij}^{(t)} \in R_{t}$ and $n_{t \ell}$ is the number of observations that belong to $\mathcal{P}_{t \ell}$. This sampling is carried out through a Metropolis-Hastings step, as the expression does not have a known distributional form;
+
+## Orthonormality constraints
+
+Below, we show how to apply the orthonormality constraints on $\gamma_{iq}$ and $\delta_{jq}$ when simulating from the AMMI model. To illustrate the strategy, we consider that $\boldsymbol\gamma \in \mathbb{R}^{I\times Q}$ and $S \in \mathbb{R}^{I\times Q}$, where $s_{ij} \sim \mbox{N}(0, \sigma^2_{x})$ - actually, $s_{ij}$ could be sampled from many other distributions, such as Gamma or Beta. Also, define $M$ as an $I \times Q$ matrix with each element being the mean of the corresponding $Q$ columns of $S$. 
+
+Recall that the orthonormality constraints impose that $\textbf{1}_{I}^{\top}\boldsymbol\gamma_{q} = 0$ and $\boldsymbol\gamma^\top\boldsymbol\gamma = \mathbb{I}$, where $\textbf{1}_{I}$ is a row vector of dimension $I$ and $\boldsymbol\gamma_{q}$ is a column of the matrix $\boldsymbol\gamma$. Initially, we know that
+
+$$
+\begin{aligned}
+B & = S - M \\
+& \Rightarrow \textbf{1}_{I}^{\top} B = 0 \\
+& \nRightarrow B^{\top} B = \mathbb{I}, \\
+& \end{aligned}
+$$
+where $B$ is, by construction, a full rank matrix and $B^\top B$ is symmetric. In this sense, we need to find a matrix, let's say, $A$, such that $C = BA \Rightarrow C^\top C = \mathbb{I}$. To do so, we know that
+$$
+\begin{aligned}
+D & = C^\top C = \mathbb{I}\\
+ & \Rightarrow (BA)^\top BA = \mathbb{I}\\
+ & \Rightarrow A^\top B^\top BA = \mathbb{I} \\
+ & \Rightarrow A^\top B^\top B = A^{-1} \\
+ & \Rightarrow  B^\top B = A^{-\top}A^{-1} \\
+ & \Rightarrow  B^\top B = (A A^{\top})^{-1} \\
+ & \Rightarrow  (B^\top B)^{-1} = A A^{\top} \\
+ & \Rightarrow  (B^\top B)^{-1} = A^{2} \mbox{ (by symmetry)} \\
+ & \Rightarrow  (B^\top B)^{-1/2} = A.
+\end{aligned}
+$$
