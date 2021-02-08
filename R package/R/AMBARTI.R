@@ -121,9 +121,9 @@ ambarti = function(x,
 
   for (k in 1:ncol(x_e)){
     name_col_e = unlist(strsplit(name_all_comb_e[k],':'))
-    # x_e[,k] = apply(x[,name_col_e],1,sum)
+    x_e[,k] = apply(x[,name_col_e],1,sum)
   }
-  x_e = x[, grepl("e", colnames(x))]
+  # x_e = x[, grepl("e", colnames(x))]
   # Put x_g and x_e into a data frame and get the column indices
   if (number_env <= 2 || number_geno <= 2) {stop('Number of genotypes and environments needs to be >= 3.')}
   x_g_e = as.data.frame(cbind(x_g, x_e))
