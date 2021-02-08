@@ -390,6 +390,7 @@ generate_data_AMBARTI = function(I,
   } # End loop through trees
 
   # We do that because we assume that the sum of BART predictions within g_i and e_j is zero.
+  bart_part = get_predictions(curr_trees, x_g_e, single_tree = ntrees == 1)
   bart_part = bart_part - mean(bart_part)
   mean_by_g = aggregate(bart_part, by=list(x_orig[,'g']), mean)[,2]
   mean_by_e = aggregate(bart_part, by=list(x_orig[,'e']), mean)[,2]
