@@ -23,14 +23,15 @@
 # b_g = 1
 # a_e = 1
 # b_e = 1
-# data = generate_data_AMMI(10, 10, 1,1,1,10)
+# data = generate_data_AMMI(5, 4, 1,1,1,10)
 # x = data$x
 # names(x) <- c('g','e')
 # x$g <- as.factor(x$g)
 # x$e <- as.factor(x$e)
 # y = data$y
-# oi = test_ambarti(x,y, ntrees=50, nburn=1000, npost=1000)
+# oi = ambarti(x,y, ntrees=10, nburn=100, npost=100, node_min_size = 1)
 # plot(apply(oi$y_hat,2,mean), y);abline(0,1)
+# plot(apply(oi$y_hat_bart,2,mean)*sd(y)+mean(y), y);abline(0,1)
 # cor(apply(oi$y_hat,2,mean), y);
 # bb = predict_ambarti(oi,x,'mean')
 
