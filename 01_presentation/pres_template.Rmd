@@ -220,7 +220,7 @@ where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $\alpha_i$
 
 \begin{enumerate} 
   \vspace{0.005cm}
-	\item Adapt our implementation to simulate large $(>15)$ $I$ and $J$. We have another idea...
+	\item Adapt our implementation to simulate large $(>15)$ $I$ and $J$.
 	\vspace{0.25cm}
 		\item Perform more simulations considering large $I$ and $J$. 
 	\vspace{0.25cm}
