@@ -5,20 +5,22 @@ predict_ambarti = function(object, newdata,
 
   # Extract the categories for genotype and environment
 
-  cov_g = newdata[,'g']
-  cov_e = newdata[,'e']
-
-  classes_g = sort(unique(cov_g))
-  classes_e = sort(unique(cov_e))
-
-  ng = as.numeric(tapply(cov_g, cov_g, length)) # the number of obs within each g_i
-  ne = as.numeric(tapply(cov_e, cov_e, length)) # the number of obs within each e_j
-  ncov = length(ng) + length(ne)
-
-  new_x <- model.matrix(~ -1 + g + e, data=newdata,
-                        contrasts.arg=list(g=contrasts(as.factor(newdata$g), contrasts=F),
-                                           e=contrasts(as.factor(newdata$e), contrasts=F)))
-
+  # cov_g = newdata[,'g']
+  # cov_e = newdata[,'e']
+  #
+  # classes_g = sort(unique(cov_g))
+  # classes_e = sort(unique(cov_e))
+  #
+  # ng = as.numeric(tapply(cov_g, cov_g, length)) # the number of obs within each g_i
+  # ne = as.numeric(tapply(cov_e, cov_e, length)) # the number of obs within each e_j
+  # ncov = length(ng) + length(ne)
+  #
+  # new_x <- model.matrix(~ -1 + g + e, data=newdata,
+  #                       contrasts.arg=list(g=contrasts(as.factor(newdata$g), contrasts=F),
+  #                                          e=contrasts(as.factor(newdata$e), contrasts=F)))
+ng = 10
+ne = 10
+  new_x <- newdata
   y_aux = rep(0, nrow(newdata))
 
   ###########################################

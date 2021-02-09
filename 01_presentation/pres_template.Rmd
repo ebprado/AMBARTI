@@ -1,6 +1,6 @@
 ---
 title: 'AMBARTI models for agricultural experiments'
-date: "January 26th, 2021 - Group meeting"
+date: "February 9th, 2021 - Group meeting"
 author: "Prado, E. B., Santos, A. A. L \\newline \\vspace{1cm} \\textit{Hamilton Institute \\& Dept. of Mathematics and Statistics} \\newline \\vspace{1cm} \\includegraphics[width=3cm]{MU_logo.jpg}"
 header-includes:
 output:
@@ -20,11 +20,13 @@ natbiboptions: round
 - AMMI + BART = AMBARTI
 \vspace{0.5cm}
 
-- Simulation results
+- Simulation (AMMI and AMBARTI)
 \vspace{0.5cm}
 
 - Next steps
+\vspace{0.5cm}
 
+- Appendix
 <!-------------------------------------------------------------------------------------------------------------->
 <!-------------------------------------------------------------------------------------------------------------->
 
@@ -38,15 +40,7 @@ An example of this class of models is the AMMI model:
 $$
 y_{i j}=\mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
-where
-\begin{itemize}
-    \item $y$ - response.
-    \item $\alpha$ - effect of genotype.
-    \item $\beta$ - effect of environment.
-    \item $\lambda$ - singular value of the multiplicative component.
-    \item $\gamma$ - genotype singular value.
-    \item $\delta$ - environment singular value.
-\end{itemize}
+where $\alpha_{i}$ is the effect of genotype and $\beta$ the effect of environment.
 
 ## Additive Main effects and Multiplicative Interactions (AMMI)
 
@@ -97,42 +91,6 @@ $$
 \end{aligned}
 $$
 
-# Some preliminary results
-
-## Simulated example
-
-We consider the following setting to generate a simulated data set:
-$$
-y_{i j}=\mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
-$$
-where
-\begin{itemize}
- \item $\mu = 10$, $\tau = 1$.
- \item $I = J = 10$.
- \item $Q = 1$ ($\lambda = 12$).
- \item $\alpha_{i} \sim \mbox{N}(0, s_g)$, with $s_g = 1$.
- \item $\beta_{j} \sim \mbox{N}(0, s_e)$, with $s_e = 2$.
- \item $\gamma = \left(-2, -1.5, ..., 1.5, 2 \right)/\sqrt(10)$.
- \item $\delta = \left(\frac{1}{2}, \frac{1}{2}, 0,0,0,0,0, -\frac{1}{2},\frac{1}{2}\right)$.
- \end{itemize}
-<!-------------------------------------------------------------------------------------------------------------->
-<!-------------------------------------------------------------------------------------------------------------->
-
-## Preliminary results
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{genAMBARTI.pdf}
-\end{center}
-
-<!-------------------------------------------------------------------------------------------------------------->
-<!-------------------------------------------------------------------------------------------------------------->
-
-## Preliminary results
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{envAMBARTI.pdf}
-\end{center}
-
 # Interesting fact...
 
 ## Bayesian AMMI - Postprocessing (Josse et al, 2014)
@@ -148,7 +106,7 @@ procedure (in accordance with the chosen constraints): each matrix is centered b
 by column, and an SVD is applied on the resulting matrix. Consequently, for each $s$, \textcolor{blue}{new
 parameters ($\mu$, $\alpha$, $\beta$, $\gamma$, $\delta$, $\lambda_{q}$) meeting the constraints are available}. Consequently, draws in the posterior distribution of the parameters (taking the $S$ new values) are available. Such a postprocessing makes it easier to interpret the results."}
 
-## Simulation scenarios (20 combinations)
+## Simulation: AMMI scenarios (20 combinations)
 
 We consider the following setting to generate a set of simulated data sets:
 $$
@@ -164,59 +122,109 @@ where
  \item We used RMSE (Root Mean Squared Error) and RRMSE (Relative Root Mean Squared Error).
  \end{itemize}
 
-## Simulation results $(y_{ij} = \mu+\textcolor{red}{\alpha_{i}}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+\textcolor{red}{\alpha_{i}}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{rrmse_alphasa.pdf}
 \end{center}
 
-## Simulation results $(y_{ij} = \mu+\alpha_{i}+\textcolor{red}{\beta_{j}}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\textcolor{red}{\beta_{j}}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{rrmse_betasb.pdf}
+\includegraphics[width=0.95\linewidth]{rrmse_betasa.pdf}
 \end{center}
 
-## Simulation results $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \textcolor{red}{\lambda_{q}} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \textcolor{red}{\lambda_{q}} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{lambda_rrmsesb.pdf}
+\includegraphics[width=0.95\linewidth]{lambda_rrmsesa.pdf}
 \end{center}
 
-## Simulation results $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \textcolor{red}{\gamma_{i q}} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \textcolor{red}{\gamma_{i q}} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{gamma_rrmsesb.pdf}
+\includegraphics[width=0.95\linewidth]{gamma_rrmsesa.pdf}
 \end{center}
 
-## Simulation results $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \textcolor{red}{\delta_{j q}})$
+## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \textcolor{red}{\delta_{j q}})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{delta_rrmsesb.pdf}
+\includegraphics[width=0.95\linewidth]{delta_rrmsesa.pdf}
 \end{center}
 
-## Simulation results $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\textcolor{red}{\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}})$
+## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\textcolor{red}{\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}})$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{rmse_blinearsa.pdf}
 \end{center}
 
-## Simulation results $(\textcolor{red}{y_{ij}} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{y_test_rmsesb.pdf}
+\includegraphics[width=0.95\linewidth]{y_test_rmsesa.pdf}
 \end{center}
 
+## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{AMMI_y_test_rmsesa.pdf}
+\end{center}
+
+## Simulation: AMBARTI scenarios (4 combinations)
+We consider the following setting to generate a set of simulated data sets:
+$$
+\begin{aligned}
+y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( \alpha_{i} + \beta_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
+\end{aligned}
+$$
+where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $\alpha_i$ and $\beta_j$ are the genotype and environment effects, respectively. 
+\begin{itemize}
+ \item $\sigma^{2} = 1$, $T=200$.
+ \item $I = J = 10$ (without repetitions).
+ \item $\mu_{t\ell}|\mathcal{T}_{t} \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu} = 3),$
+ \item $\beta_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
+ \item $\alpha_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
+ \end{itemize}
+ 
+## Simulation AMBARTI $(\textcolor{red}{y_{ij}} = \alpha_{i}+ \beta_{j} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{TEST_AMBARTI_y_hat_test.pdf}
+\end{center}
+ 
+## Simulation AMBARTI $(y_{ij} = \textcolor{red}{\alpha_{i}}+\beta_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_alphasa.pdf}
+\end{center}
+
+## Simulation AMBARTI $(y_{ij} = \textcolor{red}{\alpha_{i}}+\beta_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{reduced_AMBARTI_rrmse_alphasa.pdf}
+\end{center}
+
+## Simulation AMBARTI $(y_{ij} = \alpha_{i}+ \textcolor{red}{\beta_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_betasa.pdf}
+\end{center}
+
+## Simulation AMBARTI $(y_{ij} = \alpha_{i}+ \textcolor{red}{\beta_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{reduced_AMBARTI_rrmse_betasa.pdf}
+\end{center}
 
 ## Next steps
 
 \begin{enumerate} 
-  \item Perform more simulations, but now simulating from AMBARTI.
   \vspace{0.005cm}
-	\item Adjust the R code to simulate large $(>15)$ $I$ and $J$. We have talked to Rafael about it...
+	\item Adapt our implementation to simulate large $(>15)$ $I$ and $J$. We have another idea...
 	\vspace{0.25cm}
-	\item Perform more simulations considering $(1)$ and $(2)$.
+		\item Perform more simulations considering large $I$ and $J$. 
 	\vspace{0.25cm}
-	\item Real data sets?
+	\item Analyse real data sets.
 \end{enumerate}
 
 
@@ -230,4 +238,37 @@ This work was supported by a Science Foundation Ireland Career Development Award
 <!-------------------------------------------------------------------------------------------------------------->
 <!-------------------------------------------------------------------------------------------------------------->
 
-## References
+# Appendix 
+
+## Simulation: full model (4 combinations)
+
+We consider the following setting to generate a set of simulated data sets:
+$$
+y_{i j}= \mu+ \alpha_{i}+ \beta_{j} + \alpha_{i} \times \beta_{j} +\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
+$$
+where
+\begin{itemize}
+ \item $\mu = 100$, $\tau = 1$.
+ \item $I = J = 10$ (without repetitions).
+ \item $\beta_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
+ \item $\alpha_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
+ \end{itemize}
+
+## Simulation full model $(y_{ij} = \textcolor{red}{\alpha_{i}}+\beta_{j}+ \alpha_{i} \times \beta_{j})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{FULL_rrmse_alphasa.pdf}
+\end{center}
+
+## Simulation full model $(y_{ij} = \alpha_{i}+ \textcolor{red}{\beta_{j}}+ \alpha_{i} \times \beta_{j})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{FULL_rrmse_betasb.pdf}
+\end{center}
+
+
+## Simulation full model $(\textcolor{red}{y_{ij}} = \alpha_{i}+ \beta_{j}+ \alpha_{i} \times \beta_{j})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{FULL_y_test_rmsesa.pdf}
+\end{center}
