@@ -136,7 +136,7 @@ ambarti = function(x,
   new_trees = curr_trees
 
   # Initialise the predicted values to zero
-  yhat_bart = get_predictions(curr_trees, x, single_tree = ntrees == 1)
+  yhat_bart = get_predictions(curr_trees, x, single_tree = ntrees == 1, internal=TRUE)
 
   # Set up a progress bar
   pb = utils::txtProgressBar(min = 1, max = TotIter,
