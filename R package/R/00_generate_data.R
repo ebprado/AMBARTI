@@ -129,7 +129,14 @@ generate_gamma_delta <- function(INDEX, Q) {
 
 #' @export
 #' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
-
+ I =10
+ J = 10
+ s_alpha=1
+ s_beta=1
+ ntrees=200
+ node_min_size = 5
+ mu_mu = 0
+ sigma2_mu = 3
 generate_data_AMBARTI = function(I,
                                  J,
                                  s_alpha, # standard deviation of alpha
@@ -163,60 +170,20 @@ generate_data_AMBARTI = function(I,
                     contrasts.arg=list(g=contrasts(x$g, contrasts=F),
                                        e=contrasts(x$e, contrasts=F)))
 
-  ###########################################
-  #### Genotype
-  ###########################################
-  number_geno = length(ng)
-  num_comb_g = max(2, floor(number_geno/2))
-  formula_g = as.formula(paste('y', "~", '.^', num_comb_g))
-  x_all_iter_g <- model.matrix( formula_g, data = data.frame(y = rep(0, nrow(x)), x[, grepl("g", colnames(x))]))
-  individual_g = (1:(number_geno + 1))
-  name_all_comb_g = colnames(x_all_iter_g)
-  name_all_comb_g = name_all_comb_g[-c(individual_g)] # remove the individual effects
+  x_e = x[,grepl('e', colnames(x))]
+  x_g = x[,grepl('g', colnames(x))]
 
-  if (number_geno%%2 == 0){ #even
-    repeated_comb_g = choose(number_geno, num_comb_g)/2
-    name_all_comb_g = name_all_comb_g[-c(repeated_comb_g)] # remove some equivalent columns
-  }
+  ### aux
 
-  x_g = matrix(NA, ncol=length(name_all_comb_g), nrow=nrow(x))
-  colnames(x_g) = name_all_comb_g
+  n_class_e   = length(classes_e) # number of distinct levels
+  aux_comb_e  = 2:floor(n_class_e/2) # levels needed to create the combinations without redundances
+  num_comb_e  = choose(n_class_e, aux_comb_e) # total of combinations 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
+  prob_comb_e = num_comb_e/sum(num_comb_e) # probability of observating a combination 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
 
-  for (k in 1:ncol(x_g)){
-    name_col_g = unlist(strsplit(name_all_comb_g[k],':'))
-    x_g[,k] = apply(x[,name_col_g],1,sum)
-  }
-
-  ###########################################
-  #### Environment
-  ###########################################
-
-  number_env = length(ne)
-  num_comb_e = max(2, floor(number_env/2))
-  formula_e = as.formula(paste('y', "~", '.^', num_comb_e))
-  x_all_iter_e <- model.matrix(formula_e, data = data.frame(y = rep(0, nrow(x)), x[, grepl("e", colnames(x))]))
-  individual_e = (1:(number_env + 1))
-  repeated_comb_e = choose(number_env, num_comb_e)/2
-  name_all_comb_e = colnames(x_all_iter_e)
-  name_all_comb_e = name_all_comb_e[-c(individual_e)] # remove individual effects
-
-  if (number_env%%2 == 0){ #even
-    repeated_comb_e = choose(number_env, num_comb_e)/2
-    name_all_comb_e = name_all_comb_e[-c(repeated_comb_e)] # remove some equivalent columns
-  }
-
-  x_e = matrix(NA, ncol=length(name_all_comb_e), nrow=nrow(x))
-  colnames(x_e) = name_all_comb_e
-
-  for (k in 1:ncol(x_e)){
-    name_col_e = unlist(strsplit(name_all_comb_e[k],':'))
-    x_e[,k] = apply(x[,name_col_e],1,sum)
-  }
-  # Put x_g and x_e into a data frame and get the column indices
-  if (number_env <= 2 || number_geno <= 2) {stop('Number of genotypes and environments needs to be >= 3.')}
-  x_g_e = as.data.frame(cbind(x_g, x_e))
-  ind_x_g = 1:ncol(x_g)
-  ind_x_e = (ncol(x_g) + 1):ncol(x_g_e)
+  n_class_g   = length(classes_g) # number of distinct levels
+  aux_comb_g  = 2:floor(n_class_g/2) # levels needed to create the combinations without redundances
+  num_comb_g  = choose(n_class_g, aux_comb_g) # total of combinations 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
+  prob_comb_g = num_comb_g/sum(num_comb_g) # probability of observating a combination 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
 
   # Extract control parameters
   tree_store = vector('list', 1)
@@ -237,23 +204,27 @@ generate_data_AMBARTI = function(I,
     # Propose a new tree
     type = 'grow'
 
+    x_e_inter   = create_interaction(x_e, n_class_e, aux_comb_e, prob_comb_e)
+    x_g_inter   = create_interaction(x_g, n_class_g, aux_comb_g, prob_comb_g)
+    x_e_g_inter = cbind(x_e_inter, x_g_inter)
+
     # Below, there are two calls because we need to add an interaction of genotype and then
     # add to the same tree an interaction of environment, otherwise we run the risk of allowing
     # confunding.
 
-    new_trees[[j]] = update_tree(X = x_g_e,
-                                 type = type,
-                                 curr_tree = curr_trees[[j]],
+    new_trees[[j]] = update_tree(X             = x_e_inter,
+                                 type          = type,
+                                 curr_tree     = curr_trees[[j]],
                                  node_min_size = node_min_size,
-                                 s = s_g,
-                                 index = ind_x_g)
+                                 s             = 1,
+                                 index         = colnames(x_e_inter))
 
-    new_trees[[j]] = update_tree(X = x_g_e,
-                                 type = type,
-                                 curr_tree = new_trees[[j]],
+    new_trees[[j]] = update_tree(X             = x_g_inter,
+                                 type          = type,
+                                 curr_tree     = new_trees[[j]],
                                  node_min_size = node_min_size,
-                                 s = s_e,
-                                 index = ind_x_e)
+                                 s             = 1,
+                                 index         = colnames(x_g_inter))
 
     curr_trees[[j]] = new_trees[[j]]
 
@@ -263,7 +234,7 @@ generate_data_AMBARTI = function(I,
   } # End loop through trees
 
   # We do that because we assume that the sum of BART predictions within g_i and e_j is zero.
-  bart_part = get_predictions(curr_trees, x_g_e, single_tree = ntrees == 1)
+  bart_part = get_predictions(curr_trees, x_e_g_inter, single_tree = ntrees == 1, internal=TRUE)
   bart_part = bart_part - mean(bart_part)
   mean_by_g = aggregate(bart_part, by=list(x_orig[,'g']), mean)[,2]
   mean_by_e = aggregate(bart_part, by=list(x_orig[,'e']), mean)[,2]
