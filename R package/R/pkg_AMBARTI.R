@@ -16,13 +16,13 @@
 # sigma2 = 1
 # sigma2_mu = 1
 # sigma2_psi = 1
-# nburn = 1000
-# npost = 1000
-# nthin = 1
 # a_g = 1
 # b_g = 1
 # a_e = 1
 # b_e = 1
+# nburn = 1000
+# npost = 1000
+# nthin = 1
 # data = generate_data_AMMI(20, 20, 1,1,1,c(8, 10, 15))
 # x = data$x
 # names(x) <- c('g','e')
@@ -80,8 +80,8 @@ ambarti = function(x,
   x <- model.matrix(~ -1 + g + e, data=x,
                     contrasts.arg=list(g=contrasts(x$g, contrasts=F),
                                        e=contrasts(x$e, contrasts=F)))
-  x_e = x[,grepl('e', colnames(x))]
-  x_g = x[,grepl('g', colnames(x))]
+  x_e = x[,grepl('^e', colnames(x))]
+  x_g = x[,grepl('^g', colnames(x))]
 
   ### aux
 
