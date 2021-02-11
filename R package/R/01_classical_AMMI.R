@@ -1,6 +1,4 @@
 #' @export
-#' @importFrom agricolae 'AMMI'
-#'
 run_classical_AMMI <- function(data, Q){
 
   x_train <- data$x
