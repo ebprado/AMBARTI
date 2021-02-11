@@ -2,12 +2,12 @@
 #' @importFrom truncnorm 'rtruncnorm'
 #'
 generate_data_AMMI <- function(I, # Number of genotypes
-                          J, # Number of environments
-                          s_alpha, # standard deviation of alpha
-                          s_beta, # standard deviation of alpha
-                          s_y, # standard deviation of y
-                          lambda # values for lambda (number of Q)
-                          ){
+                               J, # Number of environments
+                               s_alpha, # standard deviation of alpha
+                               s_beta, # standard deviation of alpha
+                               s_y, # standard deviation of y
+                               lambda # values for lambda (number of Q)
+){
 
   # Total number of observations
   N = I*J
@@ -126,133 +126,6 @@ generate_gamma_delta <- function(INDEX, Q) {
   }
 }
 
-#' @export
-#' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
-
-generate_data_AMBARTI_new = function(I,
-                                 J,
-                                 s_alpha, # standard deviation of alpha
-                                 s_beta, # standard deviation of alpha
-                                 s_y, # standard deviation of y
-                                 ntrees = 200,
-                                 node_min_size = 5,
-                                 mu_mu = 0,
-                                 sigma2_mu = 3) {
-
-  # Generate the "design matrix"
-  N = I*J
-  x = expand.grid(1:I, 1:J)
-  names(x) <- c('g', 'e') # g = genotype and e = envorinment
-  x$g = as.factor(x$g)
-  x$e = as.factor(x$e)
-  x_orig = x
-
-  # Extract the categories for genotype and environment
-  cov_g = x[,'g']
-  cov_e = x[,'e']
-
-  classes_g = unique(cov_g)
-  classes_e = unique(cov_e)
-
-  ng = as.numeric(tapply(cov_g, cov_g, length)) # the number of obs within each g_i
-  ne = as.numeric(tapply(cov_e, cov_e, length)) # the number of obs within each e_j
-  ncov = length(ng) + length(ne)
-
-  x <- model.matrix(~ -1 + g + e, data=x,
-                    contrasts.arg=list(g=contrasts(x$g, contrasts=F),
-                                       e=contrasts(x$e, contrasts=F)))
-
-  x_g <- x[, grepl('g',colnames(x))]
-  x_e <- x[, grepl('e',colnames(x))]
-
-  number_geno = length(ng)
-  number_env = length(ne)
-
-  # Put x_g and x_e into a data frame and get the column indices
-  if (number_env <= 2 || number_geno <= 2) {stop('Number of genotypes and environments needs to be >= 3.')}
-  x_g_e = as.data.frame(cbind(x_g, x_e))
-  ind_x_g = 1:ncol(x_g)
-  ind_x_e = (ncol(x_g) + 1):ncol(x_g_e)
-
-  # Extract control parameters
-  tree_store = vector('list', 1)
-  p_g = ncol(x_g)
-  p_e = ncol(x_e)
-  s_g = rep(1/p_g, p_g)
-  s_e = rep(1/p_e, p_e)
-
-  # Create a list of trees for the initial stump
-  curr_trees = create_stump(num_trees = ntrees, y = 1:nrow(x))
-
-  # Initialise the new trees as current one
-  new_trees = curr_trees
-
-  # Start looping through trees
-  for (j in 1:ntrees) {
-
-    # Propose a new tree
-    type = 'grow'
-
-    # Below, there are two calls because we need to add an interaction of genotype and then
-    # add to the same tree an interaction of environment, otherwise we run the risk of allowing
-    # confunding.
-
-    new_trees[[j]] = update_tree(X = x_g_e,
-                                 type = type,
-                                 curr_tree = curr_trees[[j]],
-                                 node_min_size = node_min_size,
-                                 s = s_g,
-                                 index = ind_x_g)
-
-    new_trees[[j]] = update_tree(X = x_g_e,
-                                 type = type,
-                                 curr_tree = new_trees[[j]],
-                                 node_min_size = node_min_size,
-                                 s = s_e,
-                                 index = ind_x_e)
-
-    curr_trees[[j]] = new_trees[[j]]
-
-    # Generate the predicted values
-    curr_trees[[j]] = simulate_mu_bart_prior(curr_trees[[j]], mu_mu, sigma2_mu)
-
-  } # End loop through trees
-
-  bart_part = get_predictions(curr_trees, x_g_e, single_tree = ntrees == 1)
-
-  # We do that because we assume that the sum of BART predictions within g_i and e_j is zero.
-  bart_part = bart_part - mean(bart_part)
-  mean_by_g = aggregate(bart_part, by=list(x_orig[,'g']), mean)[,2]
-  mean_by_e = aggregate(bart_part, by=list(x_orig[,'e']), mean)[,2]
-  bart_part = bart_part - mean_by_g[x_orig[,'g']]
-  bart_part = bart_part - mean_by_e[x_orig[,'e']]
-
-  tree_store[[1]] = curr_trees
-
-  # Generate alpha_i and beta_j
-  alpha = rnorm(I, 0, sd = s_alpha)
-  beta  = rnorm(J, 0, sd = s_beta)
-
-  # Generate y's
-  mu = 100
-  y_train = rnorm(N, mu + alpha[cov_g] + beta[cov_e] + bart_part, sd=s_y)
-  y_test  = rnorm(N, mu + alpha[cov_g] + beta[cov_e] + bart_part, sd=s_y)
-
-  return(list(y       = y_train,
-              y_test  = y_test,
-              alpha   = alpha,
-              beta    = beta,
-              blinear = bart_part,
-              x       = x_orig,
-              I       = I,
-              J       = J,
-              s_alpha = s_alpha,
-              s_beta  = s_beta,
-              s_y     = s_y,
-              ntrees  = ntrees,
-              trees   = tree_store))
-
-} # End main function
 
 #' @export
 #' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
@@ -429,10 +302,10 @@ generate_data_AMBARTI = function(I,
 #' @export
 #' @importFrom stats 'rnorm'
 generate_data_full_model <- function(I, # Number of genotypes
-                               J, # Number of environments
-                               s_alpha, # standard deviation of alpha
-                               s_beta, # standard deviation of alpha
-                               s_y # standard deviation of y
+                                     J, # Number of environments
+                                     s_alpha, # standard deviation of alpha
+                                     s_beta, # standard deviation of alpha
+                                     s_y # standard deviation of y
 ){
 
   # Total number of observations
