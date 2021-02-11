@@ -293,8 +293,8 @@ organise_AMBARTI <- function(object, data){
 
   # Get estimates info
   estimate    = apply(object$beta_hat, 2, mean)
-  alpha_hat   = estimate[grepl('g', names(estimate))]
-  beta_hat    = estimate[grepl('e', names(estimate))]
+  alpha_hat   = estimate[grepl('^g', names(estimate))]
+  beta_hat    = estimate[grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
   y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
   blinear_hat = apply(object$y_hat_bart,2,mean)
@@ -739,8 +739,8 @@ AMBARTI_help_plot <- function(object, data){
   # Get estimates info
   id = 'AMBARTI'
   estimate    = as.data.frame(object$beta_hat)
-  alpha_hat   = estimate[,grepl('g', names(estimate))]
-  beta_hat    = estimate[,grepl('e', names(estimate))]
+  alpha_hat   = estimate[,grepl('^g', names(estimate))]
+  beta_hat    = estimate[,grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
   y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
   blinear_hat = apply(object$y_hat_bart,2,mean)

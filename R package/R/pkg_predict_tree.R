@@ -3,15 +3,15 @@ predict_ambarti = function(object, newdata,
                            type = c('all', 'median', 'mean')) {
 
   x_train_names = colnames(object$x)
-  x_e_train_names = x_train_names[grepl('e', colnames(x_train_names))]
-  x_g_train_names = x_train_names[grepl('g', colnames(x_train_names))]
+  x_e_train_names = x_train_names[grepl('^e', colnames(x_train_names))]
+  x_g_train_names = x_train_names[grepl('^g', colnames(x_train_names))]
 
   new_x <- model.matrix(~ -1 + g + e, data=newdata,
                     contrasts.arg=list(g=contrasts(newdata$g, contrasts=F),
                                        e=contrasts(newdata$e, contrasts=F)))
 
-  x_e_test = new_x[,grepl('e', colnames(new_x))]
-  x_g_test = new_x[,grepl('g', colnames(new_x))]
+  x_e_test = new_x[,grepl('^e', colnames(new_x))]
+  x_g_test = new_x[,grepl('^g', colnames(new_x))]
 
   n_its = object$npost
   y_hat_mat = matrix(NA, nrow = n_its,

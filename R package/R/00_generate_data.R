@@ -163,8 +163,8 @@ generate_data_AMBARTI = function(I,
                     contrasts.arg=list(g=contrasts(x$g, contrasts=F),
                                        e=contrasts(x$e, contrasts=F)))
 
-  x_e = x[,grepl('e', colnames(x))]
-  x_g = x[,grepl('g', colnames(x))]
+  x_e = x[,grepl('^e', colnames(x))]
+  x_g = x[,grepl('^g', colnames(x))]
 
   ### aux
 

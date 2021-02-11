@@ -248,8 +248,8 @@ ambarti = function(x,
     # Updating the final predictions
     y_hat = random_effects + yhat_bart
 
-    gi    = beta_hat[grepl('g', colnames(x))]
-    ej    = beta_hat[grepl('e', colnames(x))]
+    gi = beta_hat[grepl('^g', colnames(x))]
+    ej = beta_hat[grepl('^e', colnames(x))]
 
     sum_of_squares   = sum((y_scale - y_hat)^2)
     sum_of_squares_g = sum((gi - mu_g)^2)
