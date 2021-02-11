@@ -129,14 +129,7 @@ generate_gamma_delta <- function(INDEX, Q) {
 
 #' @export
 #' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
- I =10
- J = 10
- s_alpha=1
- s_beta=1
- ntrees=200
- node_min_size = 5
- mu_mu = 0
- sigma2_mu = 3
+
 generate_data_AMBARTI = function(I,
                                  J,
                                  s_alpha, # standard deviation of alpha
