@@ -416,6 +416,11 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   g_names = unique(x_train$g)
   e_names = unique(x_train$e)
 
+  if (is.null(data$y_test)==TRUE) {
+    g_names = gsub('g', '', unique(x_train$g))
+    e_names = gsub('e', '', unique(x_train$e))
+  }
+
   id = 'AMMI'
   alpha_hat  = data.frame(id = id, Q = Q, variable = paste('alpha[',g_names ,']', sep=''), value=alpha_hat, true=alpha_true)
   beta_hat   = data.frame(id = id, Q = Q, variable = paste('beta[',e_names ,']', sep=''), value=beta_hat, true=beta_true)
