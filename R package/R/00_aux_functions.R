@@ -374,19 +374,17 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   # Get training info
   x_train      = data$x
   y_train      = data$y
-  alpha_true   = data$alpha
-  beta_true    = data$beta
 
   # Get test info
   x_test = data$x
-  y_test = data$y_test
 
-  alpha_true   = data$alpha
-  beta_true    = data$beta
+  if(is.null(data$y_test) == FALSE)  {y_test  = data$y_test} else {y_test=NA}
+  if(is.null(data$alpha) == FALSE)  {alpha_true  = data$alpha} else {alpha_true=NA}
+  if(is.null(data$beta) == FALSE)   {beta_true   = data$beta} else {beta_true=NA}
   if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
   if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
   if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
-  blinear_true = data$blinear
+  if(is.null(data$blinear) == FALSE)  {blinear_true  = data$blinear}  else {blinear_true=NA}
 
   # Get parameter estimates
   mu_hat     = object$mu_hat
@@ -423,9 +421,9 @@ AMMI_help_plot <- function(object, data, Q = NULL){
   beta_hat   = data.frame(id = id, Q = Q, variable = paste('beta[',e_names ,']', sep=''), value=beta_hat, true=beta_true)
   lambda_hat = data.frame(id = id, Q = Q, variable = paste('lambda[',1:Q,']',sep=''), value=lambda_hat, true=lambda_true)
   gamma_hat  = data.frame(id = id, Q = Q, variable = paste('gamma[',g_names,',',rep(1:Q, each=length(g_names)),']',sep=''), value=as.numeric(gamma_hat), true=as.numeric(gamma_true))
-  delta_hat  = data.frame(id = id, Q = Q, variable = paste('delta[',g_names,',',rep(1:Q, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(delta_true))
+  delta_hat  = data.frame(id = id, Q = Q, variable = paste('delta[',e_names,',',rep(1:Q, each=length(e_names)),']',sep=''), value=as.numeric(delta_hat), true=as.numeric(delta_true))
 
-  aux_blinear_hat   = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
+  aux_blinear_hat   = data.frame(id = id, Q = Q, variable = 'blinear', value = blinear_true - blin_train, true = blinear_true)
   aux_y_hat_train   = data.frame(id = id, Q = Q, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
   aux_y_hat_test    = data.frame(id = id, Q = Q, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
 
@@ -729,12 +727,13 @@ AMBARTI_help_plot <- function(object, data){
   # Get training info
   x_train = data$x
   y_train = data$y
+  if(is.null(data$blinear) == FALSE)  {blinear_true  = data$blinear}  else {blinear_true=NA}
 
   # Get test info
   x_test = data$x
   x_test$g = as.factor(x_test$g)
   x_test$e = as.factor(x_test$e)
-  y_test = data$y_test
+  if(is.null(data$y_test) == FALSE)  {y_test  = data$y_test}  else {y_test=NA}
 
   # Get estimates info
   id = 'AMBARTI'
@@ -757,9 +756,9 @@ AMBARTI_help_plot <- function(object, data){
   alpha_hat$true = rep(as.numeric(data[['alpha']]), each=object$npost)
   beta_hat$true  = rep(as.numeric(data[['beta']]), each=object$npost)
 
-  aux_blinear_hat   = data.frame(id = id, Q = NA, variable = 'blinear', value = data$blinear - blinear_hat, true = data$blinear)
-  aux_y_hat_train   = data.frame(id = id, Q = NA, variable = 'blinear', value = y_train - y_hat_train, true = data$y)
-  aux_y_hat_test    = data.frame(id = id, Q = NA, variable = 'blinear', value = y_test - y_hat_test, true = data$y_test)
+  aux_blinear_hat   = data.frame(id = id, Q = NA, variable = 'blinear', value = blinear_true - blinear_hat, true = blinear_true)
+  aux_y_hat_train   = data.frame(id = id, Q = NA, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
+  aux_y_hat_test    = data.frame(id = id, Q = NA, variable = 'blinear', value = y_test - y_hat_test, true = y_test)
 
 
   return(list(alpha_hat   = alpha_hat,
