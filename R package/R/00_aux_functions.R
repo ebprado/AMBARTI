@@ -727,6 +727,8 @@ AMBARTI_help_plot <- function(object, data){
   # Get training info
   x_train = data$x
   y_train = data$y
+  if(is.null(data$alpha) == FALSE)  {alpha_true  = data$alpha} else {alpha_true=NA}
+  if(is.null(data$beta) == FALSE)   {beta_true   = data$beta} else {beta_true=NA}
   if(is.null(data$blinear) == FALSE)  {blinear_true  = data$blinear}  else {blinear_true=NA}
 
   # Get test info
@@ -741,10 +743,21 @@ AMBARTI_help_plot <- function(object, data){
   alpha_hat   = estimate[,grepl('^g', names(estimate))]
   beta_hat    = estimate[,grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
-  y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+
+  if(is.null(data$y_test) == FALSE) {
+    y_test  = data$y_test
+    y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+    names(alpha_hat) = paste(gsub('g','alpha[', names(alpha_hat)), ']', sep='')
+    names(beta_hat) = paste(gsub('e','beta[', names(beta_hat)), ']', sep='')
+  } else {
+    y_test=NA
+    y_hat_test=NA
+    names(alpha_hat) = paste(gsub('gg','alpha[', names(alpha_hat)), ']', sep='')
+    names(beta_hat) = paste(gsub('ee','beta[', names(beta_hat)), ']', sep='')
+  }
+
+
   blinear_hat = apply(object$y_hat_bart,2,mean)
-  names(alpha_hat) = paste(gsub('g','alpha[', names(alpha_hat)), ']', sep='')
-  names(beta_hat) = paste(gsub('e','beta[', names(beta_hat)), ']', sep='')
   alpha_hat$id = id
   alpha_hat$Q = NA
   beta_hat$id = id
@@ -753,8 +766,8 @@ AMBARTI_help_plot <- function(object, data){
   alpha_hat = melt(alpha_hat, measure.vars = colnames(alpha_hat)[grepl('alpha', colnames(alpha_hat))])
   beta_hat  = melt(beta_hat, measure.vars = colnames(beta_hat)[grepl('beta', colnames(beta_hat))])
 
-  alpha_hat$true = rep(as.numeric(data[['alpha']]), each=object$npost)
-  beta_hat$true  = rep(as.numeric(data[['beta']]), each=object$npost)
+  alpha_hat$true = rep(as.numeric(alpha_true), each=object$npost)
+  beta_hat$true  = rep(as.numeric(beta_true), each=object$npost)
 
   aux_blinear_hat   = data.frame(id = id, Q = NA, variable = 'blinear', value = blinear_true - blinear_hat, true = blinear_true)
   aux_y_hat_train   = data.frame(id = id, Q = NA, variable = 'blinear', value = y_train - y_hat_train, true = y_train)
@@ -769,6 +782,7 @@ AMBARTI_help_plot <- function(object, data){
               Q           = NA,
               id          = 'AMBARTI'))
 }
+
 
 #' @export
 new_parse_format <- function(text) {
