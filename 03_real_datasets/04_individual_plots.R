@@ -4,6 +4,8 @@ install_github("ebprado/AMBARTI/R package",
                auth_token = '363d4ad84eaa25d3eb26752732cc208f7e698086')
 
 library(AMBARTI)
+library(dplyr)
+library(ggplot2)
 save_file = "~/Documents/GitHub/AMBARTI/03_real_datasets/results/"
 
 #-------------------------------------------------
@@ -123,9 +125,6 @@ plot_individual_boxplots(beta_hat)
 # plot_individual_boxplots(lambda_hat)
 # plot_individual_boxplots(gamma_hat)
 # plot_individual_boxplots(delta_hat)
-
-alpha_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
-beta_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
 
 ## Density plots for the DIFFERENCE (true - predicted)
 
