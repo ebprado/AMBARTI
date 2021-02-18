@@ -1,6 +1,6 @@
 ---
 title: 'AMBARTI models for agricultural experiments'
-date: "February 9th, 2021 - Group meeting"
+date: "February 18th, 2021 - Group meeting"
 author: "Prado, E. B., Santos, A. A. L \\newline \\vspace{1cm} \\textit{Hamilton Institute \\& Dept. of Mathematics and Statistics} \\newline \\vspace{1cm} \\includegraphics[width=3cm]{MU_logo.jpg}"
 header-includes:
 output:
@@ -183,31 +183,19 @@ where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and 
 ## Simulation AMBARTI $(\textcolor{red}{y_{ij}} = g_{i}+ e_{j} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{TEST_AMBARTI_y_hat_test.pdf}
+\includegraphics[width=0.95\linewidth]{AMBARTI_y_test_rmsesa.pdf}
 \end{center}
  
 ## Simulation AMBARTI $(y_{ij} = \textcolor{red}{g_{i}}+e_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_alphasa.pdf}
-\end{center}
-
-## Simulation AMBARTI $(y_{ij} = \textcolor{red}{g_{i}}+e_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{reduced_AMBARTI_rrmse_alphasa.pdf}
+\includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_gsa.pdf}
 \end{center}
 
 ## Simulation AMBARTI $(y_{ij} = g_{i}+ \textcolor{red}{e_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_betasa.pdf}
-\end{center}
-
-## Simulation AMBARTI $(y_{ij} = g_{i}+ \textcolor{red}{e_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{reduced_AMBARTI_rrmse_betasa.pdf}
+\includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_esa.pdf}
 \end{center}
 
 ## Next steps
