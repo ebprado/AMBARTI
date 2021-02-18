@@ -44,8 +44,8 @@ for (Q in 1:3){
   aux_AMMI    = get(paste('classical_AMMI_Q',Q, sep=''))
   res_AMMI    = AMMI_help_plot(aux_AMMI, data, Q = Q)
 
-  g_hat   = rbind(g_hat,    res_AMMI$g_hat)
-  e_hat    = rbind(e_hat,     res_AMMI$e_hat)
+  g_hat       = rbind(g_hat,    res_AMMI$g_hat)
+  e_hat       = rbind(e_hat,     res_AMMI$e_hat)
   lambda_hat  = rbind(lambda_hat,   res_AMMI$lambda_hat)
   gamma_hat   = rbind(gamma_hat,    res_AMMI$gamma_hat)
   delta_hat   = rbind(delta_hat,    res_AMMI$delta_hat)
