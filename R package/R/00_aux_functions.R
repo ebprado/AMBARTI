@@ -18,7 +18,7 @@ get_metrics = function(object, data, rep){
   y_hat_train = object$y_hat_train
   y_hat_test  = object$y_hat_test
   blinear_hat = object$blinear_hat
-  if(is.null(object$Q)==FALSE) {Q = object$Q} else{Q = data$Q}
+  if(is.na(object$Q)==FALSE) {Q = object$Q} else{Q = data$Q}
 
   rmse_y_train = RMSE(y_train, y_hat_train)
   rmse_y_test  = RMSE(y_test, y_hat_test)
