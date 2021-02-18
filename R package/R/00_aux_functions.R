@@ -60,8 +60,10 @@ get_metrics = function(object, data, rep){
 
   I  = data$I
   J  = data$J
-  sa = data$s_g
-  sb = data$s_e
+  # sa = data$s_g
+  # sb = data$s_e
+  sa = data$s_alpha
+  sb = data$s_beta
   sy = data$s_y
 
 aux = data.frame(
