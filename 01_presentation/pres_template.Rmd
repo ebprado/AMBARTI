@@ -38,9 +38,9 @@ genotype-by-environment data.
 \vspace{0.1cm}
 An example of this class of models is the AMMI model:
 $$
-y_{i j}=\mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
+y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
-where $\alpha_{i}$ is the effect of genotype and $\beta$ the effect of environment.
+where $g_{i}$ is the effect of genotype and $e_{j}$ the effect of environment.
 
 ## Additive Main effects and Multiplicative Interactions (AMMI)
 
@@ -48,8 +48,8 @@ The following priors are assumed in its Bayesian version (Josse et al, JABES, 20
 \vspace{-0.5cm}
     \begin{eqnarray*} 
     \mu & \sim& \mbox{N}\left(m, s_{\mu}^{2}\right), \\ 
-    \alpha_{i} & \sim&  \mbox{N}\left(0, s_{g}^{2}\right), \\
-    \beta_{j} &\sim& \mbox{N}\left(0, s_{e}^{2}\right), \\
+    g_{i} & \sim&  \mbox{N}\left(0, s_{g}^{2}\right), \\
+    e_{j} &\sim& \mbox{N}\left(0, s_{e}^{2}\right), \\
     \left(\lambda_{q}\right)_{q=1, \ldots, Q} &\sim& \text { ordered sample of } Q \text { independent } \mbox{N}^{+}\left(0, s_{\lambda}^{2}\right), \\
     \gamma_{1 q} & \sim&  \mbox{N}^{+}(0,1) \quad \text { for } q=1, \ldots, Q, \\
     \gamma_{i q} & \sim&  \mbox{N}(0,1) \quad \text { for } i>1 \text { and } q=1, \ldots, Q, \\ \delta_{j q} & \sim&  \mbox{N}(0,1) \quad \text { for } j \geq 1 \text { and } q=1, \ldots, Q, \\
@@ -76,15 +76,15 @@ The following priors are assumed in its Bayesian version (Josse et al, JABES, 20
 BART is a flexible tree-based method that can be used for predicting when there are interactions and non-linear relationships.
 $$
 \begin{aligned}
-y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( \alpha_{i} + \beta_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
+y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( g_{i} + e_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
 \end{aligned}
 $$
-where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $\alpha_i$ and $\beta_j$ are the genotype and environment effects, respectively. 
+where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and $e_j$ are the genotype and environment effects, respectively. 
 $$
   \begin{aligned}
 \mu_{t\ell}|\mathcal{T}_{t}  & \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu}),\\
-\alpha_{i}|\mathcal{T}_{t}   & \sim \mbox{N}(\mu_{g}, \sigma^{2}_{g}), \\
-\beta_{j}|\mathcal{T}_{t}   & \sim \mbox{N}(\mu_{e}, \sigma^{2}_{e}), \\
+g_{i}|\mathcal{T}_{t}   & \sim \mbox{N}(\mu_{g}, \sigma^{2}_{g}), \\
+e_{j}|\mathcal{T}_{t}   & \sim \mbox{N}(\mu_{e}, \sigma^{2}_{e}), \\
 \sigma^{2}_{g} & \sim \mbox{IG}(a_{g}, b_{g}), \\
 \sigma^{2}_{e} & \sim \mbox{IG}(a_{e}, b_{e}), \\
 \sigma^{2} & \sim \mbox{IG}(a, b). \\
@@ -97,74 +97,68 @@ $$
 Recall that
 \vspace{-0.1cm}
 $$
-\textcolor{blue}{\mu_{i j}} = \hat{y}_{i j}=\hat{\mu}+\hat{\alpha}_{i}+\hat{\beta}_{j}+\sum_{q=1}^{Q} \hat{\lambda}_{q} \hat{\gamma}_{i q} \hat{\delta}_{j q}.
+\textcolor{blue}{\mu_{i j}} = \hat{y}_{i j}=\hat{\mu}+\hat{g}_{i}+\hat{e}_{j}+\sum_{q=1}^{Q} \hat{\lambda}_{q} \hat{\gamma}_{i q} \hat{\delta}_{j q}.
 $$
 \textit{"This means that, concretely, $S$ matrices of size $I \times J$ are available
 as draws from the posterior distributions of the $\textcolor{blue}{\mu_{ij}}$. Thus, it is
 possible to \textcolor{blue}{apply a postprocessing on each matrix} $(s = 1, . . . , S)$ performing the classical
 procedure (in accordance with the chosen constraints): each matrix is centered by row and
 by column, and an SVD is applied on the resulting matrix. Consequently, for each $s$, \textcolor{blue}{new
-parameters ($\mu$, $\alpha$, $\beta$, $\gamma$, $\delta$, $\lambda_{q}$) meeting the constraints are available}. Consequently, draws in the posterior distribution of the parameters (taking the $S$ new values) are available. Such a postprocessing makes it easier to interpret the results."}
+parameters ($\mu$, $g$, $e$, $\gamma$, $\delta$, $\lambda_{q}$) meeting the constraints are available}. Consequently, draws in the posterior distribution of the parameters (taking the $S$ new values) are available. Such a postprocessing makes it easier to interpret the results."}
 
 ## Simulation: AMMI scenarios (20 combinations)
 
 We consider the following setting to generate a set of simulated data sets:
 $$
-y_{i j}=\mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
+y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
 where
 \begin{itemize}
  \item $\mu = 100$, $\tau = 1$.
  \item $I = J = 10$ (without repetitions).
- \item $\beta_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
- \item $\alpha_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
+ \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
+ \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
  \item $Q = c(1, 2, 3)$, with $\lambda = c(8, 12, [8, 12], [10, 12],[8, 10, 12])$.
  \item We used RMSE (Root Mean Squared Error) and RRMSE (Relative Root Mean Squared Error).
  \end{itemize}
 
-## Simulation AMMI $(y_{ij} = \mu+\textcolor{red}{\alpha_{i}}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+\textcolor{red}{g_{i}}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{rrmse_alphasa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_rrmse_gsa.pdf}
 \end{center}
 
-## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\textcolor{red}{\beta_{j}}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+\textcolor{red}{e_{j}}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{rrmse_betasa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_rrmse_esa.pdf}
 \end{center}
 
-## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \textcolor{red}{\lambda_{q}} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \textcolor{red}{\lambda_{q}} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{lambda_rrmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_lambda_rrmsesa.pdf}
 \end{center}
 
-## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \textcolor{red}{\gamma_{i q}} \delta_{j q})$
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \textcolor{red}{\gamma_{i q}} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{gamma_rrmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_gamma_rrmsesa.pdf}
 \end{center}
 
-## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \textcolor{red}{\delta_{j q}})$
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \textcolor{red}{\delta_{j q}})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{delta_rrmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_delta_rrmsesa.pdf}
 \end{center}
 
-## Simulation AMMI $(y_{ij} = \mu+\alpha_{i}+\beta_{j}+\textcolor{red}{\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}})$
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\textcolor{red}{\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{rmse_blinearsa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_rmse_blinearsa.pdf}
 \end{center}
 
-## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{y_test_rmsesa.pdf}
-\end{center}
-
-## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+\alpha_{i}+\beta_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{AMMI_y_test_rmsesa.pdf}
@@ -174,43 +168,43 @@ where
 We consider the following setting to generate a set of simulated data sets:
 $$
 \begin{aligned}
-y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( \alpha_{i} + \beta_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
+y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( g_{i} + e_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
 \end{aligned}
 $$
-where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $\alpha_i$ and $\beta_j$ are the genotype and environment effects, respectively. 
+where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and $e_j$ are the genotype and environment effects, respectively. 
 \begin{itemize}
  \item $\sigma^{2} = 1$, $T=200$.
  \item $I = J = 10$ (without repetitions).
  \item $\mu_{t\ell}|\mathcal{T}_{t} \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu} = 3),$
- \item $\beta_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
- \item $\alpha_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
+ \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
+ \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
  \end{itemize}
  
-## Simulation AMBARTI $(\textcolor{red}{y_{ij}} = \alpha_{i}+ \beta_{j} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+## Simulation AMBARTI $(\textcolor{red}{y_{ij}} = g_{i}+ e_{j} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{TEST_AMBARTI_y_hat_test.pdf}
 \end{center}
  
-## Simulation AMBARTI $(y_{ij} = \textcolor{red}{\alpha_{i}}+\beta_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+## Simulation AMBARTI $(y_{ij} = \textcolor{red}{g_{i}}+e_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_alphasa.pdf}
 \end{center}
 
-## Simulation AMBARTI $(y_{ij} = \textcolor{red}{\alpha_{i}}+\beta_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+## Simulation AMBARTI $(y_{ij} = \textcolor{red}{g_{i}}+e_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{reduced_AMBARTI_rrmse_alphasa.pdf}
 \end{center}
 
-## Simulation AMBARTI $(y_{ij} = \alpha_{i}+ \textcolor{red}{\beta_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+## Simulation AMBARTI $(y_{ij} = g_{i}+ \textcolor{red}{e_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{AMBARTI_rrmse_betasa.pdf}
 \end{center}
 
-## Simulation AMBARTI $(y_{ij} = \alpha_{i}+ \textcolor{red}{\beta_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
+## Simulation AMBARTI $(y_{ij} = g_{i}+ \textcolor{red}{e_{j}} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{reduced_AMBARTI_rrmse_betasa.pdf}
@@ -244,30 +238,30 @@ This work was supported by a Science Foundation Ireland Career Development Award
 
 We consider the following setting to generate a set of simulated data sets:
 $$
-y_{i j}= \mu+ \alpha_{i}+ \beta_{j} + \alpha_{i} \times \beta_{j} +\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
+y_{i j}= \mu+ g_{i}+ e_{j} + g_{i} \times e_{j} +\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
 where
 \begin{itemize}
  \item $\mu = 100$, $\tau = 1$.
  \item $I = J = 10$ (without repetitions).
- \item $\beta_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
- \item $\alpha_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
+ \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
+ \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
  \end{itemize}
 
-## Simulation full model $(y_{ij} = \textcolor{red}{\alpha_{i}}+\beta_{j}+ \alpha_{i} \times \beta_{j})$
+## Simulation full model $(y_{ij} = \textcolor{red}{g_{i}}+e_{j}+ g_{i} \times e_{j})$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{FULL_rrmse_alphasa.pdf}
 \end{center}
 
-## Simulation full model $(y_{ij} = \alpha_{i}+ \textcolor{red}{\beta_{j}}+ \alpha_{i} \times \beta_{j})$
+## Simulation full model $(y_{ij} = g_{i}+ \textcolor{red}{e_{j}}+ g_{i} \times e_{j})$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{FULL_rrmse_betasb.pdf}
 \end{center}
 
 
-## Simulation full model $(\textcolor{red}{y_{ij}} = \alpha_{i}+ \beta_{j}+ \alpha_{i} \times \beta_{j})$
+## Simulation full model $(\textcolor{red}{y_{ij}} = g_{i}+ e_{j}+ g_{i} \times e_{j})$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{FULL_y_test_rmsesa.pdf}

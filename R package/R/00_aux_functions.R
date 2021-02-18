@@ -294,7 +294,7 @@ organise_AMBARTI <- function(object, data){
   e_hat       = estimate[grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
   y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
-  blinear_hat = apply(object$y_hat_bart,2,mean)
+  blinear_hat = apply(object$y_hat_bart,2,mean) - mean(y_train) # to make it comparable with the AMMI estimates
 
   return(list(g_hat       = g_hat,
               e_hat       = e_hat,
