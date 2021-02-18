@@ -160,8 +160,10 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
   # Get estimates info
   estimate   = object$BUGSoutput$sims.matrix
   mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
-  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g*?(\\d+).*',  colnames(estimate))]]
-  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e*?(\\d+).',   colnames(estimate))]]
+  # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g*?(\\d+).*',  colnames(estimate))]]
+  # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e*?(\\d+).',   colnames(estimate))]]
+  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
+  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
   delta_hat  = estimate[-seq_burn,colnames(estimate)[grepl('delta',  colnames(estimate))]]
   gamma_hat  = estimate[-seq_burn,colnames(estimate)[grepl('gamma',  colnames(estimate))]]
   lambda_hat = estimate[-seq_burn,colnames(estimate)[grepl('lambda', colnames(estimate))]]
@@ -264,21 +266,6 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
               id          = 'Bayesian AMMI (postproc)'))
 }
 
-# plot(new_g_hat, ylim=c(-8,8), main='g - WITH postprocessing')
-# points(data$g, col=2)
-# points(g_hat[1,], col=3)
-#
-# plot(new_e_hat, ylim=c(-8,8), main='e - WITH postprocessing')
-# points(data$e, col=2)
-# points(e_hat[1,], col=3)
-#
-# plot(new_delta_hat, ylim=c(-2,2), main='delta - WITH postprocessing')
-# points(data$delta, col=2)
-# points(delta_hat[1,], col=3)
-#
-# plot(new_gamma_hat, ylim=c(-2,2), main='gamma - WITH postprocessing')
-# points(data$gamma, col=2)
-# points(gamma_hat[1,], col=3)
 #' @export
 #'
 organise_AMBARTI <- function(object, data){
@@ -333,8 +320,10 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data, Q = NULL
   # Get estimates info
   estimate   = object$BUGSoutput$mean
   mu_hat     = as.numeric(estimate$mu_all)
-  g_hat      = estimate$g
-  e_hat      = estimate$e
+  # g_hat      = estimate$g
+  # e_hat      = estimate$e
+  g_hat      = estimate$alpha
+  e_hat      = estimate$beta
   delta_hat  = estimate$delta
   gamma_hat  = estimate$gamma
   lambda_hat = estimate$lambda
@@ -477,8 +466,10 @@ if(is.null(data$Q) == FALSE){Q = data$Q}
 # Get estimates info
 estimate   = object$BUGSoutput$mean
 mu_hat     = as.numeric(estimate$mu_all)
-g_hat      = estimate$g
-e_hat      = estimate$e
+# g_hat      = estimate$g
+# e_hat      = estimate$e
+g_hat      = estimate$alpha
+e_hat      = estimate$beta
 delta_hat  = estimate$delta
 gamma_hat  = estimate$gamma
 lambda_hat = estimate$lambda
@@ -581,8 +572,10 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   # Get estimates info
   estimate   = object$BUGSoutput$sims.matrix
   mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
-  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g*?(\\d+).*',  colnames(estimate))]]
-  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e*?(\\d+).',   colnames(estimate))]]
+  # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g*?(\\d+).*',  colnames(estimate))]]
+  # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e*?(\\d+).',   colnames(estimate))]]
+  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
+  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
   delta_hat  = estimate[-seq_burn,colnames(estimate)[grepl('delta',  colnames(estimate))]]
   gamma_hat  = estimate[-seq_burn,colnames(estimate)[grepl('gamma',  colnames(estimate))]]
   lambda_hat = estimate[-seq_burn,colnames(estimate)[grepl('lambda', colnames(estimate))]]

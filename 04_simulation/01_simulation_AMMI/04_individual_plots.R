@@ -26,7 +26,7 @@ load(paste(save_file, ambarti_filename,   sep=''))
 # Get parameter estimates from classical AMMI
 res_AMMI = AMMI_help_plot(classical_AMMI, data)
 
-alpha_hat   = res_AMMI$alpha_hat
+g_hat       = res_AMMI$g_hat
 beta_hat    = res_AMMI$beta_hat
 lambda_hat  = res_AMMI$lambda_hat
 gamma_hat   = res_AMMI$gamma_hat
@@ -38,7 +38,7 @@ y_test_hat  = res_AMMI$y_hat_test
 # Get parameter estimates from Bayesian AMMI (WITHOUT postprocessing)
 bAMMI_save_info = bAMMI_help_plot(bayesian_AMMI, data)
 
-alpha_hat   = rbind(alpha_hat,    bAMMI_save_info$alpha_hat)
+g_hat       = rbind(g_hat,    bAMMI_save_info$g_hat)
 beta_hat    = rbind(beta_hat,     bAMMI_save_info$beta_hat)
 lambda_hat  = rbind(lambda_hat,   bAMMI_save_info$lambda_hat)
 gamma_hat   = rbind(gamma_hat,    bAMMI_save_info$gamma_hat)
@@ -50,7 +50,7 @@ y_test_hat  = rbind(y_test_hat,   bAMMI_save_info$y_hat_test)
 # Get parameter estimates from Bayesian AMMI (WITH postprocessing)
 bAMMI_save_info_WITHPOS = bAMMI_help_plot_WITHPOS(bayesian_AMMI, data)
 
-alpha_hat   = rbind(alpha_hat,   bAMMI_save_info_WITHPOS$alpha_hat)
+g_hat       = rbind(g_hat,   bAMMI_save_info_WITHPOS$g_hat)
 beta_hat    = rbind(beta_hat,    bAMMI_save_info_WITHPOS$beta_hat)
 lambda_hat  = rbind(lambda_hat,  bAMMI_save_info_WITHPOS$lambda_hat)
 gamma_hat   = rbind(gamma_hat,   bAMMI_save_info_WITHPOS$gamma_hat)
@@ -62,7 +62,7 @@ y_test_hat  = rbind(y_test_hat,  bAMMI_save_info_WITHPOS$y_hat_test)
 # Get parameter estimates from AMBARTI
 AMBARTI_save_info = AMBARTI_help_plot(ambarti, data)
 
-alpha_hat   = rbind(alpha_hat, AMBARTI_save_info$alpha_hat)
+g_hat       = rbind(g_hat, AMBARTI_save_info$g_hat)
 beta_hat    = rbind(beta_hat, AMBARTI_save_info$beta_hat)
 blinear_hat = rbind(blinear_hat, AMBARTI_save_info$blinear_hat)
 y_train_hat = rbind(y_train_hat, AMBARTI_save_info$y_hat_train)
@@ -70,14 +70,14 @@ y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_hat_test)
 
 # Some postprocessing
 
-alpha_hat$id   = factor(alpha_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+g_hat$id       = factor(g_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 beta_hat$id    = factor(beta_hat$id,    levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 blinear_hat$id = factor(blinear_hat$id, levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 y_train_hat$id = factor(y_train_hat$id, levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 y_test_hat$id  = factor(y_test_hat$id,  levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 
 
-alpha_hat$id   = factor(alpha_hat$id,   levels = sort(as.character(unique(alpha_hat$id))),   labels = sort(as.character(unique(alpha_hat$id))))
+g_hat$id       = factor(g_hat$id,   levels = sort(as.character(unique(g_hat$id))),   labels = sort(as.character(unique(g_hat$id))))
 beta_hat$id    = factor(beta_hat$id,    levels = sort(as.character(unique(beta_hat$id))),    labels = sort(as.character(unique(beta_hat$id))))
 blinear_hat$id = factor(blinear_hat$id, levels = sort(as.character(unique(blinear_hat$id))), labels = sort(as.character(unique(blinear_hat$id))))
 y_train_hat$id = factor(y_train_hat$id, levels = sort(as.character(unique(y_train_hat$id))), labels = sort(as.character(unique(y_train_hat$id))))
@@ -109,13 +109,13 @@ plot_individual_boxplots <- function(object, data){
                      labels = fixed_labels) # +
     # scale_color_discrete(labels=unique(db$Method))
 }
-plot_individual_boxplots(alpha_hat, data)
+plot_individual_boxplots(g_hat, data)
 plot_individual_boxplots(beta_hat, data)
 plot_individual_boxplots(lambda_hat, data)
 plot_individual_boxplots(gamma_hat, data)
 plot_individual_boxplots(delta_hat, data)
 
-alpha_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
+g_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
 beta_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postproc) has mean > 0
 
 ## Density plots for the DIFFERENCE (true - predicted)
