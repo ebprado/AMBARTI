@@ -13,7 +13,7 @@ save_file = "~/Documents/GitHub/AMBARTI/03_real_datasets/results/"
 #-------------------------------------------------
 library(reshape2)
 setwd(save_file)
-year = 2019
+year = 2015
 filename = paste('Ireland_VCU_',
                  year,
                  sep='')
@@ -30,8 +30,8 @@ load(paste(save_file, ammi_filenameQ2,  sep=''))
 load(paste(save_file, ammi_filenameQ3,  sep=''))
 load(paste(save_file, ambarti_filename, sep=''))
 
-alpha_hat   = NULL
-beta_hat    = NULL
+g_hat   = NULL
+e_hat    = NULL
 lambda_hat  = NULL
 gamma_hat   = NULL
 delta_hat   = NULL
@@ -44,8 +44,8 @@ for (Q in 1:3){
   aux_AMMI    = get(paste('classical_AMMI_Q',Q, sep=''))
   res_AMMI    = AMMI_help_plot(aux_AMMI, data, Q = Q)
 
-  alpha_hat   = rbind(alpha_hat,    res_AMMI$alpha_hat)
-  beta_hat    = rbind(beta_hat,     res_AMMI$beta_hat)
+  g_hat   = rbind(g_hat,    res_AMMI$g_hat)
+  e_hat    = rbind(e_hat,     res_AMMI$e_hat)
   lambda_hat  = rbind(lambda_hat,   res_AMMI$lambda_hat)
   gamma_hat   = rbind(gamma_hat,    res_AMMI$gamma_hat)
   delta_hat   = rbind(delta_hat,    res_AMMI$delta_hat)
@@ -58,16 +58,16 @@ for (Q in 1:3){
 # Get parameter estimates from AMBARTI
 AMBARTI_save_info = AMBARTI_help_plot(ambarti, data)
 
-alpha_hat   = rbind(alpha_hat,   AMBARTI_save_info$alpha_hat)
-beta_hat    = rbind(beta_hat,    AMBARTI_save_info$beta_hat)
+g_hat   = rbind(g_hat,   AMBARTI_save_info$g_hat)
+e_hat    = rbind(e_hat,    AMBARTI_save_info$e_hat)
 blinear_hat = rbind(blinear_hat, AMBARTI_save_info$blinear_hat)
 y_train_hat = rbind(y_train_hat, AMBARTI_save_info$y_hat_train)
 y_test_hat  = rbind(y_test_hat,  AMBARTI_save_info$y_hat_test)
 
 # Some postprocessing
 
-alpha_hat$id   = factor(alpha_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
-beta_hat$id    = factor(beta_hat$id,    levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+g_hat$id   = factor(g_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+e_hat$id    = factor(e_hat$id,    levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 lambda_hat$id  = factor(lambda_hat$id,  levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 gamma_hat$id   = factor(gamma_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 delta_hat$id   = factor(delta_hat$id,   levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
@@ -75,8 +75,8 @@ blinear_hat$id = factor(blinear_hat$id, levels = c('AMMI', 'Bayesian AMMI (pospr
 y_train_hat$id = factor(y_train_hat$id, levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 y_test_hat$id  = factor(y_test_hat$id,  levels = c('AMMI', 'Bayesian AMMI (posproc)', 'Bayesian AMMI (no postproc)', 'AMBARTI'), labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
 
-alpha_hat$id   = ifelse(alpha_hat$id   != 'AMBARTI', paste(alpha_hat$id,   ' (Q = ', alpha_hat$Q, ')',    sep=''),as.character(alpha_hat$id))
-beta_hat$id    = ifelse(beta_hat$id    != 'AMBARTI', paste(beta_hat$id,    ' (Q = ', beta_hat$Q, ')',     sep=''),as.character(beta_hat$id))
+g_hat$id   = ifelse(g_hat$id   != 'AMBARTI', paste(g_hat$id,   ' (Q = ', g_hat$Q, ')',    sep=''),as.character(g_hat$id))
+e_hat$id    = ifelse(e_hat$id    != 'AMBARTI', paste(e_hat$id,    ' (Q = ', e_hat$Q, ')',     sep=''),as.character(e_hat$id))
 lambda_hat$id  = ifelse(lambda_hat$id  != 'AMBARTI', paste(lambda_hat$id,   ' (Q = ', lambda_hat$Q, ')',    sep=''),as.character(lambda_hat$id))
 gamma_hat$id   = ifelse(gamma_hat$id   != 'AMBARTI', paste(gamma_hat$id,    ' (Q = ', gamma_hat$Q, ')',     sep=''),as.character(gamma_hat$id))
 delta_hat$id   = ifelse(delta_hat$id   != 'AMBARTI', paste(delta_hat$id,    ' (Q = ', delta_hat$Q, ')',     sep=''),as.character(delta_hat$id))
@@ -84,8 +84,8 @@ blinear_hat$id = ifelse(blinear_hat$id != 'AMBARTI', paste(blinear_hat$id, ' (Q 
 y_train_hat$id = ifelse(y_train_hat$id != 'AMBARTI', paste(y_train_hat$id, ' (Q = ', y_train_hat$Q, ')',  sep=''),as.character(y_train_hat$id))
 y_test_hat$id  = ifelse(y_test_hat$id  != 'AMBARTI', paste(y_test_hat$id,  ' (Q = ', y_test_hat$Q, ')',   sep=''),as.character(y_test_hat$id))
 
-alpha_hat$id   = factor(alpha_hat$id,   levels = sort(as.character(unique(alpha_hat$id))),   labels = sort(as.character(unique(alpha_hat$id))))
-beta_hat$id    = factor(beta_hat$id,    levels = sort(as.character(unique(beta_hat$id))),    labels = sort(as.character(unique(beta_hat$id))))
+g_hat$id   = factor(g_hat$id,   levels = sort(as.character(unique(g_hat$id))),   labels = sort(as.character(unique(g_hat$id))))
+e_hat$id    = factor(e_hat$id,    levels = sort(as.character(unique(e_hat$id))),    labels = sort(as.character(unique(e_hat$id))))
 blinear_hat$id = factor(blinear_hat$id, levels = sort(as.character(unique(blinear_hat$id))), labels = sort(as.character(unique(blinear_hat$id))))
 
 lambda_hat$id = factor(lambda_hat$id,   levels = sort(as.character(unique(lambda_hat$id))),   labels = sort(as.character(unique(lambda_hat$id))))
@@ -96,7 +96,7 @@ y_train_hat$id = factor(y_train_hat$id, levels = sort(as.character(unique(y_trai
 y_test_hat$id  = factor(y_test_hat$id,  levels = sort(as.character(unique(y_test_hat$id))),  labels = sort(as.character(unique(y_test_hat$id))))
 
 # Box plots for the parameter estimates ----------
-# alpha_hat = alpha_hat %>% group_by(id, Q, variable) %>% summarise(value=mean(value), true=NA)
+# g_hat = g_hat %>% group_by(id, Q, variable) %>% summarise(value=mean(value), true=NA)
 plot_individual_boxplots <- function(object){
 
   db = object
@@ -120,8 +120,8 @@ plot_individual_boxplots <- function(object){
     scale_x_discrete(limit = orig_labels,
                      labels = fixed_labels)
 }
-plot_individual_boxplots(alpha_hat)
-plot_individual_boxplots(beta_hat)
+plot_individual_boxplots(g_hat)
+plot_individual_boxplots(e_hat)
 # plot_individual_boxplots(lambda_hat)
 # plot_individual_boxplots(gamma_hat)
 # plot_individual_boxplots(delta_hat)
@@ -149,7 +149,7 @@ plot_individual_density <- function(object, data){
           legend.title = element_blank(),
           legend.position = "bottom")
 }
-# plot_individual_density(blinear_hat, data)
+plot_individual_density(blinear_hat, data)
 plot_individual_density(y_train_hat, data)
 # plot_individual_density(y_test_hat, data)
 

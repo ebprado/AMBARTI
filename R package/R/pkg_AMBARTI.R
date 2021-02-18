@@ -109,8 +109,8 @@ ambarti = function(x,
   var_count = rep(0, ncol(x))
   var_count_store = matrix(0, ncol = ncol(x), nrow = store_size)
   s_prob_store = matrix(0, ncol = ncol(x), nrow = store_size)
-  beta_hat_store = matrix(0, ncol = ncol(x), nrow = store_size)
-  colnames(beta_hat_store) <- colnames(x)
+  g_e_hat_store = matrix(0, ncol = ncol(x), nrow = store_size)
+  colnames(g_e_hat_store) <- colnames(x)
   tree_fits_store = matrix(0, ncol = ntrees, nrow = length(y))
 
   # Scale the response target variable
@@ -150,19 +150,19 @@ ambarti = function(x,
 
     # If at the right place, store everything
     if((i > nburn) & ((i - nburn) %% nthin) == 0) {
-      curr = (i - nburn)/nthin
-      tree_store[[curr]] = curr_trees
-      sigma2_store[curr] = sigma2
+      curr                 = (i - nburn)/nthin
+      tree_store[[curr]]   = curr_trees
+      sigma2_store[curr]   = sigma2
       sigma2_g_store[curr] = sigma2_g
       sigma2_e_store[curr] = sigma2_e
-      bart_store[curr,] = yhat_bart
-      y_hat_store[curr,] = y_hat
-      beta_hat_store[curr,] = beta_hat
+      bart_store[curr,]    = yhat_bart
+      y_hat_store[curr,]   = y_hat
+      g_e_hat_store[curr,] = g_e_hat
     }
 
     # Update the random effects alpha_i and beta_j
-    beta_hat = update_linear_component(y_scale, 0, x, sigma2, sigma2_psi_inv)
-    random_effects = x%*%beta_hat
+    g_e_hat = update_linear_component(y_scale, 0, x, sigma2, sigma2_psi_inv)
+    random_effects = x%*%g_e_hat
 
     # Start looping through trees
     for (j in 1:ntrees) {
@@ -248,8 +248,8 @@ ambarti = function(x,
     # Updating the final predictions
     y_hat = random_effects + yhat_bart
 
-    gi = beta_hat[grepl('^g', colnames(x))]
-    ej = beta_hat[grepl('^e', colnames(x))]
+    gi = g_e_hat[grepl('^g', colnames(x))]
+    ej = g_e_hat[grepl('^e', colnames(x))]
 
     sum_of_squares   = sum((y_scale - y_hat)^2)
     sum_of_squares_g = sum((gi - mu_g)^2)
@@ -278,7 +278,8 @@ ambarti = function(x,
               ntrees     = ntrees,
               y_mean     = y_mean,
               y_sd       = y_sd,
-              beta_hat   = beta_hat_store*y_sd,
+              g_hat      = g_e_hat_store[, grepl('^g', colnames(x))]*y_sd,
+              e_hat      = g_e_hat_store[, grepl('^e', colnames(x))]*y_sd,
               x          = x))
 
 } # End main function

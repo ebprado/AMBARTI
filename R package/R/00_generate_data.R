@@ -3,8 +3,8 @@
 #'
 generate_data_AMMI <- function(I, # Number of genotypes
                                J, # Number of environments
-                               s_alpha, # standard deviation of alpha
-                               s_beta, # standard deviation of alpha
+                               s_g, # standard deviation of g
+                               s_e, # standard deviation of e
                                s_y, # standard deviation of y
                                lambda # values for lambda (number of Q)
 ){
@@ -15,11 +15,11 @@ generate_data_AMMI <- function(I, # Number of genotypes
   # Number of components in the bilinear part
   Q = length(lambda)
 
-  # Generate alpha (genotypes)
-  alpha = rnorm(I, 0, s_alpha)
+  # Generate g (genotypes)
+  g = rnorm(I, 0, s_g)
 
-  # Generate beta (environments)
-  beta = rnorm(J, 0, s_beta)
+  # Generate e (environments)
+  e = rnorm(J, 0, s_e)
 
   # Set the grand mean
   mu = 100
@@ -46,7 +46,7 @@ generate_data_AMMI <- function(I, # Number of genotypes
   }
 
   # Now simulate the response
-  mu_ij = mu + alpha[x[,'g']] + beta[x[,'e']] + blin
+  mu_ij = mu + g[x[,'g']] + e[x[,'e']] + blin
 
   # Compute the response for the TRAINING set
   y = rnorm(N, mu_ij, s_y)
@@ -57,7 +57,7 @@ generate_data_AMMI <- function(I, # Number of genotypes
   # J1 <- rep(1,J)
 
   # This is a matrix representation from Alessandra (it works fine)
-  # mu_ij <- mu*I1%*%t(J1) + kronecker(alpha,t(J1)) + kronecker(t(beta), (I1)) + gamma%*%diag(lambda)%*%t(delta)
+  # mu_ij <- mu*I1%*%t(J1) + kronecker(g,t(J1)) + kronecker(t(e), (I1)) + gamma%*%diag(lambda)%*%t(delta)
   # y <- rnorm(N, c(mu.Y), s_y)
 
   return(list(y       = y,
@@ -66,12 +66,12 @@ generate_data_AMMI <- function(I, # Number of genotypes
               I       = I,
               J       = J,
               Q       = Q,
-              s_alpha = s_alpha,
-              s_beta  = s_beta,
+              s_g     = s_g,
+              s_e     = s_e,
               s_y     = s_y,
               lambda  = lambda,
-              alpha   = alpha,
-              beta    = beta,
+              g       = g,
+              e       = e,
               gamma   = gamma,
               delta   = delta,
               blinear = blin))
@@ -101,14 +101,14 @@ generate_gamma_delta <- function(INDEX, Q) {
   first_row = TRUE
 
   while(first_row) {
-    raw_par = matrix(rnorm(INDEX*Q), ncol=Q)
-    par_mean  = matrix(rep(apply(raw_par,2,mean), each = nrow(raw_par)), ncol=Q)
+    raw_par  = matrix(rnorm(INDEX*Q), ncol=Q)
+    par_mean = matrix(rep(apply(raw_par,2,mean), each = nrow(raw_par)), ncol=Q)
     par_aux  = raw_par - par_mean
 
     # Constraints ----
     # apply(par_aux,2,sum)
     parTpar = solve(t(par_aux)%*%(par_aux))
-    A = square_root_matrix(parTpar)
+    A       = square_root_matrix(parTpar)
     samples = par_aux%*%A
 
     # Force the first to be positive
@@ -132,8 +132,8 @@ generate_gamma_delta <- function(INDEX, Q) {
 
 generate_data_AMBARTI = function(I,
                                  J,
-                                 s_alpha, # standard deviation of alpha
-                                 s_beta, # standard deviation of alpha
+                                 s_g, # standard deviation of g
+                                 s_e, # standard deviation of e
                                  s_y, # standard deviation of y
                                  ntrees = 200,
                                  node_min_size = 5,
@@ -236,50 +236,48 @@ generate_data_AMBARTI = function(I,
 
   tree_store[[1]] = curr_trees
 
-  # Generate alpha_i and beta_j
-  alpha = rnorm(I, 0, sd = s_alpha)
-  beta  = rnorm(J, 0, sd = s_beta)
+  # Generate g_i and e_j
+  g = rnorm(I, 0, sd = s_g)
+  e  = rnorm(J, 0, sd = s_e)
 
   # Generate y's
   mu = 100
-  y_train = rnorm(N, mu + alpha[cov_g] + beta[cov_e] + bart_part, sd=s_y)
-  y_test  = rnorm(N, mu + alpha[cov_g] + beta[cov_e] + bart_part, sd=s_y)
+  y_train = rnorm(N, mu + g[cov_g] + e[cov_e] + bart_part, sd=s_y)
+  y_test  = rnorm(N, mu + g[cov_g] + e[cov_e] + bart_part, sd=s_y)
 
   return(list(y       = y_train,
               y_test  = y_test,
-              alpha   = alpha,
-              beta    = beta,
+              g       = g,
+              e       = e,
               blinear = bart_part,
               x       = x_orig,
               I       = I,
               J       = J,
-              s_alpha = s_alpha,
-              s_beta  = s_beta,
+              s_g     = s_g,
+              s_e     = s_e,
               s_y     = s_y,
               ntrees  = ntrees,
               trees   = tree_store))
 
 } # End main function
 
-
-
 #' @export
 #' @importFrom stats 'rnorm'
 generate_data_full_model <- function(I, # Number of genotypes
                                      J, # Number of environments
-                                     s_alpha, # standard deviation of alpha
-                                     s_beta, # standard deviation of alpha
+                                     s_g, # standard deviation of g
+                                     s_e, # standard deviation of e
                                      s_y # standard deviation of y
 ){
 
   # Total number of observations
   N = I*J
 
-  # Generate alpha (genotypes)
-  alpha = rnorm(I, 0, s_alpha)
+  # Generate g (genotypes)
+  g = rnorm(I, 0, s_g)
 
-  # Generate beta (environments)
-  beta = rnorm(J, 0, s_beta)
+  # Generate e (environments)
+  e = rnorm(J, 0, s_e)
 
   # Set the grand mean
   mu = 100
@@ -291,8 +289,8 @@ generate_data_full_model <- function(I, # Number of genotypes
   x$e = as.factor(x$e)
 
   # Now simulate the response
-  inter = alpha[x[,'g']] * beta[x[,'e']]
-  mu_ij = mu + alpha[x[,'g']] + beta[x[,'e']] + inter
+  inter = g[x[,'g']] * e[x[,'e']]
+  mu_ij = mu + g[x[,'g']] + e[x[,'e']] + inter
 
   # Compute the response for the TRAINING set
   y = rnorm(N, mu_ij, s_y)
@@ -305,10 +303,10 @@ generate_data_full_model <- function(I, # Number of genotypes
               x       = x,
               I       = I,
               J       = J,
-              s_alpha = s_alpha,
-              s_beta  = s_beta,
+              s_g     = s_g,
+              s_e     = s_e,
               s_y     = s_y,
-              alpha   = alpha,
-              beta    = beta,
+              g       = g,
+              e       = e,
               blinear = inter))
 }
