@@ -133,7 +133,8 @@ resample <- function(x, ...) x[sample.int(length(x), size=1), ...]
 create_interaction = function(X, nclass, aux_comb, prob){
   num_cov = sample(aux_comb, 1, prob = prob) # number of covariates to be sampled
   s_covs  = sample(x = 1:nclass, size = num_cov, replace = FALSE) # sampled covariates
-  new_cov = matrix(apply(X[,s_covs], 1,sum), ncol=1) # create the interaction from the sampled covariates
+  # new_cov = matrix(apply(X[,s_covs], 1,sum), ncol=1) # create the interaction from the sampled covariates
+  new_cov = matrix(rowSums(X[,s_covs]), ncol=1) # create the interaction from the sampled covariates
   colnames(new_cov) = paste(sort(colnames(X)[s_covs]), collapse = ':')
   return(new_cov)
 }

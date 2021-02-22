@@ -164,7 +164,7 @@ where
 \includegraphics[width=0.95\linewidth]{AMMI_y_test_rmsesa.pdf}
 \end{center}
 
-## Simulation AMBARTI (4 combinations)
+## Simulation AMBARTI (8 combinations)
 We consider the following setting to generate a set of simulated data sets:
 $$
 \begin{aligned}
@@ -174,7 +174,7 @@ $$
 where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and $e_j$ are the genotype and environment effects, respectively. 
 \begin{itemize}
  \item $\sigma^{2} = 1$, $T=200$.
- \item $I = J = 10$ (without repetitions).
+ \item $I = J = c(10, 25)$ (without repetitions).
  \item $\mu_{t\ell}|\mathcal{T}_{t} \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu} = 3),$
  \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
  \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
@@ -200,21 +200,83 @@ where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and 
 
 # Real data
 
-## Innovar project: wheat data
+## INNOVAR project: wheat data
 
+\begin{itemize}
+\item European Union Horizon 2020 project INNOVAR: improve the efficacy and accuracy of European crop variety testing and on-farm decision-making. 
+\vspace{0.2cm}
+\item INNOVAR is a collaboration between 22 different partners across Europe.
+\vspace{0.2cm}
+\item Each year has $\sim 20$ genotypes and $\sim 8$ environments (4 replicates). 
+\vspace{0.2cm}
+\item The response variable is the production of wheat in tonnes per hectare.
+
+\end{itemize}
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_by_g.pdf}
+\end{center}
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_by_e.pdf}
+\end{center}
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_g.pdf}
+\end{center}
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_e.pdf}
+\end{center}
+
+## Results
+
+\begin{table}
+\begin{tabular}{ccc}
+Year & AMMI & AMBARTI\\
+\hline
+2010 & 0.5030 & \textcolor{blue}{0.4814} \\
+2011 & 0.4539 & \textcolor{blue}{0.4263} \\
+2012 & 0.3755 & \textcolor{blue}{0.3029} \\
+2013 & 0.4416 & \textcolor{blue}{0.4247} \\
+2014 & 0.4644 & \textcolor{blue}{0.4386} \\
+2015 & 0.3811 & \textcolor{blue}{0.3389} \\
+2016 & 0.4205 & \textcolor{blue}{0.3830} \\
+2017 & 0.4175 & \textcolor{blue}{0.3928} \\
+2018 & 0.5659 & \textcolor{blue}{0.5532} \\
+2019 & 0.4509 & \textcolor{blue}{0.4010} \\
+\hline
+\end{tabular}
+\caption{RMSE for $\hat{y}$ on test data.}
+\end{table}
 
 
 ## Next steps
 
 \begin{enumerate} 
   \vspace{0.005cm}
-	\item Adapt our implementation to simulate large $(>15)$ $I$ and $J$.
-	\vspace{0.25cm}
-		\item Perform more simulations considering large $I$ and $J$. 
-	\vspace{0.25cm}
-	\item Analyse real data sets.
+	\item Starting writing the paper.
 \end{enumerate}
 
+## Guess what!
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{DieysU5W4AATr0W.jpg}
+\end{center}
+
+## Guess what!
+
+\begin{center}
+\includegraphics[width=0.70\linewidth]{funny-birthday-good-for-your-health-memes.jpg}
+\end{center}
 
 ## That's all, folks! Thank you!
 

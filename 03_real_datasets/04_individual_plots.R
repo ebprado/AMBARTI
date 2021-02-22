@@ -149,11 +149,12 @@ plot_individual_density <- function(object, data){
           legend.title = element_blank(),
           legend.position = "bottom")
 }
-plot_individual_density(blinear_hat, data)
+# plot_individual_density(blinear_hat, data)
 plot_individual_density(y_train_hat, data)
 # plot_individual_density(y_test_hat, data)
 
 # Calculate correlation ------
+
 yhat_ammi_q1 = y_train_hat %>% filter(Q==1) %>% mutate(y_hat = value + true)
 yhat_ammi_q2 = y_train_hat %>% filter(Q==2) %>% mutate(y_hat = value + true)
 yhat_ammi_q3 = y_train_hat %>% filter(Q==3) %>% mutate(y_hat = value + true)
@@ -161,3 +162,5 @@ cor(data$y, yhat_ammi_q1$y_hat)
 cor(data$y, yhat_ammi_q2$y_hat)
 cor(data$y, yhat_ammi_q3$y_hat)
 cor(data$y, apply(ambarti$y_hat,2,mean))
+
+

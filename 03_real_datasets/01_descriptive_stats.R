@@ -37,19 +37,19 @@ tab3 = aux %>%
   summarise(n=n())
 
 tab4 = aux %>%
-  group_by(Year,
-           Location) %>%
+  group_by(Location,
+           Year) %>%
   summarise(n=n())
 
 tab5 = aux %>%
-  group_by(Year,
-           Genotype) %>%
+  group_by(Genotype,
+           Year) %>%
   summarise(n=n())
 
 ## Filter some sites and genotypes to ease the visualisation
-data = ireland %>% filter(Year %in% c(2010, 2011, 2012),
+data = ireland %>% filter(Year %in% c(2013, 2014, 2015),
                           Location %in% c('BN', 'CK', 'CKC'),
-                          Genotype %in% c('Alchemy', 'Alves', 'Avatar', 'Cordiale'))
+                          Genotype %in% c('Dunmore', 'Einstein', 'KWS Lili', 'Leeds'))
 
 ## plot 1
 data %>%
@@ -67,17 +67,27 @@ data %>%
   ggplot(aes(x = Year , y = yld_ton_ha, colour=Genotype)) +
   geom_boxplot() +
   theme_bw(base_size = 12) +
-  theme(plot.title = element_text(size = 15, hjust = 0.5),
-        legend.position = 'bottom',
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+  labs(title = "Production of wheat",
+       y = 'Tonnes per hectare',
+       x = 'Year') +
+  theme(axis.text.x = element_text(size=12),
+        axis.title = element_blank(),
+        plot.title = element_text(size = 18, hjust = 0.5),
+        legend.text = element_text(size = 12),
+        legend.title = element_blank(),
+        legend.position = "bottom")
 
 # plot 3
 data %>%
   ggplot(aes(x = Year , y = yld_ton_ha, colour=Location)) +
   geom_boxplot() +
   theme_bw(base_size = 12) +
-  theme(plot.title = element_text(size = 15, hjust = 0.5),
-        legend.position = 'bottom',
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+  labs(title = "Production of wheat",
+       y = 'Tonnes per hectare',
+       x = 'Year') +
+  theme(axis.text.x = element_text(size=12),
+        axis.title = element_blank(),
+        plot.title = element_text(size = 18, hjust = 0.5),
+        legend.text = element_text(size = 12),
+        legend.title = element_blank(),
+        legend.position = "bottom")
