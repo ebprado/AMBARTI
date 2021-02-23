@@ -241,6 +241,7 @@ where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and 
 
 \begin{table}
 \begin{tabular}{ccc}
+\hline
 Year & AMMI & AMBARTI\\
 \hline
 2010 & 0.5030 & \textcolor{blue}{0.4814} \\
