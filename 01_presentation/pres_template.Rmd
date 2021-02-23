@@ -1,6 +1,6 @@
 ---
 title: 'AMBARTI models for agricultural experiments'
-date: "February 18th, 2021 - Group meeting"
+date: "February 23rd, 2021 - Group meeting"
 author: "Prado, E. B., Santos, A. A. L \\newline \\vspace{1cm} \\textit{Hamilton Institute \\& Dept. of Mathematics and Statistics} \\newline \\vspace{1cm} \\includegraphics[width=3cm]{MU_logo.jpg}"
 header-includes:
 output:
@@ -21,6 +21,9 @@ natbiboptions: round
 \vspace{0.5cm}
 
 - Simulation (AMMI and AMBARTI)
+\vspace{0.5cm}
+
+- Real data sets
 \vspace{0.5cm}
 
 - Next steps
@@ -115,7 +118,7 @@ $$
 where
 \begin{itemize}
  \item $\mu = 100$, $\tau = 1$.
- \item $I = J = 10$ (without repetitions).
+ \item $I = J = c(10, 25)$ (without repetitions).
  \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
  \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
  \item $Q = c(1, 2, 3)$, with $\lambda = c(8, 12, [8, 12], [10, 12],[8, 10, 12])$.
@@ -165,7 +168,7 @@ where
 \end{center}
 
 ## Simulation AMBARTI (8 combinations)
-We consider the following setting to generate a set of simulated data sets:
+We consider the following settings to generate a set of simulated data sets:
 $$
 \begin{aligned}
 y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( g_{i} + e_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
@@ -200,7 +203,7 @@ where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and 
 
 # Real data
 
-## INNOVAR project: wheat data
+## INNOVAR project: wheat data \includegraphics[width=0.05\linewidth]{wheat2.png}
 
 \begin{itemize}
 \item European Union Horizon 2020 project INNOVAR: improve the efficacy and accuracy of European crop variety testing and on-farm decision-making. 
@@ -293,7 +296,7 @@ This work was supported by a Science Foundation Ireland Career Development Award
 
 ## Simulation: full model (4 combinations)
 
-We consider the following setting to generate a set of simulated data sets:
+We consider the following settings to generate a set of simulated data sets:
 $$
 y_{i j}= \mu+ g_{i}+ e_{j} + g_{i} \times e_{j} +\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
