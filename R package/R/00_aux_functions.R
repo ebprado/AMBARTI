@@ -288,14 +288,14 @@ organise_AMBARTI <- function(object, data){
   # Get estimates info
   # estimate_g  = apply(object$g_hat, 2, mean)
   # estimate_e  = apply(object$e_hat, 2, mean)
-  estimate  = apply(object$beta_hat, 2, mean)
+  estimate  = apply(object$beta_hat, 2, mean) - object$y_mean
   # g_hat       = estimate_g[grepl('^g', names(estimate_g))]
   # e_hat       = estimate_e[grepl('^e', names(estimate_e))]
   g_hat       = estimate[grepl('^g', names(estimate))]
   e_hat       = estimate[grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
   y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
-  blinear_hat = apply(object$y_hat_bart,2,mean) - mean(y_train) # to make it comparable with the AMMI estimates
+  blinear_hat = apply(object$y_hat_bart,2,mean) # to make it comparable with the AMMI estimates
 
   return(list(g_hat       = g_hat,
               e_hat       = e_hat,
@@ -754,7 +754,7 @@ AMBARTI_help_plot <- function(object, data){
   # estimate_e  = as.data.frame(object$e_hat)
   # g_hat       = estimate_g[,grepl('^g', names(estimate_g))]
   # e_hat       = estimate_e[,grepl('^e', names(estimate_e))]
-  estimate  = as.data.frame(object$beta_hat)
+  estimate  = as.data.frame(object$beta_hat) - object$y_mean
   g_hat       = estimate[,grepl('^g', names(estimate))]
   e_hat       = estimate[,grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
