@@ -11,9 +11,10 @@ bibliography: math_refs.bib
 biblio-style: apalike
 link-citations: true
 natbiboptions: round
+
 ---
 ## Agenda
-
+  
 - Additive Main Effect interaction (AMMI) models
 \vspace{0.5cm}
 
@@ -27,18 +28,19 @@ natbiboptions: round
 \vspace{0.5cm}
 
 - Appendix
-<!-------------------------------------------------------------------------------------------------------------->
-<!-------------------------------------------------------------------------------------------------------------->
 
+<!-------------------------------------------------------------------------------------------------------------->
+  <!-------------------------------------------------------------------------------------------------------------->
+  
 ## Additive Main effects and Multiplicative Interactions (AMMI)
-
+  
 Linear–bilinear models are frequently used to analyse two-way data such as
 genotype-by-environment data.
 
 \vspace{0.1cm}
 An example of this class of models is the AMMI model:
 $$
-y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
+  y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
 where $g_{i}$ is the effect of genotype and $e_{j}$ the effect of environment.
 
@@ -46,24 +48,24 @@ where $g_{i}$ is the effect of genotype and $e_{j}$ the effect of environment.
 
 The following priors are assumed in its Bayesian version (Josse et al, JABES, 2014):
 \vspace{-0.5cm}
-    \begin{eqnarray*} 
-    \mu & \sim& \mbox{N}\left(m, s_{\mu}^{2}\right), \\ 
-    g_{i} & \sim&  \mbox{N}\left(0, s_{g}^{2}\right), \\
-    e_{j} &\sim& \mbox{N}\left(0, s_{e}^{2}\right), \\
-    \left(\lambda_{q}\right)_{q=1, \ldots, Q} &\sim& \text { ordered sample of } Q \text { independent } \mbox{N}^{+}\left(0, s_{\lambda}^{2}\right), \\
-    \gamma_{1 q} & \sim&  \mbox{N}^{+}(0,1) \quad \text { for } q=1, \ldots, Q, \\
-    \gamma_{i q} & \sim&  \mbox{N}(0,1) \quad \text { for } i>1 \text { and } q=1, \ldots, Q, \\ \delta_{j q} & \sim&  \mbox{N}(0,1) \quad \text { for } j \geq 1 \text { and } q=1, \ldots, Q, \\
-    \sigma_{E} & \sim& \mbox{U}\left(0, S_{\mathrm{ME}}\right).
-    \end{eqnarray*}
+\begin{eqnarray*} 
+\mu & \sim& \mbox{N}\left(m, s_{\mu}^{2}\right), \\ 
+g_{i} & \sim&  \mbox{N}\left(0, s_{g}^{2}\right), \\
+e_{j} &\sim& \mbox{N}\left(0, s_{e}^{2}\right), \\
+\left(\lambda_{q}\right)_{q=1, \ldots, Q} &\sim& \text { ordered sample of } Q \text { independent } \mbox{N}^{+}\left(0, s_{\lambda}^{2}\right), \\
+\gamma_{1 q} & \sim&  \mbox{N}^{+}(0,1) \quad \text { for } q=1, \ldots, Q, \\
+\gamma_{i q} & \sim&  \mbox{N}(0,1) \quad \text { for } i>1 \text { and } q=1, \ldots, Q, \\ \delta_{j q} & \sim&  \mbox{N}(0,1) \quad \text { for } j \geq 1 \text { and } q=1, \ldots, Q, \\
+\sigma_{E} & \sim& \mbox{U}\left(0, S_{\mathrm{ME}}\right).
+\end{eqnarray*}
 
 <!-------------------------------------------------------------------------------------------------------------->
-<!-------------------------------------------------------------------------------------------------------------->
-
+  <!-------------------------------------------------------------------------------------------------------------->
+  
 # Additive Main Effect Bayesian Additive Regression Tree Interaction models (AMBARTI)
-
+  
 ## BART
-
-\begin{figure}[H]
+  
+\begin{figure}
 \centering
 \begin{tabular}{c}
 \includegraphics[width=0.95\linewidth]{TreeTermsBART.pdf}
@@ -90,37 +92,37 @@ e_{j}|\mathcal{T}_{t}   & \sim \mbox{N}(\mu_{e}, \sigma^{2}_{e}), \\
 \sigma^{2} & \sim \mbox{IG}(a, b). \\
 \end{aligned}
 $$
-
+  
 # Interesting fact...
-
+  
 ## Bayesian AMMI - Postprocessing (Josse et al, 2014)
-Recall that
+  Recall that
 \vspace{-0.1cm}
 $$
-\textcolor{blue}{\mu_{i j}} = \hat{y}_{i j}=\hat{\mu}+\hat{g}_{i}+\hat{e}_{j}+\sum_{q=1}^{Q} \hat{\lambda}_{q} \hat{\gamma}_{i q} \hat{\delta}_{j q}.
+  \textcolor{blue}{\mu_{i j}} = \hat{y}_{i j}=\hat{\mu}+\hat{g}_{i}+\hat{e}_{j}+\sum_{q=1}^{Q} \hat{\lambda}_{q} \hat{\gamma}_{i q} \hat{\delta}_{j q}.
 $$
-\textit{"This means that, concretely, $S$ matrices of size $I \times J$ are available
-as draws from the posterior distributions of the $\textcolor{blue}{\mu_{ij}}$. Thus, it is
-possible to \textcolor{blue}{apply a postprocessing on each matrix} $(s = 1, . . . , S)$ performing the classical
-procedure (in accordance with the chosen constraints): each matrix is centered by row and
-by column, and an SVD is applied on the resulting matrix. Consequently, for each $s$, \textcolor{blue}{new
-parameters ($\mu$, $g$, $e$, $\gamma$, $\delta$, $\lambda_{q}$) meeting the constraints are available}. Consequently, draws in the posterior distribution of the parameters (taking the $S$ new values) are available. Such a postprocessing makes it easier to interpret the results."}
+  \textit{"This means that, concretely, $S$ matrices of size $I \times J$ are available
+    as draws from the posterior distributions of the $\textcolor{blue}{\mu_{ij}}$. Thus, it is
+    possible to \textcolor{blue}{apply a postprocessing on each matrix} $(s = 1, . . . , S)$ performing the classical
+    procedure (in accordance with the chosen constraints): each matrix is centered by row and
+    by column, and an SVD is applied on the resulting matrix. Consequently, for each $s$, \textcolor{blue}{new
+    parameters ($\mu$, $g$, $e$, $\gamma$, $\delta$, $\lambda_{q}$) meeting the constraints are available}. Consequently, draws in the posterior distribution of the parameters (taking the $S$ new values) are available. Such a postprocessing makes it easier to interpret the results."}
 
 ## Simulation: AMMI scenarios (20 combinations)
 
-We consider the following settings to generate a set of simulated data sets:
+We consider the following setting to generate a set of simulated data sets:
 $$
 y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
 where
 \begin{itemize}
- \item $\mu = 100$, $\tau = 1$.
- \item $I = J = 10$ (without repetitions).
- \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
- \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
- \item $Q = c(1, 2, 3)$, with $\lambda = c(8, 12, [8, 12], [10, 12],[8, 10, 12])$.
- \item We used RMSE (Root Mean Squared Error) and RRMSE (Relative Root Mean Squared Error).
- \end{itemize}
+\item $\mu = 100$, $\tau = 1$.
+\item $I = J = c(10, 25)$ (without repetitions).
+\item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
+\item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
+\item $Q = c(1, 2, 3)$, with $\lambda = c(8, 12, [8, 12], [10, 12],[8, 10, 12])$.
+\item We used RMSE (Root Mean Squared Error) and RRMSE (Relative Root Mean Squared Error).
+\end{itemize}
 
 ## Simulation AMMI $(y_{ij} = \mu+\textcolor{red}{g_{i}}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
@@ -165,27 +167,27 @@ where
 \end{center}
 
 ## Simulation AMBARTI (4 combinations)
-We consider the following settings to generate a set of simulated data sets:
+We consider the following setting to generate a set of simulated data sets:
 $$
-\begin{aligned}
+  \begin{aligned}
 y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( g_{i} + e_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
 \end{aligned}
 $$
-where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and $e_j$ are the genotype and environment effects, respectively. 
+  where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and $e_j$ are the genotype and environment effects, respectively. 
 \begin{itemize}
- \item $\sigma^{2} = 1$, $T=200$.
- \item $I = J = 10$ (without repetitions).
- \item $\mu_{t\ell}|\mathcal{T}_{t} \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu} = 3),$
- \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
- \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
- \end{itemize}
- 
+\item $\sigma^{2} = 1$, $T=200$.
+\item $I = J = c(10, 25)$ (without repetitions).
+\item $\mu_{t\ell}|\mathcal{T}_{t} \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu} = 3),$
+  \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
+\item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
+\end{itemize}
+
 ## Simulation AMBARTI $(\textcolor{red}{y_{ij}} = g_{i}+ e_{j} + \sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
 \includegraphics[width=0.95\linewidth]{AMBARTI_y_test_rmsesa.pdf}
 \end{center}
- 
+
 ## Simulation AMBARTI $(y_{ij} = \textcolor{red}{g_{i}}+e_{j}+\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t}))$
 
 \begin{center}
@@ -200,21 +202,72 @@ where $y_{ij}$ is the yield for genotype $i$ and environment $j$, and $g_i$ and 
 
 # Real data
 
-## Innovar project: wheat data
+## Innovar project: wheat data \includegraphics[width=0.04\linewidth]{wheat2.png}
 
+European Union Horizon 2020 project INNOVAR: improve the efficacy and accuracy of European crop variety testing and on-farm decision-making.
+\vspace{0.4cm}
+
+INNOVAR is a collaboration between 22 different partnersacross Europe.
+\vspace{0.4cm}
+
+Each year has $\sim 20$ genotypes and $\sim 8$ environments (4 replicates).
+\vspace{0.4cm}
+
+The response variable is the production of wheat in tonnes per hectare.
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_by_g.pdf}
+\end{center}
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_by_e.pdf}
+\end{center}
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_g.pdf}
+\end{center}
+
+## Results (2015)
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{real_dataset_e.pdf}
+\end{center}
+
+## Results
+\begin{table}
+\centering
+ \begin{tabular}{ccc} 
+ \hline
+ Year &  AMMI & AMBARTI \\
+ \hline
+  2010 & 0.5030 & \textcolor{blue}{0.4814} \\
+  2011 & 0.4539 & \textcolor{blue}{0.4263} \\
+  2012 & 0.3755 & \textcolor{blue}{0.3029} \\
+  2013 & 0.4416 & \textcolor{blue}{0.4247} \\
+  2014 & 0.4644 & \textcolor{blue}{0.4386} \\
+  2015 & 0.3811 & \textcolor{blue}{0.3389} \\
+  2016 & 0.4205 & \textcolor{blue}{0.3830} \\
+  2017 & 0.4175 & \textcolor{blue}{0.3928} \\
+  2018 & 0.5659 & \textcolor{blue}{0.5532} \\
+  2019 & 0.4509 & \textcolor{blue}{0.4010} \\
+ \hline
+ \end{tabular}
+ \caption{RMSE for $\hat{y}$ on test data}
+\end{table}
 
 
 ## Next steps
 
 \begin{enumerate} 
-  \vspace{0.005cm}
-	\item Adapt our implementation to simulate large $(>15)$ $I$ and $J$.
-	\vspace{0.25cm}
-		\item Perform more simulations considering large $I$ and $J$. 
-	\vspace{0.25cm}
-	\item Analyse real data sets.
+\vspace{0.005cm}
+\item Start writing the paper.
 \end{enumerate}
-
 
 ## That's all, folks! Thank you!
 
@@ -225,47 +278,3 @@ This work was supported by a Science Foundation Ireland Career Development Award
 
 <!-------------------------------------------------------------------------------------------------------------->
 <!-------------------------------------------------------------------------------------------------------------->
-
-# Appendix 
-
-## Simulation AMMI $(y_{ij} = \mu+\textcolor{red}{g_{i}}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_I25_rrmse_gsa.pdf}
-\end{center}
-
-## Simulation AMMI $(y_{ij} = \mu+g_{i}+\textcolor{red}{e_{j}}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_I25_rrmse_esa.pdf}
-\end{center}
-
-## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \textcolor{red}{\lambda_{q}} \gamma_{i q} \delta_{j q})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_I25_lambda_rrmsesa.pdf}
-\end{center}
-
-## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \textcolor{red}{\gamma_{i q}} \delta_{j q})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_I25_gamma_rrmsesa.pdf}
-\end{center}
-
-## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \textcolor{red}{\delta_{j q}})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_I25_delta_rrmsesa.pdf}
-\end{center}
-
-## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\textcolor{red}{\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_I25_rmse_blinearsa.pdf}
-\end{center}
-
-## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
-
-\begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_I25_y_test_rmsesa.pdf}
-\end{center}
