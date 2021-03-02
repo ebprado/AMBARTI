@@ -177,7 +177,7 @@ $$
 \begin{itemize}
 \item $\sigma^{2} = 1$, $T=200$.
 \item $I = J = c(10, 25)$ (without repetitions).
-\item $\mu_{t\ell}|\mathcal{T}_{t} \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu} = 3),$
+\item $\mu_{t\ell}|\mathcal{T}_{t} \sim \mbox{N}(\mu_{\mu} = 0, \sigma^{2}_{\mu} = 3).$
   \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
 \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
 \end{itemize}
