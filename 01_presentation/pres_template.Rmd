@@ -108,7 +108,7 @@ parameters ($\mu$, $g$, $e$, $\gamma$, $\delta$, $\lambda_{q}$) meeting the cons
 
 ## Simulation: AMMI scenarios (20 combinations)
 
-We consider the following setting to generate a set of simulated data sets:
+We consider the following settings to generate a set of simulated data sets:
 $$
 y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
@@ -125,47 +125,47 @@ where
 ## Simulation AMMI $(y_{ij} = \mu+\textcolor{red}{g_{i}}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_rrmse_gsa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I10_rrmse_gsa.pdf}
 \end{center}
 
 ## Simulation AMMI $(y_{ij} = \mu+g_{i}+\textcolor{red}{e_{j}}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_rrmse_esa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I10_rrmse_esa.pdf}
 \end{center}
 
 ## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \textcolor{red}{\lambda_{q}} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_lambda_rrmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I10_lambda_rrmsesa.pdf}
 \end{center}
 
 ## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \textcolor{red}{\gamma_{i q}} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_gamma_rrmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I10_gamma_rrmsesa.pdf}
 \end{center}
 
 ## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \textcolor{red}{\delta_{j q}})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_delta_rrmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I10_delta_rrmsesa.pdf}
 \end{center}
 
 ## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\textcolor{red}{\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_rmse_blinearsa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I10_rmse_blinearsa.pdf}
 \end{center}
 
 ## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{AMMI_y_test_rmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I10_y_test_rmsesa.pdf}
 \end{center}
 
 ## Simulation AMBARTI (4 combinations)
-We consider the following setting to generate a set of simulated data sets:
+We consider the following settings to generate a set of simulated data sets:
 $$
 \begin{aligned}
 y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( g_{i} + e_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
@@ -228,35 +228,44 @@ This work was supported by a Science Foundation Ireland Career Development Award
 
 # Appendix 
 
-## Simulation: full model (4 combinations)
-
-We consider the following setting to generate a set of simulated data sets:
-$$
-y_{i j}= \mu+ g_{i}+ e_{j} + g_{i} \times e_{j} +\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
-$$
-where
-\begin{itemize}
- \item $\mu = 100$, $\tau = 1$.
- \item $I = J = 10$ (without repetitions).
- \item $e_{j} \sim \mbox{N}(0, s_e)$, with $s_e = c(1,5)$.
- \item $g_{i} \sim \mbox{N}(0, s_g)$, with $s_g = c(1,5)$.
- \end{itemize}
-
-## Simulation full model $(y_{ij} = \textcolor{red}{g_{i}}+e_{j}+ g_{i} \times e_{j})$
+## Simulation AMMI $(y_{ij} = \mu+\textcolor{red}{g_{i}}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{FULL_rrmse_alphasa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I25_rrmse_gsa.pdf}
 \end{center}
 
-## Simulation full model $(y_{ij} = g_{i}+ \textcolor{red}{e_{j}}+ g_{i} \times e_{j})$
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+\textcolor{red}{e_{j}}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{FULL_rrmse_betasb.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I25_rrmse_esa.pdf}
 \end{center}
 
-
-## Simulation full model $(\textcolor{red}{y_{ij}} = g_{i}+ e_{j}+ g_{i} \times e_{j})$
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \textcolor{red}{\lambda_{q}} \gamma_{i q} \delta_{j q})$
 
 \begin{center}
-\includegraphics[width=0.95\linewidth]{FULL_y_test_rmsesa.pdf}
+\includegraphics[width=0.95\linewidth]{AMMI_I25_lambda_rrmsesa.pdf}
+\end{center}
+
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \textcolor{red}{\gamma_{i q}} \delta_{j q})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{AMMI_I25_gamma_rrmsesa.pdf}
+\end{center}
+
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \textcolor{red}{\delta_{j q}})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{AMMI_I25_delta_rrmsesa.pdf}
+\end{center}
+
+## Simulation AMMI $(y_{ij} = \mu+g_{i}+e_{j}+\textcolor{red}{\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{AMMI_I25_rmse_blinearsa.pdf}
+\end{center}
+
+## Simulation AMMI $(\textcolor{red}{y_{ij}} = \mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q})$
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{AMMI_I25_y_test_rmsesa.pdf}
 \end{center}

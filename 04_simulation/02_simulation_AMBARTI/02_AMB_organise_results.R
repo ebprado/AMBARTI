@@ -4,11 +4,11 @@ install_github("ebprado/AMBARTI/R package",
                auth_token = '363d4ad84eaa25d3eb26752732cc208f7e698086')
 library(AMBARTI)
 
-save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/02_simulation_AMBARTI/results/"
+save_file = "~/R/AMBARTI/02_simulation_AMBARTI/results/"
 
-I = c(10) # c(5, 15, 30) # Number of genotypes
-J = c(10) # c(5, 15, 30) # Number of environments
-s_alpha = c(1, 5) # c(1, 5) # standard deviation of alpha
+I = c(10) # c(5, 25, 50) # Number of genotypes
+J = c(10) # c(5, 25, 50) # Number of environments
+s_alpha = c(1,5) # c(1, 5) # standard deviation of alpha
 s_beta = c(1,5) # c(1, 5) # standard deviation of beta
 s_y = 1 # c(1, 5) # standard deviation of y
 n_rep = 10 # Number of Monte Carlo repetition
@@ -24,16 +24,17 @@ all_comb = expand.grid(I = I,
 n_comb = nrow(all_comb)
 save_results = NULL
 
-for (i in 1:n_comb){
-
-  comb = all_comb[i,] # Get the row of the combination i
-  I = comb$I # Number of genotypes
-  J = comb$J # Number of environments
-  s_alpha = comb$s_alpha # standard deviation of alpha
-  s_beta = comb$s_beta # standard deviation of alpha
-  s_y = comb$s_y # standard deviation of y
-
   for (j in 1:n_rep){
+    
+    for (i in 1:n_comb){
+      
+      comb = all_comb[i,] # Get the row of the combination i
+      I = comb$I # Number of genotypes
+      J = comb$J # Number of environments
+      s_alpha = comb$s_alpha # standard deviation of alpha
+      s_beta = comb$s_beta # standard deviation of alpha
+      s_y = comb$s_y # standard deviation of y
+      
     # load files
     filename = paste('AMBARTI',
                      'I', I,
