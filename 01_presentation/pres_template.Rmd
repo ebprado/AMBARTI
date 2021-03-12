@@ -110,7 +110,7 @@ $$
 
 ## Simulation: AMMI scenarios (20 combinations)
 
-We consider the following setting to generate a set of simulated data sets:
+We consider the following settings to generate a set of simulated data sets:
 $$
 y_{i j}=\mu+g_{i}+e_{j}+\sum_{q=1}^{Q} \lambda_{q} \gamma_{i q} \delta_{j q}+\epsilon_{i j}, \quad \epsilon_{i j} \sim \mathcal{N}\left(0, \tau^{-1}\right),
 $$
@@ -167,7 +167,7 @@ where
 \end{center}
 
 ## Simulation AMBARTI (4 combinations)
-We consider the following setting to generate a set of simulated data sets:
+We consider the following settings to generate a set of simulated data sets:
 $$
   \begin{aligned}
 y_{ij}|\textbf{x}_{ij}, \mathcal{T}, \mathcal{M}, \Theta, \sigma^{2} &\sim \mbox{N} \left( g_{i} + e_{j} + \textcolor{blue}{\sum_{t=1}^{T} h(\textbf{x}_{ij}, \mathcal{M}_{t}, \mathcal{T}_{t})}, \sigma^{2} \right), \\
@@ -207,7 +207,7 @@ $$
 European Union Horizon 2020 project INNOVAR: improve the efficacy and accuracy of European crop variety testing and on-farm decision-making.
 \vspace{0.4cm}
 
-INNOVAR is a collaboration between 22 different partnersacross Europe.
+INNOVAR is a collaboration between 22 different partners across Europe.
 \vspace{0.4cm}
 
 Each year has $\sim 20$ genotypes and $\sim 8$ environments (4 replicates).
