@@ -67,27 +67,27 @@ get_metrics = function(object, data, rep){
   sb = data$s_beta
   sy = data$s_y
 
-aux = data.frame(
-                 id           = id,
-                 rep          = rep,
-                 I            = I,
-                 J            = J,
-                 sa           = sa,
-                 sb           = sb,
-                 sy           = sy,
-                 Q            = Q,
-                 lambda       = lambda,
-                 y_train_rmse = rmse_y_train,
-                 y_test_rmse  = rmse_y_test,
-                 rmse_blinear = rmse_blinear,
-                 rrmse_g      = rrmse_g,
-                 rrmse_e      = rrmse_e,
-                 lambda_rrmse = rrmse_lambda,
-                 gamma_rrmse  = rrmse_gamma,
-                 delta_rrmse  = rrmse_delta
-                 )
+  aux = data.frame(
+    id           = id,
+    rep          = rep,
+    I            = I,
+    J            = J,
+    sa           = sa,
+    sb           = sb,
+    sy           = sy,
+    Q            = Q,
+    lambda       = lambda,
+    y_train_rmse = rmse_y_train,
+    y_test_rmse  = rmse_y_test,
+    rmse_blinear = rmse_blinear,
+    rrmse_g      = rrmse_g,
+    rrmse_e      = rrmse_e,
+    lambda_rrmse = rrmse_lambda,
+    gamma_rrmse  = rrmse_gamma,
+    delta_rrmse  = rrmse_delta
+  )
 
-return(aux)
+  return(aux)
 
 }
 
@@ -450,101 +450,101 @@ AMMI_help_plot <- function(object, data, Q = NULL){
 #'
 bAMMI_help_plot <- function(object, data, Q = NULL){
 
-# Get training info
-x_train = data$x
-y_train = data$y
+  # Get training info
+  x_train = data$x
+  y_train = data$y
 
-g_true = data$g
-e_true = data$e
-if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
-if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
-if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
-blinear_true = data$blinear
+  g_true = data$g
+  e_true = data$e
+  if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
+  if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
+  if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
+  blinear_true = data$blinear
 
-# Get test info
-x_test = data$x
-y_test = data$y_test
+  # Get test info
+  x_test = data$x
+  y_test = data$y_test
 
-# Get the number of PCs
-if(is.null(data$Q) == FALSE){Q = data$Q}
+  # Get the number of PCs
+  if(is.null(data$Q) == FALSE){Q = data$Q}
 
-# Get estimates info
-estimate   = object$BUGSoutput$mean
-mu_hat     = as.numeric(estimate$mu_all)
-# g_hat      = estimate$g
-# e_hat      = estimate$e
-g_hat      = estimate$alpha
-e_hat      = estimate$beta
-delta_hat  = estimate$delta
-gamma_hat  = estimate$gamma
-lambda_hat = estimate$lambda
+  # Get estimates info
+  estimate   = object$BUGSoutput$mean
+  mu_hat     = as.numeric(estimate$mu_all)
+  # g_hat      = estimate$g
+  # e_hat      = estimate$e
+  g_hat      = estimate$alpha
+  e_hat      = estimate$beta
+  delta_hat  = estimate$delta
+  gamma_hat  = estimate$gamma
+  lambda_hat = estimate$lambda
 
-# Set up the bilinear term
-blin_train = rep(0, length(y_train))
-blin_test  = rep(0, length(y_test))
+  # Set up the bilinear term
+  blin_train = rep(0, length(y_train))
+  blin_test  = rep(0, length(y_test))
 
-for (k in 1:Q) {
-  blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
-  blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
-}
+  for (k in 1:Q) {
+    blin_train = blin_train + lambda_hat[k]*gamma_hat[x_train[,'g'],k]*delta_hat[x_train[,'e'],k]
+    blin_test  = blin_test + lambda_hat[k]*gamma_hat[x_test[,'g'],k]*delta_hat[x_test[,'e'],k]
+  }
 
-# Compute the predicted response for the TRAINING data
-y_hat_train = mu_hat + g_hat[x_train[,'g']] + e_hat[x_train[,'e']] + blin_train
-# Compute the predicted response for the TEST data
-y_hat_test = mu_hat + g_hat[x_test[,'g']] + e_hat[x_test[,'e']] + blin_test
+  # Compute the predicted response for the TRAINING data
+  y_hat_train = mu_hat + g_hat[x_train[,'g']] + e_hat[x_train[,'e']] + blin_train
+  # Compute the predicted response for the TEST data
+  y_hat_test = mu_hat + g_hat[x_test[,'g']] + e_hat[x_test[,'e']] + blin_test
 
-# Get some MCMC info
-nburn      = object$BUGSoutput$n.burnin
-niter      = object$BUGSoutput$n.iter
-npost      = niter - nburn
-seq_burn   = seq(1, nburn, by=1)
+  # Get some MCMC info
+  nburn      = object$BUGSoutput$n.burnin
+  niter      = object$BUGSoutput$n.iter
+  npost      = niter - nburn
+  seq_burn   = seq(1, nburn, by=1)
 
-# Get estimates info
-id = 'Bayesian AMMI (no postproc)'
-estimate    = as.data.frame(object$BUGSoutput$sims.matrix)
-estimate$id = id
-estimate$Q  = Q
-#mu_hat     = estimate[-seq_burn,c('id',colnames(estimate)[grepl('mu_all', colnames(estimate))])]
-g_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^g*?(\\d+).*', colnames(estimate))])]
-e_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^e*?(\\d+).*', colnames(estimate))])]
-gamma_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('gamma', colnames(estimate))])]
-delta_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('delta', colnames(estimate))])]
-lambda_hat = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('lambda', colnames(estimate))])]
-if(Q==1) {colnames(lambda_hat)[3] = 'lambda[1]'}
+  # Get estimates info
+  id = 'Bayesian AMMI (no postproc)'
+  estimate    = as.data.frame(object$BUGSoutput$sims.matrix)
+  estimate$id = id
+  estimate$Q  = Q
+  #mu_hat     = estimate[-seq_burn,c('id',colnames(estimate)[grepl('mu_all', colnames(estimate))])]
+  g_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^g*?(\\d+).*', colnames(estimate))])]
+  e_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^e*?(\\d+).*', colnames(estimate))])]
+  gamma_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('gamma', colnames(estimate))])]
+  delta_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('delta', colnames(estimate))])]
+  lambda_hat = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('lambda', colnames(estimate))])]
+  if(Q==1) {colnames(lambda_hat)[3] = 'lambda[1]'}
 
-# Remove columns id and Q
-m_vars_g      = colnames(g_hat)[-which(colnames(g_hat) %in% c('id', 'Q'))]
-m_vars_e      = colnames(e_hat)[-which(colnames(e_hat) %in% c('id', 'Q'))]
-m_vars_lambda = colnames(lambda_hat)[-which(colnames(lambda_hat) %in% c('id', 'Q'))]
-m_vars_gamma  = colnames(gamma_hat)[-which(colnames(gamma_hat) %in% c('id', 'Q'))]
-m_vars_delta  = colnames(delta_hat)[-which(colnames(delta_hat) %in% c('id', 'Q'))]
+  # Remove columns id and Q
+  m_vars_g      = colnames(g_hat)[-which(colnames(g_hat) %in% c('id', 'Q'))]
+  m_vars_e      = colnames(e_hat)[-which(colnames(e_hat) %in% c('id', 'Q'))]
+  m_vars_lambda = colnames(lambda_hat)[-which(colnames(lambda_hat) %in% c('id', 'Q'))]
+  m_vars_gamma  = colnames(gamma_hat)[-which(colnames(gamma_hat) %in% c('id', 'Q'))]
+  m_vars_delta  = colnames(delta_hat)[-which(colnames(delta_hat) %in% c('id', 'Q'))]
 
-g_hat      = melt(g_hat,  measure.vars = m_vars_g)
-e_hat      = melt(e_hat,   measure.vars = m_vars_e)
-lambda_hat = melt(lambda_hat, measure.vars = m_vars_lambda)
-gamma_hat  = melt(gamma_hat,  measure.vars = m_vars_gamma)
-delta_hat  = melt(delta_hat,  measure.vars = m_vars_delta)
+  g_hat      = melt(g_hat,  measure.vars = m_vars_g)
+  e_hat      = melt(e_hat,   measure.vars = m_vars_e)
+  lambda_hat = melt(lambda_hat, measure.vars = m_vars_lambda)
+  gamma_hat  = melt(gamma_hat,  measure.vars = m_vars_gamma)
+  delta_hat  = melt(delta_hat,  measure.vars = m_vars_delta)
 
-g_hat$true      = rep(g_true,  each=npost)
-e_hat$true      = rep(e_true,   each=npost)
-lambda_hat$true = rep(lambda_true, each=npost)
-gamma_hat$true  = rep(gamma_true,  each=npost)
-delta_hat$true  = rep(delta_true,  each=npost)
+  g_hat$true      = rep(g_true,  each=npost)
+  e_hat$true      = rep(e_true,   each=npost)
+  lambda_hat$true = rep(lambda_true, each=npost)
+  gamma_hat$true  = rep(gamma_true,  each=npost)
+  delta_hat$true  = rep(delta_true,  each=npost)
 
-aux_blinear_hat = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
-aux_y_hat_train = data.frame(id = id, Q = Q, variable = 'yhattrain', value = y_train - y_hat_train, true = y_train)
-aux_y_hat_test  = data.frame(id = id, Q = Q, variable = 'yhattest', value = y_test - y_hat_test, true = y_test)
+  aux_blinear_hat = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
+  aux_y_hat_train = data.frame(id = id, Q = Q, variable = 'yhattrain', value = y_train - y_hat_train, true = y_train)
+  aux_y_hat_test  = data.frame(id = id, Q = Q, variable = 'yhattest', value = y_test - y_hat_test, true = y_test)
 
-return(list(g_hat       = g_hat,
-            e_hat       = e_hat,
-            delta_hat   = delta_hat,
-            gamma_hat   = gamma_hat,
-            lambda_hat  = lambda_hat,
-            blinear_hat = aux_blinear_hat,
-            y_hat_train = aux_y_hat_train,
-            y_hat_test  = aux_y_hat_test,
-            Q           = Q,
-            id          = id))
+  return(list(g_hat       = g_hat,
+              e_hat       = e_hat,
+              delta_hat   = delta_hat,
+              gamma_hat   = gamma_hat,
+              lambda_hat  = lambda_hat,
+              blinear_hat = aux_blinear_hat,
+              y_hat_train = aux_y_hat_train,
+              y_hat_test  = aux_y_hat_test,
+              Q           = Q,
+              id          = id))
 }
 
 #' @export
@@ -752,8 +752,8 @@ AMBARTI_help_plot <- function(object, data){
   id = 'AMBARTI'
   # estimate_g  = as.data.frame(object$g_hat)
   # estimate_e  = as.data.frame(object$e_hat)
-  # g_hat       = estimate_g[,grepl('^g', names(estimate_g))]
-  # e_hat       = estimate_e[,grepl('^e', names(estimate_e))]
+  # g_hat       = estimate_g[,grepl('^g', names(estimate_g))] - object$y_mean
+  # e_hat       = estimate_e[,grepl('^e', names(estimate_e))] - object$y_mean
   estimate  = as.data.frame(object$beta_hat) - object$y_mean
   g_hat       = estimate[,grepl('^g', names(estimate))]
   e_hat       = estimate[,grepl('^e', names(estimate))]
