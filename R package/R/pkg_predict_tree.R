@@ -38,8 +38,8 @@ predict_ambarti = function(object, newdata,
   # Sort out what to return
   out = switch(type,
                all = object$y_mean + object$y_sd * y_hat_mat,
-               mean = object$y_mean + new_x%*%apply(object$beta_hat,2,'mean') + object$y_sd * apply(y_hat_mat,2,'mean'),
-               median = object$y_mean + new_x%*%apply(object$beta_hat,2,'median') + object$y_sd * apply(y_hat_mat,2,'median'))
+               mean = object$y_mean + new_x%*%c(apply(ambarti$g_hat,2,'mean'), apply(ambarti$e_hat,2,'mean')) + object$y_sd * apply(y_hat_mat,2,'mean'),
+               median = object$y_mean + new_x%*%c(apply(ambarti$g_hat,2,'median'), apply(ambarti$e_hat,2,'median')) + object$y_sd * apply(y_hat_mat,2,'median'))
 
   return(out)
 

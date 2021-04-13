@@ -289,8 +289,8 @@ organise_AMBARTI <- function(object, data){
   estimate_g  = apply(object$g_hat, 2, mean)
   estimate_e  = apply(object$e_hat, 2, mean)
   # estimate  = apply(object$beta_hat, 2, mean) - object$y_mean
-  g_hat       = estimate_g[grepl('^g', names(estimate_g))]
-  e_hat       = estimate_e[grepl('^e', names(estimate_e))]
+  g_hat       = estimate_g[grepl('^g', names(estimate_g))] - object$y_mean
+  e_hat       = estimate_e[grepl('^e', names(estimate_e))] - object$y_mean
   # g_hat       = estimate[grepl('^g', names(estimate))]
   # e_hat       = estimate[grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
