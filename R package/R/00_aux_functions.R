@@ -104,10 +104,10 @@ organise_classical_AMMI <- function(object, data, Q = NULL){
   y_test = data$y_test
 
   mu_hat     = object$mu_hat
-  # g_hat      = object$g_hat
-  # e_hat      = object$e_hat
-  g_hat      = object$alpha_hat
-  e_hat      = object$beta_hat
+  g_hat      = object$g_hat
+  e_hat      = object$e_hat
+  # g_hat      = object$alpha_hat
+  # e_hat      = object$beta_hat
   lambda_hat = object$lambda_hat
   gamma_hat  = object$gamma_hat
   delta_hat  = object$delta_hat
