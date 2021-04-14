@@ -13,6 +13,11 @@ predict_ambarti = function(object, newdata,
   x_e_test = new_x[,grepl('^e', colnames(new_x))]
   x_g_test = new_x[,grepl('^g', colnames(new_x))]
 
+  g_estimates_mean = apply(object$g_hat,2,'mean') - object$y_mean
+  e_estimates_mean = apply(object$e_hat,2,'mean') - object$y_mean
+  g_estimates_median = apply(object$g_hat,2,'median') - object$y_mean
+  e_estimates_median = apply(object$e_hat,2,'median') - object$y_mean
+
   n_its = object$npost
   y_hat_mat = matrix(NA, nrow = n_its,
                      ncol = nrow(new_x))
@@ -38,8 +43,8 @@ predict_ambarti = function(object, newdata,
   # Sort out what to return
   out = switch(type,
                all = object$y_mean + object$y_sd * y_hat_mat,
-               mean = object$y_mean + new_x%*%c(apply(object$g_hat,2,'mean'), apply(object$e_hat,2,'mean')) + object$y_sd * apply(y_hat_mat,2,'mean'),
-               median = object$y_mean + new_x%*%c(apply(object$g_hat,2,'median'), apply(object$e_hat,2,'median')) + object$y_sd * apply(y_hat_mat,2,'median'))
+               mean = object$y_mean + new_x%*%c(g_estimates_mean, e_estimates_mean) + object$y_sd * apply(y_hat_mat,2,'mean'),
+               median = object$y_mean + new_x%*%c(g_estimates_median, e_estimates_median) + object$y_sd * apply(y_hat_mat,2,'median'))
 
   return(out)
 
