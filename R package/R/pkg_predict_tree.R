@@ -43,8 +43,8 @@ predict_ambarti = function(object, newdata,
   # Sort out what to return
   out = switch(type,
                all = object$y_mean + object$y_sd * y_hat_mat,
-               mean = new_x%*%c(g_estimates_mean, e_estimates_mean) + object$y_sd * apply(y_hat_mat,2,'mean'),
-               median = new_x%*%c(g_estimates_median, e_estimates_median) + object$y_sd * apply(y_hat_mat,2,'median'))
+               mean = object$y_mean + new_x%*%c(g_estimates_mean, e_estimates_mean) + object$y_sd * apply(y_hat_mat,2,'mean'),
+               median = object$y_mean + new_x%*%c(g_estimates_median, e_estimates_median) + object$y_sd * apply(y_hat_mat,2,'median'))
 
   return(out)
 
