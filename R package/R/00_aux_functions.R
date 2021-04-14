@@ -388,10 +388,10 @@ AMMI_help_plot <- function(object, data, Q = NULL){
 
   # Get parameter estimates
   mu_hat     = object$mu_hat
-  # g_hat      = object$g_hat
-  # e_hat      = object$e_hat
-  g_hat      = object$alpha_hat
-  e_hat      = object$beta_hat
+  g_hat      = object$g_hat
+  e_hat      = object$e_hat
+  # g_hat      = object$alpha_hat
+  # e_hat      = object$beta_hat
   lambda_hat = object$lambda_hat
   gamma_hat  = object$gamma_hat
   delta_hat  = object$delta_hat
@@ -750,13 +750,13 @@ AMBARTI_help_plot <- function(object, data){
 
   # Get estimates info
   id = 'AMBARTI'
-  # estimate_g  = as.data.frame(object$g_hat)
-  # estimate_e  = as.data.frame(object$e_hat)
-  # g_hat       = estimate_g[,grepl('^g', names(estimate_g))] - object$y_mean
-  # e_hat       = estimate_e[,grepl('^e', names(estimate_e))] - object$y_mean
-  estimate  = as.data.frame(object$beta_hat) - object$y_mean
-  g_hat       = estimate[,grepl('^g', names(estimate))]
-  e_hat       = estimate[,grepl('^e', names(estimate))]
+  estimate_g  = as.data.frame(object$g_hat)
+  estimate_e  = as.data.frame(object$e_hat)
+  g_hat       = estimate_g[,grepl('^g', names(estimate_g))] - object$y_mean
+  e_hat       = estimate_e[,grepl('^e', names(estimate_e))] - object$y_mean
+  # estimate  = as.data.frame(object$beta_hat) - object$y_mean
+  # g_hat       = estimate[,grepl('^g', names(estimate))]
+  # e_hat       = estimate[,grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
 
   if(is.null(data$y_test) == FALSE) {
