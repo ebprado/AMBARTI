@@ -25,10 +25,10 @@ get_metrics = function(object, data, rep){
   rmse_y_test  = RMSE(y_test, y_hat_test)
   rmse_blinear = RMSE(blinear, blinear_hat)
 
-  # g  = data$g
-  # e  = data$e
-  g  = data$alpha
-  e  = data$beta
+  g  = data$g
+  e  = data$e
+  # g  = data$alpha
+  # e  = data$beta
   if (is.null(data$lambda) == FALSE) {lambda = data$lambda}
   if (is.null(data$gamma) == FALSE) {gamma   = data$gamma}
   if (is.null(data$delta) == FALSE) {delta   = data$delta}
@@ -61,10 +61,10 @@ get_metrics = function(object, data, rep){
 
   I  = data$I
   J  = data$J
-  # sa = data$s_g
-  # sb = data$s_e
-  sa = data$s_alpha
-  sb = data$s_beta
+  sa = data$s_g
+  sb = data$s_e
+  # sa = data$s_alpha
+  # sb = data$s_beta
   sy = data$s_y
 
   aux = data.frame(
