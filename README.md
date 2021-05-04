@@ -7,7 +7,7 @@ In addition, it provides an implementation of AMBARTI in the format of an R pack
 ## Installation
 ``` r
 library(devtools)
-install_github("ebprado/AMBARTI/R package")
+install_github("ebprado/AMBARTI/R package", ref='main')
 ```
 Below, we fit AMBARTI to a simulated example from the equation of the Bayesian Additive Main effects and Multiplicative Interaction (AMMI) effects model presented in [Josse et al (JABES, 2014)](https://link.springer.com/content/pdf/10.1007/s13253-014-0168-z.pdf).
 
@@ -17,75 +17,55 @@ library(AMBARTI)
 rm(list = ls())
 
 # Simulate data -----------------------------------------------------------
+I          = 10 # Number of genotypes
+J          = 10 # Number of environments
+s_alpha    = 1 # standard deviation of alpha
+s_beta     = 1 # standard deviation of alpha
+s_y        = 1 # standard deviation of y
+lambda     = c(10, 8) # values for lambda
 
-# Specify fixed values
-Q = 1 # Number of components
-I = 10 # Number of genotypes
-J = 10 # Number of environments
-N = I*J # Total number of obs
+# Set a seed to make it reproducible
+set.seed(001)
 
-# Some further fixed values
-mu = 10 # Grand mean
-sigma_E = 1
-sigma_alpha = 2
-sigma_beta = 2
-alpha = rnorm(I, 0, sigma_alpha)
-beta = rnorm(J, 0, sigma_beta)
-lambda_1 = 12
-gamma = seq(2, -2,length.out = I)/sqrt(10)
-delta = seq(-0.5, 0.5,length.out = J)
+# Generate data from the AMMI model  
+data = generate_data_AMMI(I, J, s_alpha, s_beta, s_y, lambda)
+data_test = generate_data_AMMI(I, J, s_alpha, s_beta, s_y, lambda)
 
-# Now simulate the values
-set.seed(123)
-G_by_E = expand.grid(1:I, 1:J) ## setting the interaction matrix
-mu_ij = mu + alpha[G_by_E[,1]] + beta[G_by_E[,2]]  +
-lambda_1 * gamma[G_by_E[,1]] * delta[G_by_E[,2]] ## maybe insert lambda2
-Y = rnorm(N, mu_ij, sigma_E) ## response variable
+# run classical AMMI
+classical_AMMI = run_classical_AMMI(data)
 
-# ---------------------------------------
-# AMBARTI
-# ---------------------------------------
-
-# Some pre-processing
-x.ambarti = G_by_E
-names(x.ambarti) = c('g', 'e')
-x.ambarti$g = as.factor(x.ambarti$g)
-x.ambarti$e = as.factor(x.ambarti$e)
-y = Y
-set.seed(101)
-
-# Run AMBARTI
-fit.ambarti = ambarti(x.ambarti, y, ntrees = 50, nburn = 100, npost = 100, sparse= FALSE)
+# run AMBARTI
+fit.ambarti = run_AMBARTI(data, ntrees = 50, nburn = 1000, npost = 1000) # it takes a little while
 
 # Get the final prediction (y hat)
 yhat_ambarti = apply(fit.ambarti$y_hat, 2, mean)
-yhat_ambarti2 = predict_ambarti(fit.ambarti, newdata = x.ambarti, type = 'mean')
-cor(y, yhat_ambarti);
+yhat_ambarti2 = predict_ambarti(fit.ambarti, newdata = data_test$x , type = 'mean')
+cor(data$y, yhat_ambarti);
 
 # Get the prediction specifically from BART
-yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean);
-cor(y, yhat_bart); # correlation btw y and the BART component (from AMBARTI)
+yhat_bart = apply(fit.ambarti$y_hat_bart, 2, mean)
+cor(data$y, yhat_bart); # correlation btw y and the BART component (from AMBARTI)
 
 # Plot the main effects estimates and add the true values
-alpha_hat = apply(fit.ambarti$beta_hat[,1:10], 2, mean)
-plot(1:length(alpha), alpha, col=2, cex=2, main='AMBARTI-Genotype', ylim=c(-5,5)) # true values
-points(alpha_hat, cex=2, pch = 2) # estimates
-legend(8,4,'AMBARTI', col=1, pch = 2)
-legend(8,5,'True', col=2, pch = 1, cex=1)
+g_hat = apply(fit.ambarti$g_hat, 2, mean)
+plot(1:length(data$g), data$g, col=2, cex=2, main='AMBARTI-Genotype', ylim=c(-5,5)) # true values
+points(g_hat, cex=2, pch = 2) # estimates
+legend(7,4,'AMBARTI', col=1, pch = 2, bty='n')
+legend(7,5,'True', col=2, pch = 1, cex=1, bty='n')
 
 # Plot the main effects estimates and add the true values
-beta_hat = apply(fit.ambarti$beta_hat[,11:20], 2, mean)
-plot(1:length(beta), beta, col=2, cex=2, main='AMBARTI-Environment', ylim=c(-5,5)) # true values
-points(beta_hat, cex=2) # estimates
-legend(8,4,'AMBARTI', col=1, pch = 2)
-legend(8,5,'True', col=2, pch = 1, cex=1)
+e_hat = apply(fit.ambarti$e_hat, 2, mean)
+plot(1:length(data$e), data$e, col=2, cex=2, main='AMBARTI-Environment', ylim=c(-5,5)) # true values
+points(e_hat, cex=2, pch = 2) # estimates
+legend(7,4,'AMBARTI', col=1, pch = 2, bty='n')
+legend(7,5,'True', col=2, pch = 1, cex=1, bty='n')
 
-fit.ambarti$trees[[100]][[1]] # show the first tree in the last (100) MCMC iteration.
+fit.ambarti$trees[[100]][[1]] # show the first tree in the 100th MCMC iteration.
 
 # ---------------------------------------
 # BART (just to have a benchmark)
 # ---------------------------------------
-library(BART)
-bart = BART::wbart(x.ambarti, y)
-cor(y, bart$yhat.train.mean)
+library(dbarts)
+bart = dbarts::bart2(data$x, data$y)
+cor(data$y, bart$yhat.train.mean)
 ```
