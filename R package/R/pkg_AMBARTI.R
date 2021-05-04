@@ -278,8 +278,8 @@ ambarti = function(x,
               ntrees     = ntrees,
               y_mean     = y_mean,
               y_sd       = y_sd,
-              g_hat      = g_e_hat_store[, grepl('^g', colnames(x))]*y_sd + y_mean,
-              e_hat      = g_e_hat_store[, grepl('^e', colnames(x))]*y_sd + y_mean,
+              g_hat      = g_e_hat_store[, grepl('^g', colnames(x))]*y_sd,
+              e_hat      = g_e_hat_store[, grepl('^e', colnames(x))]*y_sd,
               x          = x))
 
 } # End main function
