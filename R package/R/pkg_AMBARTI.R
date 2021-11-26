@@ -126,7 +126,7 @@ ambarti = function(x,
   s_e = rep(1/p_e, p_e)
   sigma2_psi = diag(p)*sigma2_psi
   sigma2_psi_inv = solve(sigma2_psi)
-  random_effects = rep(0, length(y))
+  linear_effects = rep(0, length(y))
   yhat_bart = rep(0, length(y))
 
   # Create a list of trees for the initial stump
@@ -161,13 +161,15 @@ ambarti = function(x,
     }
 
     # Update the random effects alpha_i and beta_j
-    g_e_hat = update_linear_component(y_scale, 0, x, sigma2, sigma2_psi_inv)
-    random_effects = x%*%g_e_hat
+    partial_residuals = y_scale - yhat_bart # partial residuals for the linear terms
+    g_e_hat = update_linear_component(partial_residuals, 0, x, sigma2, sigma2_psi_inv)
+    linear_effects = x%*%g_e_hat
 
     # Start looping through trees
     for (j in 1:ntrees) {
 
-      current_partial_residuals = y_scale - (yhat_bart + random_effects) + tree_fits_store[,j]
+      # partial residuals for the trees
+      current_partial_residuals = y_scale - (yhat_bart + linear_effects) + tree_fits_store[,j]
 
       # Propose a new tree via grow/change/prune/swap
       type = sample(c('grow', 'prune'), 1)
@@ -246,7 +248,7 @@ ambarti = function(x,
     } # End loop through trees
 
     # Updating the final predictions
-    y_hat = random_effects + yhat_bart
+    y_hat = linear_effects + yhat_bart
 
     gi = g_e_hat[grepl('^g', colnames(x))]
     ej = g_e_hat[grepl('^e', colnames(x))]
