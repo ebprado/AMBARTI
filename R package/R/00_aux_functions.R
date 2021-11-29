@@ -165,10 +165,10 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
   # Get estimates info
   estimate   = object$BUGSoutput$sims.matrix
   mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
-  # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g*?(\\d+).*',  colnames(estimate))]]
-  # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e*?(\\d+).',   colnames(estimate))]]
-  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
-  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
+  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g\\[*',  colnames(estimate))]]
+  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e\\[',   colnames(estimate))]]
+  # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
+  # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
   delta_hat  = estimate[-seq_burn,colnames(estimate)[grepl('delta',  colnames(estimate))]]
   gamma_hat  = estimate[-seq_burn,colnames(estimate)[grepl('gamma',  colnames(estimate))]]
   lambda_hat = estimate[-seq_burn,colnames(estimate)[grepl('lambda', colnames(estimate))]]
