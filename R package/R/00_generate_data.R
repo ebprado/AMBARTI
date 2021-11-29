@@ -182,8 +182,6 @@ generate_data_AMBARTI = function(I,
   tree_store = vector('list', 1)
   p_g = ncol(x_g)
   p_e = ncol(x_e)
-  s_g = rep(1/p_g, p_g)
-  s_e = rep(1/p_e, p_e)
 
   # Create a list of trees for the initial stump
   curr_trees = create_stump(num_trees = ntrees, y = 1:nrow(x))
