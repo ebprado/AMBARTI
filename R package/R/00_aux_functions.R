@@ -325,10 +325,10 @@ organise_bayesian_AMMI_WITHOUT_postprocessing <- function(object, data, Q = NULL
   # Get estimates info
   estimate   = object$BUGSoutput$mean
   mu_hat     = as.numeric(estimate$mu_all)
-  # g_hat      = estimate$g
-  # e_hat      = estimate$e
-  g_hat      = estimate$alpha
-  e_hat      = estimate$beta
+  g_hat      = estimate$g
+  e_hat      = estimate$e
+  # g_hat      = estimate$alpha
+  # e_hat      = estimate$beta
   delta_hat  = estimate$delta
   gamma_hat  = estimate$gamma
   lambda_hat = estimate$lambda
