@@ -45,6 +45,8 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
 
   # First find which rows are terminal nodes
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
+  which_terminal_and_parent1 = which(tree$tree_matrix[,'terminal'] == 1 &
+                                     tree$tree_matrix[,'parent'] == 1)
 
   # Get node sizes for each terminal node
   nj = as.numeric(tree$tree_matrix[which_terminal,'node_size'])
@@ -62,6 +64,7 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
 
   # Put in just the ones that are useful
   tree$tree_matrix[which_terminal,'mu'] = mu
+  tree$tree_matrix[which_terminal_and_parent1, 'mu'] = 0 # set to zero the terminal node with no interaction which descends straight from the root node
 
   return(tree)
 }
@@ -70,7 +73,8 @@ simulate_mu_bart_prior = function(tree, mu_mu, sigma2_mu) {
 
   # First find which rows are terminal nodes
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
-
+  which_terminal_and_parent1 = which(tree$tree_matrix[,'terminal'] == 1 &
+                                       tree$tree_matrix[,'parent'] == 1)
   # Get node sizes for each terminal node
   nj = tree$tree_matrix[which_terminal,'node_size']
 
@@ -84,6 +88,7 @@ simulate_mu_bart_prior = function(tree, mu_mu, sigma2_mu) {
 
   # Put in just the ones that are useful
   tree$tree_matrix[which_terminal,'mu'] = mu
+  tree$tree_matrix[which_terminal_and_parent1, 'mu'] = 0 # set to zero the terminal node with no interaction which descends straight from the root node
 
   return(tree)
 }
