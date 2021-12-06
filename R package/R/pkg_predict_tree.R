@@ -13,11 +13,15 @@ predict_ambarti = function(object, newdata,
   x_e_test = new_x[,grepl('^e', colnames(new_x))]
   x_g_test = new_x[,grepl('^g', colnames(new_x))]
 
-  g_estimates_mean = apply(object$g_hat,2,'mean') - object$y_mean
-  e_estimates_mean = apply(object$e_hat,2,'mean') - object$y_mean
-  g_estimates_median = apply(object$g_hat,2,'median') - object$y_mean
-  e_estimates_median = apply(object$e_hat,2,'median') - object$y_mean
+  # g_estimates_mean = apply(object$g_hat,2,'mean') - object$y_mean
+  # e_estimates_mean = apply(object$e_hat,2,'mean') - object$y_mean
+  # g_estimates_median = apply(object$g_hat,2,'median') - object$y_mean
+  # e_estimates_median = apply(object$e_hat,2,'median') - object$y_mean
 
+  g_estimates_mean = apply(object$g_hat,2,'mean')
+  e_estimates_mean = apply(object$e_hat,2,'mean')
+  g_estimates_median = apply(object$g_hat,2,'median')
+  e_estimates_median = apply(object$e_hat,2,'median')
   n_its = object$npost
   y_hat_mat = matrix(NA, nrow = n_its,
                      ncol = nrow(new_x))
