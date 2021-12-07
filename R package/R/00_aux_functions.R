@@ -165,7 +165,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
   # Get estimates info
   estimate   = object$BUGSoutput$sims.matrix
   mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
-  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g\\[*',  colnames(estimate))]]
+  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g\\[',  colnames(estimate))]]
   e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e\\[',   colnames(estimate))]]
   # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
   # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
@@ -212,7 +212,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
 
     # Center matrix by row and column
     # Thank https://stackoverflow.com/questions/43639063/double-centering-in-r
-    resA = t(matrix_mu_ij*0 + colMeans(matrix_mu_ij))
+    resA = sweep(matrix_mu_ij*0, 2, -colMeans(matrix_mu_ij))
     resB = matrix_mu_ij*0 + rowMeans(matrix_mu_ij)
     res_double_centered = matrix_mu_ij - resA - resB + new_mu_hat # sum zero by row and column
 
@@ -473,10 +473,10 @@ bAMMI_help_plot <- function(object, data, Q = NULL){
   # Get estimates info
   estimate   = object$BUGSoutput$mean
   mu_hat     = as.numeric(estimate$mu_all)
-  # g_hat      = estimate$g
-  # e_hat      = estimate$e
-  g_hat      = estimate$alpha
-  e_hat      = estimate$beta
+  g_hat      = estimate$g
+  e_hat      = estimate$e
+  # g_hat      = estimate$alpha
+  # e_hat      = estimate$beta
   delta_hat  = estimate$delta
   gamma_hat  = estimate$gamma
   lambda_hat = estimate$lambda
@@ -507,8 +507,8 @@ bAMMI_help_plot <- function(object, data, Q = NULL){
   estimate$id = id
   estimate$Q  = Q
   #mu_hat     = estimate[-seq_burn,c('id',colnames(estimate)[grepl('mu_all', colnames(estimate))])]
-  g_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^g*?(\\d+).*', colnames(estimate))])]
-  e_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^e*?(\\d+).*', colnames(estimate))])]
+  g_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^g\\[', colnames(estimate))])]
+  e_hat      = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('^e\\[*', colnames(estimate))])]
   gamma_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('gamma', colnames(estimate))])]
   delta_hat  = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('delta', colnames(estimate))])]
   lambda_hat = estimate[-seq_burn,c('id','Q',colnames(estimate)[grepl('lambda', colnames(estimate))])]
@@ -579,10 +579,10 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   # Get estimates info
   estimate   = object$BUGSoutput$sims.matrix
   mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
-  # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g*?(\\d+).*',  colnames(estimate))]]
-  # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e*?(\\d+).',   colnames(estimate))]]
-  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
-  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
+  g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g\\[',  colnames(estimate))]]
+  e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e\\[',   colnames(estimate))]]
+  # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
+  # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
   delta_hat  = estimate[-seq_burn,colnames(estimate)[grepl('delta',  colnames(estimate))]]
   gamma_hat  = estimate[-seq_burn,colnames(estimate)[grepl('gamma',  colnames(estimate))]]
   lambda_hat = estimate[-seq_burn,colnames(estimate)[grepl('lambda', colnames(estimate))]]
@@ -625,8 +625,8 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
     new_e_hat    = new_mu_hat - colMeans(matrix_mu_ij) # their sum is 0
 
     # Center matrix by row and column
-    # Thank https://stackoverflow.com/questions/43639063/double-centering-in-r
-    resA = t(matrix_mu_ij*0 + colMeans(matrix_mu_ij))
+    # Thank to https://stackoverflow.com/questions/43639063/double-centering-in-r
+    resA = sweep(matrix_mu_ij*0, 2, -colMeans(matrix_mu_ij))
     resB = matrix_mu_ij*0 + rowMeans(matrix_mu_ij)
     res_double_centered = matrix_mu_ij - resA - resB + new_mu_hat # sum zero by row and column
 
@@ -754,8 +754,8 @@ AMBARTI_help_plot <- function(object, data){
   id = 'AMBARTI'
   estimate_g  = as.data.frame(object$g_hat)
   estimate_e  = as.data.frame(object$e_hat)
-  g_hat       = estimate_g[,grepl('^g', names(estimate_g))] - object$y_mean
-  e_hat       = estimate_e[,grepl('^e', names(estimate_e))] - object$y_mean
+  g_hat       = estimate_g[,grepl('^g', names(estimate_g))]
+  e_hat       = estimate_e[,grepl('^e', names(estimate_e))]
   # estimate  = as.data.frame(object$beta_hat) - object$y_mean
   # g_hat       = estimate[,grepl('^g', names(estimate))]
   # e_hat       = estimate[,grepl('^e', names(estimate))]
