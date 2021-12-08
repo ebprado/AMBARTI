@@ -207,11 +207,10 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
     # Get the matrix with mu_ij for each genotype and environment
     matrix_mu_ij  = matrix(mu_ij[i,], nrow=n_gen, ncol=n_env)
     new_mu_hat    = mean(matrix_mu_ij)
-    new_g_hat     = new_mu_hat - rowMeans(matrix_mu_ij) # their sum is 0
-    new_e_hat     = new_mu_hat - colMeans(matrix_mu_ij) # their sum is 0
+    new_g_hat     = rowMeans(matrix_mu_ij) - new_mu_hat # their sum is 0
+    new_e_hat     = colMeans(matrix_mu_ij) - new_mu_hat # their sum is 0
 
     # Center matrix by row and column
-    # Thank https://stackoverflow.com/questions/43639063/double-centering-in-r
     resA = sweep(matrix_mu_ij*0, 2, -colMeans(matrix_mu_ij))
     resB = matrix_mu_ij*0 + rowMeans(matrix_mu_ij)
     res_double_centered = matrix_mu_ij - resA - resB + new_mu_hat # sum zero by row and column
