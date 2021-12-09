@@ -9,14 +9,18 @@ RMSE <- function(true, predicted){
 
 #' @export
 #'
-get_metrics = function(object, data, rep){
+get_metrics = function(object, data, rep, postproc = FALSE){
 
   id          = object$id
   y_train     = data$y
   blinear     = data$blinear
   y_test      = data$y_test
   y_hat_train = object$y_hat_train
-  y_hat_test  = object$y_hat_test
+  if (id == 'AMBARTI') {
+    if (postproc==TRUE) {y_hat_test  = object$y_hat_test$with.postproc} else {y_hat_test  = object$y_hat_test$no.postproc}
+  } else {
+    y_hat_test = object$y_hat_test
+  }
   blinear_hat = object$blinear_hat
   if(is.na(object$Q)==FALSE) {Q = object$Q} else{Q = data$Q}
   if(is.null(Q)) {Q = NA}
@@ -272,6 +276,7 @@ organise_bayesian_AMMI_WITH_postprocessing <- function(object, data, Q = NULL){
 
 #' @export
 #'
+
 organise_AMBARTI <- function(object, data){
 
   # Get training info
@@ -295,18 +300,23 @@ organise_AMBARTI <- function(object, data){
   # g_hat       = estimate[grepl('^g', names(estimate))]
   # e_hat       = estimate[grepl('^e', names(estimate))]
   y_hat_train = apply(object$y_hat, 2, mean)
-  y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+  # y_hat_test  = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+  y_hat_test_aux  = predict_ambarti(object, x_test, type = 'mean')
+  y_hat_testwp  = as.numeric(y_hat_test_aux$wpostproc)
+  y_hat_testnp  = as.numeric(y_hat_test_aux$npostproc)
+
   blinear_hat = apply(object$y_hat_bart,2,mean) # to make it comparable with the AMMI estimates
 
   return(list(g_hat       = g_hat,
               e_hat       = e_hat,
-              y_hat_train = y_hat_train,
-              y_hat_test  = y_hat_test,
+              y_hat_train = y_hat_train, # without post-processing (for the moment)
+              y_hat_test  = list(with.postproc = y_hat_testwp, no.postproc = y_hat_testnp),
               blinear_hat = blinear_hat,
               Q           = NA,
               id          = 'AMBARTI'))
 
 }
+
 
 #' @export
 #'
