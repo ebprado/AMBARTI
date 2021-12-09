@@ -82,7 +82,7 @@ get_metrics = function(object, data, rep, postproc = FALSE){
   sy = data$s_y
 
   aux = data.frame(
-    id           = if (postproc==TRUE) {id = 'AMBARTI (PP)'} else {id = 'AMBARTI (no PP)'},
+    id           = if (postproc==TRUE) {id = 'AMBARTI (PP)'},
     rep          = rep,
     I            = I,
     J            = J,
