@@ -20,13 +20,19 @@ get_metrics = function(object, data, rep, postproc = FALSE){
     if (postproc==TRUE) {
       y_hat_test  = object$y_hat_test$with.postproc
       blinear_hat  = object$blinear_hat$with.postproc
+      g_hat  = object$g_hat - mean(object$g_hat)
+      e_hat  = object$e_hat - mean(object$e_hat)
     } else {
         y_hat_test  = object$y_hat_test$no.postproc
         blinear_hat  = object$blinear_hat$no.postproc
+        g_hat  = object$g_hat
+        e_hat  = object$e_hat
         }
   } else {
     y_hat_test = object$y_hat_test
     blinear_hat = object$blinear_hat
+    g_hat  = object$g_hat
+    e_hat  = object$e_hat
   }
 
   if(is.na(object$Q)==FALSE) {Q = object$Q} else{Q = data$Q}
@@ -43,9 +49,6 @@ get_metrics = function(object, data, rep, postproc = FALSE){
   if (is.null(data$lambda) == FALSE) {lambda = data$lambda}
   if (is.null(data$gamma) == FALSE) {gamma   = data$gamma}
   if (is.null(data$delta) == FALSE) {delta   = data$delta}
-
-  g_hat  = object$g_hat
-  e_hat  = object$e_hat
 
   rrmse_g = RRMSE(g, g_hat)
   rrmse_e = RRMSE(e, e_hat)
@@ -79,7 +82,7 @@ get_metrics = function(object, data, rep, postproc = FALSE){
   sy = data$s_y
 
   aux = data.frame(
-    id           = id,
+    id           = if (postproc==TRUE) {id = 'AMBARTI (PP)'} else {id = 'AMBARTI (no PP)'},
     rep          = rep,
     I            = I,
     J            = J,
