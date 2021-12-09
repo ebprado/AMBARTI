@@ -17,11 +17,18 @@ get_metrics = function(object, data, rep, postproc = FALSE){
   y_test      = data$y_test
   y_hat_train = object$y_hat_train
   if (id == 'AMBARTI') {
-    if (postproc==TRUE) {y_hat_test  = object$y_hat_test$with.postproc} else {y_hat_test  = object$y_hat_test$no.postproc}
+    if (postproc==TRUE) {
+      y_hat_test  = object$y_hat_test$with.postproc
+      blinear_hat  = object$blinear_hat$with.postproc
+    } else {
+        y_hat_test  = object$y_hat_test$no.postproc
+        blinear_hat  = object$blinear_hat$no.postproc
+        }
   } else {
     y_hat_test = object$y_hat_test
+    blinear_hat = object$blinear_hat
   }
-  blinear_hat = object$blinear_hat
+
   if(is.na(object$Q)==FALSE) {Q = object$Q} else{Q = data$Q}
   if(is.null(Q)) {Q = NA}
 
@@ -305,13 +312,20 @@ organise_AMBARTI <- function(object, data){
   y_hat_testwp  = as.numeric(y_hat_test_aux$wpostproc)
   y_hat_testnp  = as.numeric(y_hat_test_aux$npostproc)
 
+  I = data$I
+  J = data$J
   blinear_hat = apply(object$y_hat_bart,2,mean) # to make it comparable with the AMMI estimates
+  matBART = matrix(blinear_hat, nrow=I, ncol=J) # turns it into a g by e matrix
+  row.mean = sweep(matBART*0,2, -colMeans(matBART)) # take column means
+  col.mean = matBART*0 + rowMeans(matBART) # take row means
+  matBARTdc = mean(matBART) - row.mean - col.mean + matBART # double center
+  new_blinear_hat = as.numeric(matBARTdc)
 
   return(list(g_hat       = g_hat,
               e_hat       = e_hat,
               y_hat_train = y_hat_train, # without post-processing (for the moment)
               y_hat_test  = list(with.postproc = y_hat_testwp, no.postproc = y_hat_testnp),
-              blinear_hat = blinear_hat,
+              blinear_hat = list(with.postproc = new_blinear_hat, no.postproc = blinear_hat),
               Q           = NA,
               id          = 'AMBARTI'))
 
