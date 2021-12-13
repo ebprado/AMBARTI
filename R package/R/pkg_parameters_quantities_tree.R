@@ -18,10 +18,18 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
   # Function to compute log full conditional distirbution for an individual tree
   # R is a vector of partial residuals
 
-  # Need to calculate log complete conditional, involves a sum over terminal nodes
-
   # First find which rows are terminal nodes
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
+
+  # Identify those terminals that don't have a double split on g and e
+  terminal_ancestors = get_ancestors(tree) # get the ancestor for all terminal nodes
+  aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
+  aux_table = table(aux_ancestors[,1], aux_ancestors[,3]) # create a table to check whether or not the terminals have at least one g and one e.
+  which_terminal_no_double_split = as.numeric(rownames(which(aux_table==0, arr.ind = TRUE))) # return those terminals that don't have at least one g and one e.
+
+  # set up sigma2_mu = 0 for all which_terminal_no_double_split
+  sigma2_mu_aux = rep(sigma2_mu, length(which_terminal))
+  sigma2_mu_aux[which_terminal_no_double_split] = 0
 
   # Get node sizes for each terminal node
   nj = as.numeric(tree$tree_matrix[which_terminal,'node_size'])
@@ -31,8 +39,8 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
   S_j = aggregate(R, by = list(tree$node_indices), sum)[,2]
 
   # Now calculate the log posterior
-  log_post = 0.5 * ( sum(log( sigma2 / (nj*sigma2_mu + sigma2))) +
-              sum( (sigma2_mu* S_j^2) / (sigma2 * (nj*sigma2_mu + sigma2))))
+  log_post = 0.5 * ( sum(log( sigma2 / (nj*sigma2_mu_aux + sigma2))) +
+              sum( (sigma2_mu_aux* S_j^2) / (sigma2 * (nj*sigma2_mu_aux + sigma2))))
   return(log_post)
 }
 
@@ -45,8 +53,16 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
 
   # First find which rows are terminal nodes
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
-  which_terminal_and_parent1 = which(tree$tree_matrix[,'terminal'] == 1 &
-                                     tree$tree_matrix[,'parent'] == 1)
+
+  # Identify those terminals that don't have a double split on g and e
+  terminal_ancestors = get_ancestors(tree) # get the ancestor for all terminal nodes
+  aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
+  aux_table = table(aux_ancestors[,1], aux_ancestors[,3]) # create a table to check whether or not the terminals have at least one g and one e.
+  which_terminal_no_double_split = as.numeric(rownames(which(aux_table==0, arr.ind = TRUE))) # return those terminals that don't have at least one g and one e.
+
+  # set up sigma2_mu = 0 for all which_terminal_no_double_split
+  sigma2_mu_aux = rep(sigma2_mu, length(which_terminal))
+  sigma2_mu_aux[which_terminal_no_double_split] = 0
 
   # Get node sizes for each terminal node
   nj = as.numeric(tree$tree_matrix[which_terminal,'node_size'])
@@ -56,15 +72,15 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
 
   # Now calculate mu values
   mu = rnorm(length(nj) ,
-             mean = (sumR / sigma2) / (nj/sigma2 + sigma2_mu),
-             sd = sqrt(1/(nj/sigma2 + sigma2_mu)))
+             mean = (sumR / sigma2) / (nj/sigma2 + sigma2_mu_aux),
+             sd = sqrt(1/(nj/sigma2 + sigma2_mu_aux)))
 
   # Wipe all the old mus out for other nodes
   tree$tree_matrix[,'mu'] = NA
 
   # Put in just the ones that are useful
   tree$tree_matrix[which_terminal,'mu'] = mu
-  tree$tree_matrix[which_terminal_and_parent1, 'mu'] = 0 # set to zero the terminal node with no interaction which descends straight from the root node
+  tree$tree_matrix[which_terminal_no_double_split, 'mu'] = 0 # set to zero the terminal node with no interaction which descends straight from the root node
 
   return(tree)
 }
@@ -73,22 +89,31 @@ simulate_mu_bart_prior = function(tree, mu_mu, sigma2_mu) {
 
   # First find which rows are terminal nodes
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
-  which_terminal_and_parent1 = which(tree$tree_matrix[,'terminal'] == 1 &
-                                       tree$tree_matrix[,'parent'] == 1)
+
+  # Identify those terminals that don't have a double split on g and e
+  terminal_ancestors = get_ancestors(tree) # get the ancestor for all terminal nodes
+  aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
+  aux_table = table(aux_ancestors[,1], aux_ancestors[,3]) # create a table to check whether or not the terminals have at least one g and one e.
+  which_terminal_no_double_split = as.numeric(rownames(which(aux_table==0, arr.ind = TRUE))) # return those terminals that don't have at least one g and one e.
+
+  # set up sigma2_mu = 0 for all which_terminal_no_double_split
+  sigma2_mu_aux = rep(sigma2_mu, length(which_terminal))
+  sigma2_mu_aux[which_terminal_no_double_split] = 0
+
   # Get node sizes for each terminal node
   nj = tree$tree_matrix[which_terminal,'node_size']
 
   # Now calculate mu values
   mu = rnorm(length(nj) ,
              mean = mu_mu,
-             sd = sqrt(sigma2_mu))
+             sd = sqrt(sigma2_mu_aux))
 
   # Wipe all the old mus out for other nodes
   tree$tree_matrix[,'mu'] = NA
 
   # Put in just the ones that are useful
   tree$tree_matrix[which_terminal,'mu'] = mu
-  tree$tree_matrix[which_terminal_and_parent1, 'mu'] = 0 # set to zero the terminal node with no interaction which descends straight from the root node
+  tree$tree_matrix[which_terminal_no_double_split, 'mu'] = 0 # set to zero the terminal node with no interaction which descends straight from the root node
 
   return(tree)
 }
