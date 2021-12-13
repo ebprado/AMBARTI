@@ -4,6 +4,8 @@
 #' @importFrom MCMCpack 'rdirichlet'
 #' @importFrom truncnorm 'rtruncnorm'
 
+# x
+# y
 # ntrees = 10
 # node_min_size = 5
 # alpha = 0.95
