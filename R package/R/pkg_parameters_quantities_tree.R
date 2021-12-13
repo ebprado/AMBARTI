@@ -44,7 +44,6 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
   return(log_post)
 }
 
-
 # Simulate_par -------------------------------------------------------------
 
 simulate_mu = function(tree, R, sigma2, sigma2_mu) {
