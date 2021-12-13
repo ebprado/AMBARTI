@@ -32,7 +32,7 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
 
   # set up sigma2_mu = 0 for all which_terminal_no_double_split
   sigma2_mu_aux = rep(sigma2_mu, length(which_terminal))
-  sigma2_mu_aux[which_terminal_no_double_split] = 0
+  sigma2_mu_aux[which(which_terminal %in% which_terminal_no_double_split)] = 0
 
   # Get node sizes for each terminal node
   nj = as.numeric(tree$tree_matrix[which_terminal,'node_size'])
@@ -66,7 +66,7 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
   }
   # set up sigma2_mu = 0 for all which_terminal_no_double_split
   sigma2_mu_aux = rep(sigma2_mu, length(which_terminal))
-  sigma2_mu_aux[which_terminal_no_double_split] = 0
+  sigma2_mu_aux[which(which_terminal %in% which_terminal_no_double_split)] = 0
 
   # Get node sizes for each terminal node
   nj = as.numeric(tree$tree_matrix[which_terminal,'node_size'])
@@ -104,7 +104,7 @@ simulate_mu_bart_prior = function(tree, mu_mu, sigma2_mu) {
   }
   # set up sigma2_mu = 0 for all which_terminal_no_double_split
   sigma2_mu_aux = rep(sigma2_mu, length(which_terminal))
-  sigma2_mu_aux[which_terminal_no_double_split] = 0
+  sigma2_mu_aux[which(which_terminal %in% which_terminal_no_double_split)] = 0
 
   # Get node sizes for each terminal node
   nj = tree$tree_matrix[which_terminal,'node_size']
