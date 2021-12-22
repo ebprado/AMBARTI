@@ -163,8 +163,7 @@ ambarti = function(x,
     }
 
     # Update the random effects alpha_i and beta_j
-    partial_residuals = y_scale - yhat_bart # partial residuals for the linear terms
-    g_e_hat = update_linear_component(partial_residuals, 0, x, sigma2, sigma2_psi_inv)
+    g_e_hat = update_linear_component(y_scale, 0, x, sigma2, sigma2_psi_inv)
     linear_effects = x%*%g_e_hat
 
     # Start looping through trees
@@ -204,7 +203,7 @@ ambarti = function(x,
                                      index         = colnames(x_g_inter))
       } else {
 
-        # Our context, we can't prune a terminal node because we run the risk of removing either
+        # We can't prune a terminal node because we run the risk of removing either
         # a genotype or an environment. If we remove one of them, the predicted values
         # from the tree will be confounded with the main effect associated to the enviroment/genotype
         # removed.
@@ -231,7 +230,6 @@ ambarti = function(x,
       a = exp(l_new - l_old)
 
       # The current tree "becomes" the new tree, if the latter is better
-
       if(a > runif(1)) {
         curr_trees[[j]] = new_trees[[j]]
       }
