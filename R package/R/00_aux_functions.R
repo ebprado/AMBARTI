@@ -582,16 +582,16 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   # Get training info
   x_train = data$x
   y_train = data$y
-  g_true  = data$g
-  e_true  = data$e
+  if(is.null(data$y_test) == FALSE) {y_test      = data$y_test} else {y_test=NA}
+  if(is.null(data$g) == FALSE)      {g_true      = data$g} else {g_true=NA}
+  if(is.null(data$e) == FALSE)      {e_true      = data$e} else {e_true=NA}
   if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
   if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
   if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
-  blinear_true = data$blinear
+  if(is.null(data$blinear) == FALSE)  {blinear_true  = data$blinear}  else {blinear_true=NA}
 
   # Get test info
   x_test = data$x
-  y_test = data$y_test
 
   # Get the number of PCs
   if(is.null(data$Q) == FALSE){Q = data$Q}
@@ -607,8 +607,6 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   mu_hat     = estimate[-seq_burn,colnames(estimate)[grepl('mu_all', colnames(estimate))]]
   g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^g\\[',  colnames(estimate))]]
   e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('^e\\[',   colnames(estimate))]]
-  # g_hat      = estimate[-seq_burn,colnames(estimate)[grepl('alpha',  colnames(estimate))]]
-  # e_hat      = estimate[-seq_burn,colnames(estimate)[grepl('beta',   colnames(estimate))]]
   delta_hat  = estimate[-seq_burn,colnames(estimate)[grepl('delta',  colnames(estimate))]]
   gamma_hat  = estimate[-seq_burn,colnames(estimate)[grepl('gamma',  colnames(estimate))]]
   lambda_hat = estimate[-seq_burn,colnames(estimate)[grepl('lambda', colnames(estimate))]]
@@ -651,7 +649,6 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
     new_e_hat    = new_mu_hat - colMeans(matrix_mu_ij) # their sum is 0
 
     # Center matrix by row and column
-    # Thank to https://stackoverflow.com/questions/43639063/double-centering-in-r
     resA = sweep(matrix_mu_ij*0, 2, -colMeans(matrix_mu_ij))
     resB = matrix_mu_ij*0 + rowMeans(matrix_mu_ij)
     res_double_centered = matrix_mu_ij - resA - resB + new_mu_hat # sum zero by row and column
@@ -689,8 +686,8 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   new_delta_hat  = apply(snew_delta_hat,  2,mean)
 
   # Compute the bilinear term
-  new_blin_train = rep(0, length(y_train))
-  new_blin_test  = rep(0, length(y_test))
+  new_blin_train = rep(0, nrow(x_train))
+  new_blin_test  = rep(0, nrow(x_test))
 
   aux_new_gamma_hat = matrix(new_gamma_hat,ncol=Q)
   aux_new_delta_hat = matrix(new_delta_hat,ncol=Q)
@@ -744,7 +741,7 @@ bAMMI_help_plot_WITHPOS <- function(object, data, Q = NULL){
   snew_gamma_hat$true   = rep(gamma_true,  each=npost)
   snew_delta_hat$true   = rep(delta_true,  each=npost)
 
-  aux_blinear_hat   = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - new_blin_train, true = blinear_true)
+  aux_blinear_hat   = data.frame(id = id, Q = Q, variable = 'blinear', value = blinear_true - new_blin_train, true = blinear_true)
   aux_y_hat_train   = data.frame(id = id, Q = Q, variable = 'yhattrain', value = y_train - new_mu_ij_train, true = y_train)
   aux_y_hat_test    = data.frame(id = id, Q = Q, variable = 'yhattest', value = y_test - new_mu_ij_test, true = y_test)
 
