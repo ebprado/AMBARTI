@@ -482,16 +482,16 @@ bAMMI_help_plot <- function(object, data, Q = NULL){
   x_train = data$x
   y_train = data$y
 
-  g_true = data$g
-  e_true = data$e
+  if(is.null(data$y_test) == FALSE) {y_test      = data$y_test} else {y_test=NA}
+  if(is.null(data$g) == FALSE)      {g_true      = data$g} else {g_true=NA}
+  if(is.null(data$e) == FALSE)      {e_true      = data$e} else {e_true=NA}
   if(is.null(data$lambda) == FALSE) {lambda_true = data$lambda} else {lambda_true=NA}
   if(is.null(data$gamma) == FALSE)  {gamma_true  = data$gamma}  else {gamma_true=NA}
   if(is.null(data$delta) == FALSE)  {delta_true  = data$delta}  else {delta_true=NA}
-  blinear_true = data$blinear
+  if(is.null(data$blinear) == FALSE)  {blinear_true  = data$blinear}  else {blinear_true=NA}
 
   # Get test info
   x_test = data$x
-  y_test = data$y_test
 
   # Get the number of PCs
   if(is.null(data$Q) == FALSE){Q = data$Q}
@@ -501,8 +501,6 @@ bAMMI_help_plot <- function(object, data, Q = NULL){
   mu_hat     = as.numeric(estimate$mu_all)
   g_hat      = estimate$g
   e_hat      = estimate$e
-  # g_hat      = estimate$alpha
-  # e_hat      = estimate$beta
   delta_hat  = estimate$delta
   gamma_hat  = estimate$gamma
   lambda_hat = estimate$lambda
@@ -559,7 +557,7 @@ bAMMI_help_plot <- function(object, data, Q = NULL){
   gamma_hat$true  = rep(gamma_true,  each=npost)
   delta_hat$true  = rep(delta_true,  each=npost)
 
-  aux_blinear_hat = data.frame(id = id, Q = Q, variable = 'blinear', value = data$blinear - blin_train, true = blinear_true)
+  aux_blinear_hat = data.frame(id = id, Q = Q, variable = 'blinear', value = blinear_true - blin_train, true = blinear_true)
   aux_y_hat_train = data.frame(id = id, Q = Q, variable = 'yhattrain', value = y_train - y_hat_train, true = y_train)
   aux_y_hat_test  = data.frame(id = id, Q = Q, variable = 'yhattest', value = y_test - y_hat_test, true = y_test)
 
