@@ -22,12 +22,13 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
 
   # Identify those terminals that don't have a double split on g and e
-  terminal_ancestors = get_ancestors(tree) # get the ancestor for all terminal nodes
-  aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
-  which_terminal_no_double_split = NULL
   if(nrow(tree$tree_matrix) != 1) {
+    terminal_ancestors = get_ancestors(tree) # get the ancestor for all terminal nodes
+    aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
     aux_table = table(aux_ancestors[,1], aux_ancestors[,3]) # create a table to check whether or not the terminals have at least one g and one e.
     which_terminal_no_double_split = as.numeric(rownames(which(aux_table==0, arr.ind = TRUE))) # return those terminals that don't have at least one g and one e.
+  } else{
+    which_terminal_no_double_split = 1 # stump
   }
 
   # set up sigma2_mu = 0 for all which_terminal_no_double_split
@@ -43,11 +44,10 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
 
   # Now calculate the log posterior
   log_post = 0.5 * ( sum(log( sigma2 / (nj*sigma2_mu_aux + sigma2))) +
-              sum( (sigma2_mu_aux* S_j^2) / (sigma2 * (nj*sigma2_mu_aux + sigma2))))
+                       sum( (sigma2_mu_aux* S_j^2) / (sigma2 * (nj*sigma2_mu_aux + sigma2))))
   return(log_post)
 }
 
-# Simulate_par -------------------------------------------------------------
 
 simulate_mu = function(tree, R, sigma2, sigma2_mu) {
 
@@ -57,12 +57,13 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
   which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
 
   # Identify those terminals that don't have a double split on g and e
-  terminal_ancestors = get_ancestors(tree) # get the ancestor for all terminal nodes
-  aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
-  which_terminal_no_double_split = NULL
   if(nrow(tree$tree_matrix) != 1) {
+    terminal_ancestors = get_ancestors(tree) # get the ancestor for all terminal nodes
+    aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
     aux_table = table(aux_ancestors[,1], aux_ancestors[,3]) # create a table to check whether or not the terminals have at least one g and one e.
     which_terminal_no_double_split = as.numeric(rownames(which(aux_table==0, arr.ind = TRUE))) # return those terminals that don't have at least one g and one e.
+  } else {
+    which_terminal_no_double_split = 1 # stump
   }
   # set up sigma2_mu = 0 for all which_terminal_no_double_split
   sigma2_mu_aux = rep(sigma2_mu, length(which_terminal))
