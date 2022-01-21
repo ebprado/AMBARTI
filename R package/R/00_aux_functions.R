@@ -784,7 +784,7 @@ AMBARTI_help_plot <- function(object, data){
 
   if(is.null(data$y_test) == FALSE) {
     y_test       = data$y_test
-    y_hat_test   = as.numeric(predict_ambarti(object, x_test, type = 'mean'))
+    y_hat_test   = predict_ambarti(object, x_test, type = 'mean')$wpostproc
     names(g_hat) = paste(gsub('g','g[', names(g_hat)), ']', sep='')
     names(e_hat) = paste(gsub('e','e[', names(e_hat)), ']', sep='')
   } else {
