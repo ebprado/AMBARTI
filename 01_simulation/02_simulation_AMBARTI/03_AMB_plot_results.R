@@ -5,12 +5,14 @@ library(tidyverse)
 save_file = "~/R/AMBARTI/02_simulation_AMBARTI/results/"
 
 # Load the consolidated results
-load(paste(save_file, '00_AMB_results_consolidated.RData', sep=''))
+load(paste(save_file, '101000_AMB_results_consolidated.RData', sep='')); save_results10 = save_results
+load(paste(save_file, '252500_AMB_results_consolidated.RData', sep='')); save_results25 = save_results
 
 # Some preprocessing
-tab = save_results
-tab$id = factor(tab$id, levels = c('classical AMMI', 'Bayesian AMMI (postproc)', 'Bayesian AMMI (NO postproc)', 'AMBARTI'),
-                        labels = c('AMMI', 'B-AMMI (PP)', 'B-AMMI (No PP)', 'AMBARTI'))
+# tab = save_results10
+tab = rbind(save_results10, save_results25)
+tab$id = factor(tab$id, levels = c('classical AMMI', 'Bayesian AMMI (postproc)', 'Bayesian AMMI (NO postproc)', 'AMBARTI', 'AMBARTI (PP)'),
+                        labels = c('AMMI', 'B-AMMI', 'B-AMMI (No PP)', 'AMBARTI', 'AMBARTI (PP)'))
 
 tab$Q = factor(tab$Q, levels=c('1', '2', '3'), labels=c('Q=1', 'Q=2', 'Q=3'))
 tab$id = paste(tab$id,' (',tab$Q, ')', sep='')
@@ -23,13 +25,13 @@ tab$sa = factor(tab$sa, levels=c('1','5'), labels=c(expression(paste(sigma[g],' 
                 tab$sb = factor(tab$sb, levels=c('1','5'), labels=c(expression(paste(sigma[e],' = 1')), expression(paste(sigma[e],' = 5'))))
 tab$sy = as.factor(tab$sy)
 
-tab = tab %>% filter(id %in% c('AMMI (Q=1)', 'AMMI (Q=2)', 'AMMI (Q=3)', 'AMBARTI'), I != 'I = 50')
+tab = tab %>% filter(id %in% c('AMMI (Q=1)', 'AMMI (Q=2)', 'AMMI (Q=3)','B-AMMI (Q=1)', 'B-AMMI (Q=2)', 'B-AMMI (Q=3)', 'AMBARTI'), I != 'I = 50')
 
 # Generate plots
 save_plots = "~/R/AMBARTI/02_simulation_AMBARTI/"
 myplot <- function(varA, varB, varC){
 
-  pdf(paste(save_plots, 'AMBARTI_', varB, varA, '.pdf', sep=''), width = 9, height = 6)
+  pdf(paste(save_plots, 'new_AMBARTI_', varB, varA, '.pdf', sep=''), width = 9, height = 6)
   if (varA == 'sa'){aux = expression(sigma[g])}
   if (varA == 'sb'){aux = expression(sigma[e])}
 
@@ -44,7 +46,7 @@ myplot <- function(varA, varB, varC){
 
   xxx = tab %>%
     group_by(Q) %>%
-    filter((!!sym(varB)) < quantile(!!sym(varB), 0.9, na.rm = TRUE)) %>%
+    filter((!!sym(varB)) < quantile(!!sym(varB), 0.95, na.rm = TRUE)) %>%
     ggplot(aes_string(x = varA , y = varB, colour='id')) +
     geom_boxplot(outlier.shape = 1) +
     labs(
@@ -72,5 +74,6 @@ myplot <- function(varA, varB, varC){
 myplot('sa','rrmse_g', 'RRMSE - g')
 myplot('sa','rrmse_e',  'RRMSE - e')
 myplot('sa','rmse_blinear', 'RMSE - Interaction')
-myplot('sa','y_train_rmse', 'RMSE - y train')
+#myplot('sa','y_train_rmse', 'RMSE - y train')
 myplot('sa','y_test_rmse', 'RMSE - y test')
+

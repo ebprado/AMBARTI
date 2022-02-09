@@ -1,11 +1,12 @@
 library(devtools)
-install_github("ebprado/AMBARTI/R package")
+install_github("ebprado/AMBARTI/R package",
+               ref = 'main')
 library(AMBARTI)
 
 save_file = "~/R/AMBARTI/02_simulation_AMBARTI/results/"
 
-I = c(10) # c(5, 25, 50) # Number of genotypes
-J = c(10) # c(5, 25, 50) # Number of environments
+I = c(25) # c(5, 25, 50) # Number of genotypes
+J = c(25) # c(5, 25, 50) # Number of environments
 s_alpha = c(1,5) # c(1, 5) # standard deviation of alpha
 s_beta = c(1,5) # c(1, 5) # standard deviation of beta
 s_y = 1 # c(1, 5) # standard deviation of y
@@ -23,16 +24,16 @@ n_comb = nrow(all_comb)
 save_results = NULL
 
   for (j in 1:n_rep){
-
+    
     for (i in 1:n_comb){
-
+      
       comb = all_comb[i,] # Get the row of the combination i
       I = comb$I # Number of genotypes
       J = comb$J # Number of environments
       s_alpha = comb$s_alpha # standard deviation of alpha
       s_beta = comb$s_beta # standard deviation of alpha
       s_y = comb$s_y # standard deviation of y
-
+      
     # load files
     filename = paste('AMBARTI',
                      'I', I,
@@ -91,7 +92,8 @@ save_results = NULL
     metrics_bAMMI_Q2 = get_metrics(res_bAMMI_without_post_Q2, data, j)
     metrics_bAMMI_Q3 = get_metrics(res_bAMMI_without_post_Q3, data, j)
 
-    metrics_ambarti = get_metrics(res_ambarti, data, j)
+    metrics_ambarti1 = get_metrics(res_ambarti, data, j, postproc=FALSE)
+    metrics_ambarti2 = get_metrics(res_ambarti, data, j, postproc=TRUE)
 
     save_results = rbind(save_results,
                          metrics_AMMI_Q1,
@@ -103,10 +105,11 @@ save_results = NULL
                          metrics_bAMMI_Q1,
                          metrics_bAMMI_Q2,
                          metrics_bAMMI_Q3,
-                         metrics_ambarti)
+                         metrics_ambarti1,
+                         metrics_ambarti2)
 
     print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
   }
 }
 
-save(save_results, file = paste(save_file, '00_AMB_results_consolidated.RData',    sep=''))
+save(save_results, file = paste(save_file, I, J, '00_AMB_results_consolidated.RData', sep=''))

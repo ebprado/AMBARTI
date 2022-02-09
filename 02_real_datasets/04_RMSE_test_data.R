@@ -237,10 +237,10 @@ validation(2018)
 validation(2019)
 
 #### Table 1 in the manuscript ------ 
-# results = NULL
-# for (year in 2010:2019){
-#   load(paste(save_file, 'Prediction_test_data_VCU_ireland_', year,  sep=''))  
-#   results = rbind(results, save)
-# }
-# head(results)
-# print(xtable(results[,c(1,3,7,2,4,5)]))
+results = NULL
+for (year in 2010:2019){
+  load(paste(save_file, 'Prediction_test_data_VCU_ireland_', year, '.RData',  sep=''))
+  results = rbind(results, save)
+}
+head(results)
+print(xtable(results[,c(1,3,7,2,4,5)]))

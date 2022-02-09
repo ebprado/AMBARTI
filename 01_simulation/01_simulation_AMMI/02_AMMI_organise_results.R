@@ -1,5 +1,6 @@
 library(devtools)
-install_github("ebprado/AMBARTI/R package")
+install_github("ebprado/AMBARTI/R package",
+               ref = 'main')
 library(AMBARTI)
 
 save_file = "~/R/AMBARTI/01_simulation_AMMI/results/"
@@ -25,9 +26,9 @@ n_comb = nrow(all_comb)
 save_results = NULL
 
 for (j in 1:n_rep){
-
+  
   for (i in 1:n_comb){
-
+    
     comb       = all_comb[i,] # Get the row of the combination i
     I          = comb$I # Number of genotypes
     J          = comb$J # Number of environments
@@ -48,20 +49,20 @@ for (j in 1:n_rep){
 
     data_filename    = paste(filename, '_data.RData',           sep='')
     ammi_filename    = paste(filename, '_classical_AMMI.RData', sep='')
-    # bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
+    bammi_filename   = paste(filename, '_bayesian_AMMI.RData',  sep='')
     ambarti_filename = paste(filename, '_AMBARTI.RData',        sep='')
 
     load(paste(save_file, data_filename,      sep=''))
     load(paste(save_file, ammi_filename,      sep=''))
-    # load(paste(save_file, bammi_filename,     sep=''))
+    load(paste(save_file, bammi_filename,     sep=''))
     load(paste(save_file, ambarti_filename,   sep=''))
 
     # Get parameter estimates from the classical AMMI
     res_AMMI = organise_classical_AMMI(classical_AMMI, data)
 
     # Get parameter estimates from the Bayesian AMMI
-    # res_bAMMI_with_post = organise_bayesian_AMMI_WITH_postprocessing(bayesian_AMMI, data)
-    # res_bAMMI_without_post = organise_bayesian_AMMI_WITHOUT_postprocessing(bayesian_AMMI, data)
+    res_bAMMI_with_post = organise_bayesian_AMMI_WITH_postprocessing(bayesian_AMMI, data)
+    res_bAMMI_without_post = organise_bayesian_AMMI_WITHOUT_postprocessing(bayesian_AMMI, data)
 
     # Get parameter estimates from AMBARTI
     res_ambarti = organise_AMBARTI(ambarti, data)
@@ -70,17 +71,19 @@ for (j in 1:n_rep){
     metrics_AMMI       = get_metrics(res_AMMI, data, j)
     metrics_bAMMI_post = get_metrics(res_bAMMI_with_post, data, j)
     metrics_bAMMI      = get_metrics(res_bAMMI_without_post, data, j)
-    metrics_ambarti    = get_metrics(res_ambarti, data, j)
+    metrics_ambarti1    = get_metrics(res_ambarti, data, j, postproc=FALSE)
+    metrics_ambarti2    = get_metrics(res_ambarti, data, j, postproc=TRUE)
 
     save_results = rbind(save_results,
                          metrics_AMMI,
                          metrics_bAMMI_post,
                          metrics_bAMMI,
-                         metrics_ambarti
+                         metrics_ambarti1,
+                         metrics_ambarti2
                          )
 
     print(paste('comb = ', i, ' out of ', n_comb , ' (rep = ', j, ')', sep=''))
   }
 }
 
-save(save_results, file = paste(save_file, '00_results_consolidated.RData',    sep=''))
+save(save_results, file = paste(save_file, I, J,'00_results_consolidated.RData', sep=''))

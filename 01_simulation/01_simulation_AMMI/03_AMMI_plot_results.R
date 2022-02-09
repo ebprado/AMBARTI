@@ -5,12 +5,14 @@ library(tidyverse)
 save_file = "~/R/AMBARTI/01_simulation_AMMI/results/"
 
 # Load the consolidated results
-load(paste(save_file, '00_results_consolidated.RData', sep=''))
+load(paste(save_file, '101000_results_consolidated.RData', sep='')); save_results10 = save_results
+# load(paste(save_file, '252500_results_consolidated.RData', sep='')); save_results25 = save_results
 
 # Some preprocessing
-tab = save_results
-tab$id = factor(tab$id, levels = c('AMBARTI', 'classical AMMI', 'Bayesian AMMI (NO postproc)', 'Bayesian AMMI (postproc)'),
-                        labels = c('AMBARTI', 'AMMI', 'B-AMMI (no PP)', 'B-AMMI (PP)'))
+# tab = rbind(save_results10, save_results25)
+tab = save_results10
+tab$id = factor(tab$id, levels = c('AMBARTI', 'AMBARTI (PP)', 'classical AMMI', 'Bayesian AMMI (NO postproc)', 'Bayesian AMMI (postproc)'),
+                        labels = c('AMBARTI', 'AMBARTI (PP)', 'AMMI', 'B-AMMI (no PP)', 'B-AMMI'))
 tab$Q = factor(tab$Q, levels = c('1','2','3'), labels = c('Q = 1', 'Q = 2', 'Q = 3'))
 tab$I = factor(tab$I, levels=c('10', '25', '50'), labels=c('I = 10', 'I = 25', 'I = 50'))
 tab$J = factor(tab$J, levels=c('10', '25', '50'), labels=c('J = 10', 'J = 25', 'I = 50'))
@@ -19,13 +21,13 @@ tab$sa = factor(tab$sa, levels=c('1','5'), labels=c(expression(paste(sigma[g],' 
 tab$sb = factor(tab$sb, levels=c('1','5'), labels=c(expression(paste(sigma[e],' = 1')), expression(paste(sigma[e],' = 5'))))
 tab$sy = as.factor(tab$sy)
 
-tab = tab %>% filter(id %in% c('AMBARTI', 'AMMI'))
+tab = tab %>% filter(id %in% c('AMBARTI', 'AMMI', 'B-AMMI'))
 
 # Generate plots
 save_plots = "~/R/AMBARTI/01_simulation_AMMI/"
 myplot <- function(varA, varB, varC, varD){
 
-  pdf(paste(save_plots, 'AMMI_', gsub(' = ', '', varD), '_' , varB, varA, '.pdf', sep=''), width = 8, height = 6)
+  pdf(paste(save_plots, 'new_AMMI_', gsub(' = ', '', varD), '_' , varB, varA, '.pdf', sep=''), width = 8, height = 6)
   if (varA == 'sa'){aux = expression(sigma[g])}
   if (varA == 'sb'){aux = expression(sigma[e])}
 
@@ -40,7 +42,7 @@ myplot <- function(varA, varB, varC, varD){
 
   xxx = tab %>%
     group_by(Q) %>%
-    filter((!!sym(varB)) < quantile(!!sym(varB), 0.9, na.rm = TRUE)) %>%
+    filter((!!sym(varB)) < quantile(!!sym(varB), 0.95, na.rm = TRUE)) %>%
     filter(I == varD) %>% 
     ggplot(aes_string(x = varA , y = varB, colour='id')) +
     geom_boxplot(outlier.shape = 1) +
@@ -77,21 +79,21 @@ myplot('sa','delta_rrmse', 'RRMSE - delta', num_gen_env)
 myplot('sa','rmse_blinear', 'RMSE - Interaction', num_gen_env)
 # myplot('sb','rmse_blinear', 'RMSE - Bilinear part')
 myplot('sa','y_test_rmse', 'RMSE - y test', num_gen_env)
-myplot('sa','y_train_rmse', 'RMSE - y train', num_gen_env)
+# myplot('sa','y_train_rmse', 'RMSE - y train', num_gen_env)
 
 # Check -----------
 # they're quite similar, but still different
-myplot('sa','lambda_rrmse', 'RRMSE - lambda')
-
-tab %>%
-  filter(id %in% c('AMMI', 'B-AMMI (postproc)'), Q == 'Q = 1', sa == '1') %>%
-  select(id,
-         lambda_rrmse,
-         sb)
-
-myplot('sa','rmse_blinear', 'RMSE - Bilinear part')
-tab %>%
-  filter(id %in% c('AMMI', 'B-AMMI (postproc)'), Q == 'Q = 1', sa == '1') %>%
-  select(id,
-         rmse_blinear,
-         sb)
+# myplot('sa','lambda_rrmse', 'RRMSE - lambda')
+# 
+# tab %>%
+#   filter(id %in% c('AMMI', 'B-AMMI (postproc)'), Q == 'Q = 1', sa == '1') %>%
+#   select(id,
+#          lambda_rrmse,
+#          sb)
+# 
+# myplot('sa','rmse_blinear', 'RMSE - Bilinear part')
+# tab %>%
+#   filter(id %in% c('AMMI', 'B-AMMI (postproc)'), Q == 'Q = 1', sa == '1') %>%
+#   select(id,
+#          rmse_blinear,
+#          sb)

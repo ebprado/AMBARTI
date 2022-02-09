@@ -1,5 +1,6 @@
 library(devtools)
-install_github("ebprado/AMBARTI/R package")
+install_github("ebprado/AMBARTI/R package",
+               ref = 'main')
 
 library(AMBARTI)
 save_file = "~/R/AMBARTI/02_simulation_AMBARTI/results/"

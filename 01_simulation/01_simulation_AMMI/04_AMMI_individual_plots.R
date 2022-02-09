@@ -1,8 +1,10 @@
 library(devtools)
-install_github("ebprado/AMBARTI/R package")
+install_github("ebprado/AMBARTI/R package",
+               ref = 'main',
+               auth_token = '363d4ad84eaa25d3eb26752732cc208f7e698086')
 
 library(AMBARTI)
-save_file = "/Users/estevaoprado/Documents/GitHub/AMBARTI/04_simulation/01_simulation_AMMI/results/"
+save_file = "~/R/AMBARTI/01_simulation_AMMI/results"
 
 #-------------------------------------------------
 # Individual plots
@@ -84,13 +86,13 @@ y_test_hat$id  = factor(y_test_hat$id,  levels = sort(as.character(unique(y_test
 # Box plots for the parameter estimates ----------
 
 plot_individual_boxplots <- function(object, data){
-
+  
   db = object
   names(db) = c('Method', 'Q', 'Parameter', 'value', 'true')
   aux_name = strsplit(deparse(substitute(object)), split = '_')[[1]][1]
   orig_labels = as.character(unique(object$variable))
   fixed_labels = new_parse_format(gsub(',','', orig_labels))
-
+  
   db %>%
     ggplot(aes(x=Parameter, y=value)) +
     geom_boxplot(aes(colour=Method))+
@@ -119,14 +121,14 @@ beta_hat %>% group_by(id) %>% summarise(mean=mean(value)) # Bayes AMMI (no postp
 ## Density plots for the DIFFERENCE (true - predicted)
 
 plot_individual_density <- function(object){
-
+  
   if (deparse(substitute(object)) == 'blinear_hat') {aux_title = expression(Sigma[q]~lambda[q]~gamma[iq]~delta[jq]~-~Sigma[q]~hat(lambda)[q]~hat(gamma)[iq]~hat(delta)[jq])}
   if (deparse(substitute(object)) == 'y_train_hat') {aux_title = expression('Training data:'~y - hat(y))}
   if (deparse(substitute(object)) == 'y_test_hat') {aux_title = expression('Test data:'~y - hat(y))}
-
+  
   db = object
   names(db) = c('Method', 'Q', 'Parameter', 'value', 'true')
-
+  
   db %>%
     ggplot(aes(x=value, colour=Method)) +
     geom_density(alpha=0.4)+
