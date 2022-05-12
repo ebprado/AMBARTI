@@ -17,10 +17,10 @@ generate_data_AMMI <- function(I, # Number of genotypes
 
   # Generate g (genotypes)
   g = rnorm(I, 0, s_g)
-
+  g = g - mean(g) # impose the sum-to-zero restriction
   # Generate e (environments)
   e = rnorm(J, 0, s_e)
-
+  e = e - mean(e) # impose the sum-to-zero restriction
   # Set the grand mean
   mu = 100
 
