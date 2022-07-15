@@ -184,7 +184,7 @@ generate_data_AMBARTI = function(I,
   p_e = ncol(x_e)
 
   # Create a list of trees for the initial stump
-  curr_trees = create_stump(num_trees = ntrees, y = 1:nrow(x))
+  curr_trees = create_stump(num_trees = ntrees, X = x)
 
   # Initialise the new trees as current one
   new_trees = curr_trees

@@ -6,18 +6,17 @@
 # 1. fill_tree_details: takes a tree matrix and returns the number of obs in each node in it and the indices of each observation in each terminal node
 # 2. get_predictions: gets the predicted values from a current set of trees
 # 3. get_children: it's a function that takes a node and, if the node is terminal, returns the node. If not, returns the children and calls the function again on the children
-# 4. resample: an auxiliar function
+# 4. resample: an auxiliary function
 # 5. create_interactions: create a new column that represents an interaction between two columns of a given X.
 # 5. create_covariates_prediction: for each MCMC iteration, it creates the covariates needed for each tree.
 # 6. get_ancestors:
 # Fill_tree_details -------------------------------------------------------
-
+# curr_tree = new_tree
+# node_to_split = parent_pick
 fill_tree_details = function(curr_tree, X, node_to_split = NULL) {
 
   # Collect right bits of tree
   tree_matrix = curr_tree$tree_matrix
-
-  # tree_matrix = curr_tree$tree_matrix
 
   # Create a new tree matrix to overwrite
   new_tree_matrix = tree_matrix
@@ -27,6 +26,7 @@ fill_tree_details = function(curr_tree, X, node_to_split = NULL) {
   if (is.null(node_to_split)== FALSE) {
     loop_indices = which(tree_matrix[,'parent'] == node_to_split) # only nodes that were just created
     node_indices = curr_tree$node_indices
+    node_indices[which(node_indices %in% loop_indices)] = node_to_split
   } else {
     loop_indices = 2:nrow(tree_matrix)
     node_indices = rep(1, nrow(X))
@@ -34,7 +34,6 @@ fill_tree_details = function(curr_tree, X, node_to_split = NULL) {
 
   # For all but the top row, find the number of observations falling into each one
   for(i in loop_indices) {
-
     # Get the parent
     curr_parent = as.numeric(tree_matrix[i,'parent'])
 
@@ -61,9 +60,12 @@ fill_tree_details = function(curr_tree, X, node_to_split = NULL) {
 
 } # End of function
 
-
 # Get predictions ---------------------------------------------------------
-
+# get_predictions(curr_trees[[j]], x_e_g_inter, single_tree = TRUE, internal=TRUE)
+# trees = curr_trees[[j]]
+# X = x_e_g_inter
+# single_tree = TRUE
+# internal=TRUE
 get_predictions = function(trees, X, single_tree = FALSE, internal) {
 
   # Stop nesting problems in case of multiple trees
@@ -187,3 +189,108 @@ get_ancestors = function(tree){
 
   return(save_ancestor)
 }
+
+sample_move = function(curr_tree, i, nburn){
+
+  if (nrow(curr_tree$tree_matrix) == 1 || i < max(floor(0.1*nburn), 10)) {
+    type = 'grow'
+  } else {
+    type = sample(c('grow', 'prune', 'change'), 1)
+  }
+  return(type)
+}
+
+get_ancestors = function(tree){
+
+  save_ancestor = NULL
+  which_terminal = which(tree$tree_matrix[,'terminal'] == 1)
+
+  if(nrow(tree$tree_matrix) == 1) {
+    save_ancestor = cbind(terminal = NULL,
+                          ancestor = NULL)
+  } else {
+    for (k in seq_len(length(which_terminal))) {
+      get_parent = as.numeric(as.character(tree$tree_matrix[which_terminal[k], 'parent'])) # get the 1st parent
+      get_split_var = as.character(tree$tree_matrix[get_parent, 'split_variable']) # then, get the covariate associated to the row of the parent
+
+      save_ancestor = rbind(save_ancestor,
+                            cbind(terminal = which_terminal[k],
+                                  # parent   = get_parent,
+                                  ancestor = get_split_var))
+      while (get_parent > 1){
+        get_parent = as.numeric(as.character(tree$tree_matrix[get_parent,'parent'])) # then, get the subsequent parent
+        get_split_var = as.character(tree$tree_matrix[get_parent, 'split_variable']) # then, get the covariate associated to the row of the new parent
+        save_ancestor = rbind(save_ancestor,
+                              cbind(terminal = which_terminal[k],
+                                    # parent   = get_parent,
+                                    ancestor = get_split_var))
+      }
+    }
+    save_ancestor = unique(save_ancestor) # remove duplicates
+    save_ancestor = save_ancestor[order(save_ancestor[,1], save_ancestor[,2]),] # sort by terminal and ancestor
+  }
+
+  return(save_ancestor)
+}
+
+get_ancestors_internal = function(tree){
+  save_ancestor = NULL
+  tree = tree$tree_matrix
+  which_internal = which(tree[,'terminal'] == 0)
+
+
+  if(nrow(tree) == 1) {
+    save_ancestor = cbind(internal = NULL,
+                          ancestor = NULL)
+  } else {
+    for (k in length(which_internal):1) {
+      internal_node = which_internal[k]
+      parent = as.numeric(tree[internal_node, 'parent'])
+      get_split_var = tree[internal_node, 'split_variable']
+
+      save_ancestor = rbind(save_ancestor,
+                            cbind(internal = internal_node,
+                                  parent   = parent,
+                                  split_var = get_split_var))
+      while (is.na(parent) == FALSE && parent > 0) {
+        get_split_var = tree[parent, 'split_variable']
+        parent = tree[parent, 'parent']
+        save_ancestor = rbind(save_ancestor,
+                              cbind(internal = internal_node,
+                                    parent   = parent,
+                                    split_var = get_split_var))
+      }
+    }
+  }
+  return(save_ancestor[,,drop=FALSE])
+
+}
+
+
+var_used_trees = function(object, raw = FALSE) {
+
+  # Create holder for predicted values
+  n_its = object$npost
+  ntrees = object$ntrees
+
+  # Get which covariates are used by each tree in each MCMC iteration
+  vars_trees = matrix(NA, nrow=n_its, ncol=ntrees)
+  for (i in seq_len(n_its)) {
+    for (j in seq_len(ntrees)) {
+      aux = object$trees[[i]][[j]]$tree_matrix[,'split_variable']
+      if(length(aux) > 1){
+        aux1 = aux[which(!is.na(aux))] # remove NAs
+        aux2 = substr(gsub("[0-9]|[[:punct:]]", "", aux1),1,1) # remove special chars and number and select the first element of each string
+        vars_trees[i,j] = paste(aux2, collapse = ',')
+      }
+    }
+  }
+  if(raw == TRUE) {return(data.frame(vars_trees))}
+  if(raw == FALSE) {
+    vars_trees = as.data.frame(table(vars_trees))
+    aux_count_var = strsplit(as.character(vars_trees[,'vars_trees']),',')
+    vars_trees$count = sapply(aux_count_var, function(x) length(x))
+    return(vars_trees)
+  }
+}
+

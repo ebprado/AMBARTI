@@ -14,7 +14,7 @@
 # Function to create stump ------------------------------------------------
 
 create_stump = function(num_trees,
-                        y) {
+                        X) {
 
   # Each tree is a list of 2 elements
   # The 2 elements are the tree matrix (8 columns), and the node indices
@@ -41,7 +41,7 @@ create_stump = function(num_trees,
     all_trees[[j]][[1]] = matrix(NA, ncol = 8, nrow = 1)
 
     # Second is the assignment to node indices
-    all_trees[[j]][[2]] = rep(1, length(y))
+    all_trees[[j]][[2]] = rep(1, nrow(X))
 
     # Create column names
     colnames(all_trees[[j]][[1]]) = c('terminal',
@@ -54,7 +54,7 @@ create_stump = function(num_trees,
                                       'node_size')
 
     # Set values for stump
-    all_trees[[j]][[1]][1,] = c(1, NA, NA, NA, NA, NA, 0 , length(y))
+    all_trees[[j]][[1]][1,] = c(1, NA, NA, NA, NA, NA, 0 , nrow(X))
 
   } # End of loop through trees
 
@@ -77,7 +77,7 @@ update_tree = function(X, # Feature matrix
 
   # Call the appropriate function to get the new tree
   new_tree = switch(type,
-                    grow = grow_tree(X, curr_tree, node_min_size, s, index),
+                    grow = grow_tree(X, curr_tree, node_min_size, s),
                     prune = prune_tree(X, curr_tree),
                     change = change_tree(X, curr_tree, node_min_size),
                     swap = swap_tree(X, curr_tree, node_min_size))
@@ -88,8 +88,12 @@ update_tree = function(X, # Feature matrix
 } # End of update_tree function
 
 # Grow_tree function ------------------------------------------------------
-
-grow_tree = function(X, curr_tree, node_min_size, s, index) {
+# curr_tree = fit.ambarti$trees[[70]][[5]]
+# X         = x_e_g_inter
+# curr_tree = curr_trees[[j]]
+# s         = c(0.5, 0.5)
+# grow_tree(X,curr_tree, node_min_size,s)
+grow_tree = function(X, curr_tree, node_min_size, s) {
 
   # Set up holder for new tree
   new_tree = curr_tree
@@ -116,11 +120,16 @@ grow_tree = function(X, curr_tree, node_min_size, s, index) {
                                  c(1, NA, NA, NA, NA, NA, NA, NA))
 
     # Choose a random terminal node to split
-    node_to_split = sample(terminal_nodes, 1,
-                           prob = as.integer(terminal_node_size > node_min_size)) # Choose which node to split, set prob to zero for any nodes that are too small
+      node_to_split = sample(terminal_nodes, 1,
+                             prob = as.integer(terminal_node_size > node_min_size)) # Choose which node to split, set prob to zero for any nodes that are too small
 
     # Choose a split variable uniformly from all columns (the first one is the intercept)
-    split_variable = sample(index, 1, prob = s)
+    terminal_ancestors = get_ancestors(curr_tree) # get the ancestor for all terminal nodes
+    split_variable = sample(colnames(X), 1, prob = s)
+    index_split_variable = which(colnames(X) == split_variable)
+    node_ancestors = unique(c(split_variable, terminal_ancestors[terminal_ancestors[,1] == node_to_split,2])) # covariates used in the splitting rules of the ancestor nodes + new_variable
+    aux_node_ancestors = gsub("[0-9]|[[:punct:]]", "", node_ancestors) # remove numbers and special characters
+    check_validity_new_node = all(c('g','e') %in% unique(substr(aux_node_ancestors,1,1))) # check whether the node has both g and e
 
     # Alternatively follow BARTMachine and choose a split value using sample on the internal values of the available
     available_values = sort(unique(X[new_tree$node_indices == node_to_split,
@@ -136,7 +145,7 @@ grow_tree = function(X, curr_tree, node_min_size, s, index) {
     }
 
     curr_parent = new_tree$tree_matrix[node_to_split, 'parent'] # Make sure to keep the current parent in there. Will be NA if at the root node
-    new_tree$tree_matrix[node_to_split,1:6] = c(0, # Now not temrinal
+    new_tree$tree_matrix[node_to_split,1:6] = c(0, # Now not terminal
                                                 nrow(new_tree$tree_matrix) - 1, # child_left is penultimate row
                                                 nrow(new_tree$tree_matrix),  # child_right is penultimate row
                                                 curr_parent,
@@ -157,6 +166,15 @@ grow_tree = function(X, curr_tree, node_min_size, s, index) {
     if(any(as.numeric(new_tree$tree_matrix[,'node_size']) <= node_min_size)) {
       count_bad_trees = count_bad_trees + 1
     } else {
+      if (length(node_ancestors) == 1 || check_validity_new_node == FALSE){ # double grow if the tree is a stump OR grow if the chosen nodes doesn't have g and e in the ancestors
+        s_aux = s
+        s_aux[index_split_variable] = 0 # set zero to the probability of the split variable that was just added in the tree, which is common to x1
+        new_tree = grow_tree(X, new_tree, node_min_size, s_aux)
+        new_tree$var[2] = new_tree$var
+        # save = new_tree$var
+        new_tree$ForceStump = FALSE
+        # return(new_tree)
+      }
       bad_trees = FALSE
     }
 
@@ -171,7 +189,11 @@ grow_tree = function(X, curr_tree, node_min_size, s, index) {
 } # End of grow_tree function
 
 # Prune_tree function -----------------------------------------------------
-
+# X = x_e_g_inter
+# curr_tree = aa
+# cc = prune_tree(X, curr_tree)
+# table(cc$node_indices)
+# table(aa$node_indices)
 prune_tree = function(X, curr_tree) {
 
   # Create placeholder for new tree
@@ -226,7 +248,17 @@ prune_tree = function(X, curr_tree) {
   if(nrow(new_tree$tree_matrix) == 1) {
     new_tree$var = var_pruned_nodes
     new_tree$node_indices = rep(1, nrow(X))
+  } else if (nrow(new_tree$tree_matrix) == 3) {# A tree with either g or e only.
+    new_tree = create_stump(1, X)[[1]]
+    new_tree$ForceStump = TRUE
+    new_tree$node_indices = rep(1, nrow(X))
   } else {
+
+    get_old_indices = which(new_tree$node_indices %in% c(child_left, child_right))
+    # Replace the old node indices by the indice of their parent node
+    new_tree$node_indices[get_old_indices] = parent_pick
+    # Store the covariate name that was used in the splitting rule of the terminal nodes that were just pruned
+    new_tree$var = var_pruned_nodes
     # If we've removed some nodes from the middle we need to re-number all the child_left and child_right values - the parent values will still be correct
     if(node_to_prune <= nrow(new_tree$tree_matrix)) { # Only need do this if we've removed some observations from the middle of the tree matrix
       # If you're pruning any nodes which affect parent indices further down the tree then make sure to shift the parent values
@@ -240,28 +272,29 @@ prune_tree = function(X, curr_tree) {
         # Find both the children of this node
         curr_children = which(as.numeric(new_tree$tree_matrix[,'parent']) == curr_parent)
         # Input these children back into the parent
-        new_tree$tree_matrix[curr_parent,c('child_left','child_right')] = sort(curr_children)
+        old_left_right = as.numeric(new_tree$tree_matrix[curr_parent,c('child_left','child_right')])
+        sort_curr_children = sort(curr_children)
+        new_tree$tree_matrix[curr_parent,c('child_left','child_right')] = sort_curr_children
+        if (all(old_left_right != sort_curr_children)){
+          for (k in 1:length(old_left_right)){
+            new_tree$node_indices[which(new_tree$node_indices %in% old_left_right[k])] = sort_curr_children[k]
+          }
+        }
       } # End for loop of correcting parents and children
     } # End if statement to fill in tree details
-
-    # Call the fill function on this tree
-    # new_tree = fill_tree_details(new_tree, X, node_to_prune)
-    # Get the old indices
-    get_old_indices = which(new_tree$node_indices == c(child_left, child_right))
-    # Replace the old node indices by the indice of their parent node
-    new_tree$node_indices[get_old_indices] = parent_pick
-
-    # Store the covariate name that was used in the splitting rule of the terminal nodes that were just pruned
-    new_tree$var = var_pruned_nodes
-
   }
-
   # Return new_tree
   return(new_tree)
 
 } # End of prune_tree function
 
 # change_tree function ----------------------------------------------------
+# X             = x_e_g_inter
+# curr_tree     = curr_trees[[j]]
+# change_tree(X,curr_tree,node_min_size)
+
+
+
 
 change_tree = function(X, curr_tree, node_min_size) {
 
@@ -274,11 +307,15 @@ change_tree = function(X, curr_tree, node_min_size) {
   }
 
   # Create a holder for the new tree
+
   new_tree = curr_tree
 
   # Need to get the internal nodes
-  internal_nodes = which(as.numeric(new_tree$tree_matrix[,'terminal']) == 0)
+  #internal_nodes = which(as.numeric(new_tree$tree_matrix[,'terminal']) == 0)
   terminal_nodes = which(as.numeric(new_tree$tree_matrix[,'terminal']) == 1)
+  internal_parent_of_terminals = table(new_tree$tree_matrix[terminal_nodes,'parent'])
+  internal_parent_of_two_terminals = which(internal_parent_of_terminals > 1)
+  internal_nodes = as.numeric(names(internal_parent_of_terminals[internal_parent_of_two_terminals]))
 
   # Create a while loop to get good trees
   # Create a counter to stop after a certain number of bad trees
@@ -286,14 +323,15 @@ change_tree = function(X, curr_tree, node_min_size) {
   count_bad_trees = 0
   bad_trees = TRUE
   while(bad_trees) {
+
     # Re-set the tree
     new_tree = curr_tree
 
     # choose an internal node to change
-    node_to_change = sample(internal_nodes, 1)
-
+    node_to_change = as.numeric(sample(as.character(internal_nodes), 1)) # it looks weird, but I did it because of the sample function
+    # print(node_to_change)
     # Get the covariate that will be changed
-    var_changed_node = as.numeric(new_tree$tree_matrix[node_to_change, 'split_variable'])
+    var_changed_node = new_tree$tree_matrix[node_to_change, 'split_variable']
 
     # Use the get_children function to get all the children of this node
     all_children = get_children(new_tree$tree_matrix, node_to_change)
@@ -305,8 +343,8 @@ change_tree = function(X, curr_tree, node_min_size) {
     # then check this doesn't give a bad tree
 
     available_values = NULL
-
-    new_split_variable = sample(1:ncol(X), 1)
+    x.colnames = colnames(X)
+    new_split_variable = x.colnames[which(grepl(substr(var_changed_node,1,1),x.colnames))] # change g by g and e by e
 
     available_values = sort(unique(X[use_node_indices,
                                      new_split_variable]))
@@ -328,7 +366,7 @@ change_tree = function(X, curr_tree, node_min_size) {
                                                new_split_value)
 
     # Update the tree node indices
-    new_tree = fill_tree_details(new_tree, X)
+    new_tree = fill_tree_details(new_tree, X, node_to_change)
 
     # Store the covariate name that was used in the splitting rule of the terminal node that was just changed
     new_tree$var = c(var_changed_node, new_split_variable)
@@ -345,9 +383,9 @@ change_tree = function(X, curr_tree, node_min_size) {
     }
 
   } # end of while loop
-
   # Return new_tree
   return(new_tree)
+
 
 } # End of change_tree function
 

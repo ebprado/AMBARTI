@@ -6,31 +6,31 @@
 
 # x
 # y
-# ntrees = 10
-# node_min_size = 5
-# alpha = 0.95
-# beta = 2
-# nu = 3
-# lambda = 0.1
-# mu_mu = 0
-# mu_g = 0
-# mu_e = 0
-# sigma2 = 1
-# sigma2_mu = 1
-# sigma2_psi = 1
-# a_g = 1
-# b_g = 1
-# a_e = 1
-# b_e = 1
-# nburn = 1000
-# npost = 1000
-# nthin = 1
-# data = generate_data_AMMI(20, 20, 1,1,1,c(8, 10, 15))
-# x = data$x
-# names(x) <- c('g','e')
-# x$g <- as.factor(x$g)
-# x$e <- as.factor(x$e)
-# y = data$y
+ntrees = 10
+node_min_size = 5
+alpha = 0.95
+beta = 2
+nu = 3
+lambda = 0.1
+mu_mu = 0
+mu_g = 0
+mu_e = 0
+sigma2 = 1
+sigma2_mu = 1
+sigma2_psi = 1
+a_g = 1
+b_g = 1
+a_e = 1
+b_e = 1
+nburn = 1000
+npost = 1000
+nthin = 1
+data = generate_data_AMMI(10, 10, 1,1,1,c(8, 10, 15))
+x = data$x
+names(x) <- c('g','e')
+x$g <- as.factor(x$g)
+x$e <- as.factor(x$e)
+y = data$y
 
 # ambarti = ambarti(x,y,ntrees=200, nburn=100, npost=100)
 # newdata = data$x
@@ -65,7 +65,8 @@ ambarti = function(x,
                    b_e = 1,
                    nburn = 1000,
                    npost = 1000,
-                   nthin = 1) {
+                   nthin = 1,
+                   m = 1) {
 
   # Extract the categories for genotype and environment
 
@@ -116,6 +117,7 @@ ambarti = function(x,
   tree_fits_store = matrix(0, ncol = ntrees, nrow = length(y))
 
   # Scale the response target variable
+  c = (1:m)/m
   y_mean = mean(y)
   y_sd = sd(y)
   y_scale = (y - y_mean)/y_sd
@@ -126,6 +128,8 @@ ambarti = function(x,
   p_e = ncol(x_e)
   s_g = rep(1/p_g, p_g)
   s_e = rep(1/p_e, p_e)
+  old.sigma2 = sigma2
+  new.sigma2 = sigma2
   sigma2_psi = diag(p)*sigma2_psi
   sigma2_psi_inv = solve(sigma2_psi)
   linear_effects = rep(0, length(y))
@@ -133,7 +137,7 @@ ambarti = function(x,
 
   # Create a list of trees for the initial stump
   curr_trees = create_stump(num_trees = ntrees,
-                            y = y_scale)
+                            X = x)
   # Initialise the new trees as current one
   new_trees = curr_trees
 
@@ -163,22 +167,26 @@ ambarti = function(x,
     }
 
     # Update the random effects alpha_i and beta_j
+    old.linear.effects = linear_effects
     g_e_hat = update_linear_component(y_scale, 0, x, sigma2, sigma2_psi_inv)
-    linear_effects = x%*%g_e_hat
+    new.linear.effects = x%*%g_e_hat
 
-    # Start looping through trees
-    for (j in 1:ntrees) {
+    # Tempered transition (phi = (g_i, e_j, sigma2))
+    for (k in 1:m){
+      linear.effects = c[k]*new.linear.effects + (1-c[k])*old.linear.effects
+      sigma2 = c[k]*new.sigma2 + (1-c[k])*old.sigma2
 
-      # partial residuals for the trees
-      current_partial_residuals = y_scale - (yhat_bart + linear_effects) + tree_fits_store[,j]
+      # Start looping through trees
+      for (j in 1:ntrees) {
+        # partial residuals for the trees
+        current_partial_residuals = y_scale - (yhat_bart + linear.effects) + tree_fits_store[,j]
 
-      # Propose a new tree via grow/change/prune/swap
-      type = sample(c('grow', 'prune'), 1)
-      if(i < max(floor(0.1*nburn), 10)) type = 'grow' # Grow for the first few iterations
+        # Propose a new tree via grow/change/prune/swap
+        # type = sample(c('grow', 'prune'), 1)
+        type = sample_move(curr_trees[[j]], i, nburn)
+        # if(i < max(floor(0.1*nburn), 10)) type = 'grow' # Grow for the first few iterations
 
-      # Generate a new tree based on the current
-
-      if (type == 'grow' || (type=='prune' && nrow(curr_trees[[j]]$tree_matrix) == 1)){
+        # Generate a new tree based on the current
 
         x_e_inter   = create_interaction(x_e, n_class_e, aux_comb_e, prob_comb_e)
         x_g_inter   = create_interaction(x_g, n_class_g, aux_comb_g, prob_comb_g)
@@ -186,69 +194,52 @@ ambarti = function(x,
 
         # Below, there are two calls because we need to add an interaction of genotype and then
         # add to the same tree an interaction of environment, otherwise we run the risk of allowing
-        # confunding.
+        # confounding.
 
-        new_trees[[j]] = update_tree(X             = x_e_inter,
+        new_trees[[j]] = update_tree(X             = x_e_g_inter,
                                      type          = type,
                                      curr_tree     = curr_trees[[j]],
                                      node_min_size = node_min_size,
-                                     s             = 1,
-                                     index         = colnames(x_e_inter))
+                                     s             = c(0.5, 0.5))
 
-        new_trees[[j]] = update_tree(X             = x_g_inter,
-                                     type          = type,
-                                     curr_tree     = new_trees[[j]],
-                                     node_min_size = node_min_size,
-                                     s             = 1,
-                                     index         = colnames(x_g_inter))
-      } else {
+        # NEW TREE: compute the log of the marginalised likelihood + log of the tree prior
+        l_new = tree_full_conditional(new_trees[[j]],
+                                      current_partial_residuals,
+                                      sigma2,
+                                      sigma2_mu) +
+          get_tree_prior(new_trees[[j]], alpha, beta)
 
-        # We can't prune a terminal node because we run the risk of removing either
-        # a genotype or an environment. If we remove one of them, the predicted values
-        # from the tree will be confounded with the main effect associated to the enviroment/genotype
-        # removed.
+        # CURRENT TREE: compute the log of the marginalised likelihood + log of the tree prior
+        l_old = tree_full_conditional(curr_trees[[j]],
+                                      current_partial_residuals,
+                                      sigma2,
+                                      sigma2_mu) +
+          get_tree_prior(curr_trees[[j]], alpha, beta)
 
-        new_trees[[j]] = create_stump(num_trees = 1,
-                                      y = y_scale)[[1]]
+        # Exponentiate the results above
+        a = exp(l_new - l_old)
+
+        # The current tree "becomes" the new tree, if the latter is better
+        if(a > runif(1)) {
+          curr_trees[[j]] = new_trees[[j]]
+        }
+
+        # Update mu whether tree accepted or not
+        curr_trees[[j]] = simulate_mu(curr_trees[[j]],
+                                      current_partial_residuals,
+                                      sigma2,
+                                      sigma2_mu)
+
+        current_fit = get_predictions(curr_trees[[j]], x_e_g_inter, single_tree = TRUE, internal=TRUE)
+
+        yhat_bart = yhat_bart - tree_fits_store[,j] # subtract the old fit
+        yhat_bart = yhat_bart + current_fit # add the new fit
+        tree_fits_store[,j] = current_fit # update the new fit
       }
-
-      # NEW TREE: compute the log of the marginalised likelihood + log of the tree prior
-      l_new = tree_full_conditional(new_trees[[j]],
-                                    current_partial_residuals,
-                                    sigma2,
-                                    sigma2_mu) +
-        get_tree_prior(new_trees[[j]], alpha, beta)
-
-      # CURRENT TREE: compute the log of the marginalised likelihood + log of the tree prior
-      l_old = tree_full_conditional(curr_trees[[j]],
-                                    current_partial_residuals,
-                                    sigma2,
-                                    sigma2_mu) +
-        get_tree_prior(curr_trees[[j]], alpha, beta)
-
-      # Exponentiate the results above
-      a = exp(l_new - l_old)
-
-      # The current tree "becomes" the new tree, if the latter is better
-      if(a > runif(1)) {
-        curr_trees[[j]] = new_trees[[j]]
-      }
-
-      # Update mu whether tree accepted or not
-      curr_trees[[j]] = simulate_mu(curr_trees[[j]],
-                                    current_partial_residuals,
-                                    sigma2,
-                                    sigma2_mu)
-
-      current_fit = get_predictions(curr_trees[[j]], x_e_g_inter, single_tree = TRUE, internal=TRUE)
-      yhat_bart = yhat_bart - tree_fits_store[,j] # subtract the old fit
-      yhat_bart = yhat_bart + current_fit # add the new fit
-      tree_fits_store[,j] = current_fit # update the new fit
-
     } # End loop through trees
 
     # Updating the final predictions
-    y_hat = linear_effects + yhat_bart
+    y_hat = linear.effects + yhat_bart
 
     gi = g_e_hat[grepl('^g', colnames(x))]
     ej = g_e_hat[grepl('^e', colnames(x))]
@@ -258,7 +249,9 @@ ambarti = function(x,
     sum_of_squares_e = sum((ej - mu_e)^2)
 
     # Update sigma2 (variance of the residuals)
+    old.sigma2 = sigma2
     sigma2   = update_sigma2(sum_of_squares, n = length(y_scale), nu, lambda)
+    new.sigma2 = sigma2
     sigma2_g = update_sigma2_g(sum_of_squares_g, length(gi), a_g, b_g)
     sigma2_e = update_sigma2_e(sum_of_squares_e, length(ej), a_e, b_e)
     aux_s2eg = c(rep(1/sigma2_g, length(gi)), rep(1/sigma2_e, length(ej)))

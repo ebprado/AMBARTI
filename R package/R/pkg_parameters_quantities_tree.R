@@ -12,10 +12,12 @@
 # 6. get_number_distinct_cov: counts the number of distinct covariates that are used in a tree to create the splitting rules
 # 7. update_linear_component:
 # Compute the full conditionals -------------------------------------------------
+# tree = new_trees[[j]]
+# R = current_partial_residuals
 
 tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
 
-  # Function to compute log full conditional distirbution for an individual tree
+  # Function to compute log full conditional distribution for an individual tree
   # R is a vector of partial residuals
 
   # First find which rows are terminal nodes
@@ -27,6 +29,7 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
     aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
     aux_table = table(aux_ancestors[,1], aux_ancestors[,3]) # create a table to check whether or not the terminals have at least one g and one e.
     which_terminal_no_double_split = as.numeric(rownames(which(aux_table==0, arr.ind = TRUE))) # return those terminals that don't have at least one g and one e.
+    if (ncol(aux_table) == 1) {which_terminal_no_double_split = which_terminal}
   } else{
     which_terminal_no_double_split = 1 # stump
   }
@@ -48,6 +51,8 @@ tree_full_conditional = function(tree, R, sigma2, sigma2_mu) {
   return(log_post)
 }
 
+# tree = curr_trees[[j]]
+# R = current_partial_residuals
 
 simulate_mu = function(tree, R, sigma2, sigma2_mu) {
 
@@ -62,6 +67,7 @@ simulate_mu = function(tree, R, sigma2, sigma2_mu) {
     aux_ancestors = cbind(terminal_ancestors, charIni = sub("(.).*", "\\1", perl = TRUE, terminal_ancestors[,2])) # extract the very first string
     aux_table = table(aux_ancestors[,1], aux_ancestors[,3]) # create a table to check whether or not the terminals have at least one g and one e.
     which_terminal_no_double_split = as.numeric(rownames(which(aux_table==0, arr.ind = TRUE))) # return those terminals that don't have at least one g and one e.
+    if (ncol(aux_table) == 1) {which_terminal_no_double_split = which_terminal}
   } else {
     which_terminal_no_double_split = 1 # stump
   }
