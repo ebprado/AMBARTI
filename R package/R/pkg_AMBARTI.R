@@ -6,6 +6,7 @@
 
 # x
 # y
+m=40
 ntrees = 10
 node_min_size = 5
 alpha = 0.95
@@ -22,8 +23,8 @@ a_g = 1
 b_g = 1
 a_e = 1
 b_e = 1
-nburn = 1000
-npost = 1000
+nburn = 1
+npost = 5000
 nthin = 1
 data = generate_data_AMMI(10, 10, 1,1,1,c(8, 10, 15))
 x = data$x

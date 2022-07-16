@@ -245,10 +245,8 @@ prune_tree = function(X, curr_tree) {
                                      'split_value')] = c(1, NA, NA, NA, NA)
 
   # If we're back to a stump no need to call fill_tree_details
-  if(nrow(new_tree$tree_matrix) == 1) {
+  if(nrow(new_tree$tree_matrix) %in% c(1,3)) {
     new_tree$var = var_pruned_nodes
-    new_tree$node_indices = rep(1, nrow(X))
-  } else if (nrow(new_tree$tree_matrix) == 3) {# A tree with either g or e only.
     new_tree = create_stump(1, X)[[1]]
     new_tree$ForceStump = TRUE
     new_tree$node_indices = rep(1, nrow(X))
