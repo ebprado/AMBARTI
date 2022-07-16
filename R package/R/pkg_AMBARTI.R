@@ -6,32 +6,32 @@
 
 # x
 # y
-m=40
-ntrees = 10
-node_min_size = 5
-alpha = 0.95
-beta = 2
-nu = 3
-lambda = 0.1
-mu_mu = 0
-mu_g = 0
-mu_e = 0
-sigma2 = 1
-sigma2_mu = 1
-sigma2_psi = 1
-a_g = 1
-b_g = 1
-a_e = 1
-b_e = 1
-nburn = 1
-npost = 5000
-nthin = 1
-data = generate_data_AMMI(10, 10, 1,1,1,c(8, 10, 15))
-x = data$x
-names(x) <- c('g','e')
-x$g <- as.factor(x$g)
-x$e <- as.factor(x$e)
-y = data$y
+# nsteps=40
+# ntrees = 10
+# node_min_size = 5
+# alpha = 0.95
+# beta = 2
+# nu = 3
+# lambda = 0.1
+# mu_mu = 0
+# mu_g = 0
+# mu_e = 0
+# sigma2 = 1
+# sigma2_mu = 1
+# sigma2_psi = 1
+# a_g = 1
+# b_g = 1
+# a_e = 1
+# b_e = 1
+# nburn = 1
+# npost = 5000
+# nthin = 1
+# data = generate_data_AMMI(10, 10, 1,1,1,c(8, 10, 15))
+# x = data$x
+# names(x) <- c('g','e')
+# x$g <- as.factor(x$g)
+# x$e <- as.factor(x$e)
+# y = data$y
 
 # ambarti = ambarti(x,y,ntrees=200, nburn=100, npost=100)
 # newdata = data$x
@@ -67,7 +67,7 @@ ambarti = function(x,
                    nburn = 1000,
                    npost = 1000,
                    nthin = 1,
-                   m = 1) {
+                   nsteps = 1) {
 
   # Extract the categories for genotype and environment
 
@@ -118,7 +118,7 @@ ambarti = function(x,
   tree_fits_store = matrix(0, ncol = ntrees, nrow = length(y))
 
   # Scale the response target variable
-  c = (1:m)/m
+  c = (1:nsteps)/nsteps
   y_mean = mean(y)
   y_sd = sd(y)
   y_scale = (y - y_mean)/y_sd
@@ -173,7 +173,7 @@ ambarti = function(x,
     new.linear.effects = x%*%g_e_hat
 
     # Tempered transition (phi = (g_i, e_j, sigma2))
-    for (k in 1:m){
+    for (k in 1:nsteps){
       linear.effects = c[k]*new.linear.effects + (1-c[k])*old.linear.effects
       sigma2 = c[k]*new.sigma2 + (1-c[k])*old.sigma2
 

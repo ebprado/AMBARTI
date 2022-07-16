@@ -4,7 +4,7 @@ run_AMBARTI <- function(data,
                         ntrees = 50,
                         nburn = 2000,
                         npost = 1000,
-                        m){
+                        nsteps){
 
   # Some pre-processing
   y = data$y
@@ -13,7 +13,7 @@ run_AMBARTI <- function(data,
   x$e = as.factor(x$e)
 
   # Run AMBARTI
-  fit.ambarti = ambarti(x, y, ntrees = ntrees, nburn = nburn, npost = npost, m = m)
+  fit.ambarti = ambarti(x, y, ntrees = ntrees, nburn = nburn, npost = npost, nsteps = nsteps)
 
   return(fit.ambarti)
 }
