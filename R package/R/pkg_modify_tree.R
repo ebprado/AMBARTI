@@ -129,7 +129,9 @@ grow_tree = function(X, curr_tree, node_min_size, s) {
     index_split_variable = which(colnames(X) == split_variable)
     node_ancestors = unique(c(split_variable, terminal_ancestors[terminal_ancestors[,1] == node_to_split,2])) # covariates used in the splitting rules of the ancestor nodes + new_variable
     aux_node_ancestors = gsub("[0-9]|[[:punct:]]", "", node_ancestors) # remove numbers and special characters
-    check_validity_new_node = all(c('g','e') %in% unique(substr(aux_node_ancestors,1,1))) # check whether the node has both g and e
+    # check_validity_new_node = all(c('g','e') %in% unique(substr(aux_node_ancestors,1,1))) # check whether the node has both g and e
+    num_split_variables_anc = length(unique(substr(aux_node_ancestors,1,1))) # check whether the node has both g and e
+    if (num_split_variables_anc > 1) {check_validity_new_node = TRUE} else {check_validity_new_node = FALSE}
 
     # Alternatively follow BARTMachine and choose a split value using sample on the internal values of the available
     available_values = sort(unique(X[new_tree$node_indices == node_to_split,
