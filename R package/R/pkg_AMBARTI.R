@@ -286,42 +286,6 @@ ambarti = function(x,
 
 
 #' @export
-# x
-# y
-nsteps=1
-ntrees = 10
-node_min_size = 5
-alpha = 0.95
-beta = 2
-nu = 3
-lambda = 0.1
-mu_mu = 0
-mu_g = 0
-mu_e = 0
-sigma2 = 1
-sigma2_mu = 1
-sigma2_psi = 1
-a_g = 1
-b_g = 1
-a_e = 1
-b_e = 1
-nburn = 1
-npost = 5000
-nthin = 1
-
-# ambarti = ambarti(x,y,ntrees=200, nburn=100, npost=100)
-# newdata = data$x
-# object = ambarti
-# bb = predict_ambarti(object, newdata, type = 'mean')
-# aa = apply(ambarti$y_hat,2,mean)
-# plot(aa,bb)
-# plot(y, aa); abline(0,1)
-# cor(y, aa)
-# cc = run_classical_AMMI(data)
-# dd = organise_classical_AMMI(cc, data)
-# dd
-# points(y, dd$y_hat_train, col=2)
-# cor(y, dd$y_hat_train)
 alessa_ambarti = function(x,
                    y,
                    ntrees = 10,
