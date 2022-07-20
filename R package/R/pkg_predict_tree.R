@@ -6,11 +6,11 @@ predict_ambarti = function(object, newdata,
   x_e_train_names = x_train_names[grepl('^e', colnames(x_train_names))]
   x_g_train_names = x_train_names[grepl('^g', colnames(x_train_names))]
 
-  # new_x <- model.matrix(~ -1 + g + e, data=newdata,
-  #                       contrasts.arg=list(g=contrasts(newdata$g, contrasts=F),
-  #                                          e=contrasts(newdata$e, contrasts=F)))
+  new_x <- model.matrix(~ -1 + g + e, data=newdata,
+                        contrasts.arg=list(g=contrasts(newdata$g, contrasts=F),
+                                           e=contrasts(newdata$e, contrasts=F)))
 
-  new_x <- dbarts::makeModelMatrixFromDataFrame(newdata)
+  # new_x <- dbarts::makeModelMatrixFromDataFrame(newdata)
 
   x_e_test = new_x[,grepl('^e', colnames(new_x))]
   x_g_test = new_x[,grepl('^g', colnames(new_x))]
