@@ -4,8 +4,8 @@ run_AMBARTI <- function(data,
                         ntrees = 50,
                         nburn = 2000,
                         npost = 1000,
-                        nsteps,
-                        nthin){
+                        nsteps = 1,
+                        nthin = 1){
 
   # Some pre-processing
   y = data$y
