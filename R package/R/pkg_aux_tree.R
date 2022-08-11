@@ -148,7 +148,7 @@ create_covariates_prediction = function(variables, data){
     colnames(mat_covs) = variables
     for (k in 1:length(variables)){
       columns = unlist(strsplit(variables[k], ':'))
-      mat_covs[,k] = apply(data[,columns],1,sum)
+      mat_covs[,k] = apply(data[,columns, drop=FALSE],1,sum)
     }
     return(mat_covs)
   }
