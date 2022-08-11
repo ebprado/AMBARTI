@@ -266,7 +266,7 @@ get_ancestors_internal = function(tree){
 
 }
 
-
+#' @export
 var_used_trees = function(object, raw = FALSE) {
 
   # Create holder for predicted values
