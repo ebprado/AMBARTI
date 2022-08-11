@@ -7,7 +7,7 @@
 # 2. get_predictions: gets the predicted values from a current set of trees
 # 3. get_children: it's a function that takes a node and, if the node is terminal, returns the node. If not, returns the children and calls the function again on the children
 # 4. resample: an auxiliary function
-# 5. create_interactions: create a new column that represents an interaction between two columns of a given X.
+# 5. create_interaction: create a new column that represents an interaction between two columns of a given X.
 # 5. create_covariates_prediction: for each MCMC iteration, it creates the covariates needed for each tree.
 # 6. get_ancestors:
 # Fill_tree_details -------------------------------------------------------
@@ -132,7 +132,7 @@ get_children = function(tree_mat, parent) {
 resample <- function(x, ...) x[sample.int(length(x), size=1), ...]
 
 # Create interactions -------
-
+#' @export
 create_interaction = function(X, nclass, aux_comb, prob){
   num_cov = sample(aux_comb, 1, prob = prob) # number of covariates to be sampled
   s_covs  = sample(x = 1:nclass, size = num_cov, replace = FALSE) # sampled covariates

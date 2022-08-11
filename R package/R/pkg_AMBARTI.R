@@ -92,14 +92,14 @@ ambarti = function(x,
   ### aux
 
   n_class_e   = length(classes_e) # number of distinct levels
-  aux_comb_e  = 2:floor(n_class_e/2) # levels needed to create the combinations without redundances
+  aux_comb_e  = 2:floor(n_class_e/2) # levels needed to create the combinations without redundancies
   num_comb_e  = choose(n_class_e, aux_comb_e) # total of combinations 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
-  prob_comb_e = num_comb_e/sum(num_comb_e) # probability of observating a combination 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
+  prob_comb_e = num_comb_e/sum(num_comb_e) # probability of observing a combination 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
 
   n_class_g   = length(classes_g) # number of distinct levels
-  aux_comb_g  = 2:floor(n_class_g/2) # levels needed to create the combinations without redundances
+  aux_comb_g  = 2:floor(n_class_g/2) # levels needed to create the combinations without redundancies
   num_comb_g  = choose(n_class_g, aux_comb_g) # total of combinations 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
-  prob_comb_g = num_comb_g/sum(num_comb_g) # probability of observating a combination 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
+  prob_comb_g = num_comb_g/sum(num_comb_g) # probability of observing a combination 2x2, 3x3, up to floor(ne/2)xfloor(ne/2).
 
   # Extract MCMC details
   TotIter = nburn + npost*nthin # Total of iterations
@@ -525,6 +525,7 @@ alessa_ambarti = function(x,
               y_sd       = y_sd,
               g_hat      = g_e_hat_store[, grepl('^g', colnames(x))]*y_sd,
               e_hat      = g_e_hat_store[, grepl('^e', colnames(x))]*y_sd,
+              t_hat      = g_e_hat_store[, grepl('^t', colnames(x))]*y_sd,
               x          = x))
 
 } # End main function
