@@ -1,6 +1,6 @@
 # AMBARTI models for agricultural experiments
 
-This repository contains R scripts and data sets that can be used to reproduce the simulation and real datasets results in [_Bayesian Additive Regression Trees for Genotype by Environment Interaction Models_. bioRxiv (2021)](https://www.biorxiv.org/content/10.1101/2021.05.07.442731v2).
+This repository contains R scripts and data sets that can be used to reproduce the simulation and real datasets results in [_Bayesian additive regression trees for genotype by environment interaction models_. Annals of Applied Statistics (to appear)](https://www.biorxiv.org/content/10.1101/2021.05.07.442731v5.full.pdf).
 
 In addition, it provides an implementation of AMBARTI in the format of an R package named ```AMBARTI```.
 
