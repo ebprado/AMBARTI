@@ -1,0 +1,67 @@
+* using log directory ‘/Users/estevaoprado/Documents/GitHub/AMBARTI/AMBARTI.Rcheck’
+* using R version 4.2.1 (2022-06-23)
+* using platform: x86_64-apple-darwin17.0 (64-bit)
+* using session charset: UTF-8
+* using options ‘--no-manual --as-cran’
+* checking for file ‘AMBARTI/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘AMBARTI’ version ‘0.1.0’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking serialization versions ... OK
+* checking whether package ‘AMBARTI’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... NOTE
+unable to verify current time
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... OK
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  ‘AMBARTI_help_plot’ ‘AMMI_help_plot’ ‘RMSE’ ‘RRMSE’ ‘alessa_ambarti’
+  ‘ambarti’ ‘bAMMI_help_plot’ ‘bAMMI_help_plot_WITHPOS’ ‘change_tree’
+  ‘create_covariates_prediction’ ‘create_interaction’ ‘create_stump’
+  ‘fill_tree_details’ ‘generate_data_AMBARTI’ ‘generate_data_AMMI’
+  ‘generate_data_full_model’ ‘generate_gamma_delta’ ‘get_ancestors’
+  ‘get_ancestors_internal’ ‘get_children’ ‘get_metrics’
+  ‘get_predictions’ ‘get_tree_prior’ ‘grow_tree’ ‘new_parse_format’
+  ‘organise_AMBARTI’ ‘organise_bayesian_AMMI_WITHOUT_postprocessing’
+  ‘organise_bayesian_AMMI_WITH_postprocessing’
+  ‘organise_classical_AMMI’ ‘predict_ambarti’ ‘predict_ambarti_alessa’
+  ‘prune_tree’ ‘resample’ ‘run_AMBARTI’ ‘run_bayesian_AMMI’
+  ‘run_classical_AMMI’ ‘sample_move’ ‘simulate_mu’
+  ‘simulate_mu_bart_prior’ ‘square_root_matrix’ ‘swap_tree’
+  ‘tree_full_conditional’ ‘update_e’ ‘update_g’
+  ‘update_linear_component’ ‘update_sigma2’ ‘update_sigma2_e’
+  ‘update_sigma2_g’ ‘update_tree’ ‘update_z’ ‘var_used_trees’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking examples ... NONE
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+Status: 1 WARNING, 1 NOTE
