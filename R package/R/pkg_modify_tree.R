@@ -88,12 +88,7 @@ update_tree = function(X, # Feature matrix
 } # End of update_tree function
 
 # Grow_tree function ------------------------------------------------------
-# curr_tree = fit.ambarti$trees[[70]][[5]]
-# X         = x_e_g_inter
-# curr_tree = curr_trees[[j]]
-# s         = c(0.5, 0.5)
-# grow_tree(X,curr_tree, node_min_size,s)
-grow_tree = function(X, curr_tree, node_min_size, s) {
+grow_tree = function(X, curr_tree, node_min_size, s){
 
   # Set up holder for new tree
   new_tree = curr_tree

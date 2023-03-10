@@ -27,7 +27,7 @@
 # nburn = 1
 # npost = 5000
 # nthin = 1
-# data = generate_data_AMMI(10, 10, 1,1,1,c(8, 10, 15))
+# data = generate_data_AMMI(30, 5, 1,1,1,c(8, 10, 15))
 # x = data$x
 # names(x) <- c('g','e')
 # x$g <- as.factor(x$g)

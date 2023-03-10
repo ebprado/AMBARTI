@@ -130,13 +130,13 @@ get_children = function(tree_mat, parent) {
 # Sample function ----------------------------------------------------------
 
 resample <- function(x, ...) x[sample.int(length(x), size=1), ...]
+resample2 <- function(x, ...) x[sample.int(length(x), ...)]
 
 # Create interactions -------
 #' @export
 create_interaction = function(X, nclass, aux_comb, prob){
-  num_cov = sample(aux_comb, 1, prob = prob) # number of covariates to be sampled
+  num_cov = resample2(aux_comb, 1, prob = prob) # number of covariates to be sampled
   s_covs  = sample(x = 1:nclass, size = num_cov, replace = FALSE) # sampled covariates
-  # new_cov = matrix(apply(X[,s_covs], 1,sum), ncol=1) # create the interaction from the sampled covariates
   new_cov = matrix(rowSums(X[,s_covs,drop=FALSE]), ncol=1) # create the interaction from the sampled covariates
   colnames(new_cov) = paste(sort(colnames(X)[s_covs]), collapse = ':')
   return(new_cov)

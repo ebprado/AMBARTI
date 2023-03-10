@@ -130,6 +130,16 @@ generate_gamma_delta <- function(INDEX, Q) {
 #' @export
 #' @importFrom stats 'rnorm' 'aggregate' 'contrasts' 'model.matrix' 'as.formula'
 
+# I = 30
+# J = 5
+# s_g=1 # standard deviation of g
+# s_e=1 # standard deviation of e
+# s_y=1 # standard deviation of y
+# ntrees = 200
+# node_min_size = 5
+# mu_mu = 0
+# sigma2_mu = 3
+
 generate_data_AMBARTI = function(I,
                                  J,
                                  s_g, # standard deviation of g
@@ -201,21 +211,27 @@ generate_data_AMBARTI = function(I,
 
     # Below, there are two calls because we need to add an interaction of genotype and then
     # add to the same tree an interaction of environment, otherwise we run the risk of allowing
-    # confunding.
+    # confounding.
 
-    new_trees[[j]] = update_tree(X             = x_e_inter,
+    # new_trees[[j]] = update_tree(X             = x_e_inter,
+    #                              type          = type,
+    #                              curr_tree     = curr_trees[[j]],
+    #                              node_min_size = node_min_size,
+    #                              s             = 1,
+    #                              index         = colnames(x_e_inter))
+    #
+    # new_trees[[j]] = update_tree(X             = x_g_inter,
+    #                              type          = type,
+    #                              curr_tree     = new_trees[[j]],
+    #                              node_min_size = node_min_size,
+    #                              s             = 1,
+    #                              index         = colnames(x_g_inter))
+
+    new_trees[[j]] = update_tree(X             = x_e_g_inter,
                                  type          = type,
                                  curr_tree     = curr_trees[[j]],
                                  node_min_size = node_min_size,
-                                 s             = 1,
-                                 index         = colnames(x_e_inter))
-
-    new_trees[[j]] = update_tree(X             = x_g_inter,
-                                 type          = type,
-                                 curr_tree     = new_trees[[j]],
-                                 node_min_size = node_min_size,
-                                 s             = 1,
-                                 index         = colnames(x_g_inter))
+                                 s             = rep(1/ncol(x_e_g_inter), ncol(x_e_g_inter)))
 
     curr_trees[[j]] = new_trees[[j]]
 
