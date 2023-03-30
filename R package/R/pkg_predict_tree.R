@@ -192,8 +192,8 @@ predict_bart_comp_AMBARTI = function(object, newdata,
   new_beta_hat = c(new_g_hat,new_e_hat)
 
   out = switch(type,
-               mean = object$y_mean + object$y_sd*apply(new_y_bart_mat,2,'mean'),
-               median = object$y_mean + object$y_sd* apply(new_y_bart_mat,2,'median')
+               mean = object$y_mean + object$y_sd*apply(y_hat_mat,2,'mean'),
+               median = object$y_mean + object$y_sd* apply(y_hat_mat,2,'median')
   )
 
   return(out)
