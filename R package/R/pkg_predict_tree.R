@@ -43,32 +43,27 @@ predict_ambarti = function(object, newdata,
                                     internal=FALSE)
 
     # imposing the sum-to-zero constraint by row and column (only on the BART component)
-    matBART = matrix(y_hat_mat[i,], nrow=I, ncol=J) # turns it into a g by e matrix
-    row.mean = sweep(matBART*0,2, -colMeans(matBART)) # take column means
-    col.mean = matBART*0 + rowMeans(matBART) # take row means
-    matBARTdc = mean(matBART) - row.mean - col.mean + matBART # double center
-    y_hat_bart_dc = as.numeric(matBARTdc) # turns it back into a (now constrained) vector
-    new_y_bart_mat[i,] = y_hat_bart_dc
+    # matBART = matrix(y_hat_mat[i,], nrow=I, ncol=J) # turns it into a g by e matrix
+    # row.mean = sweep(matBART*0,2, -colMeans(matBART)) # take column means
+    # col.mean = matBART*0 + rowMeans(matBART) # take row means
+    # matBARTdc = mean(matBART) - row.mean - col.mean + matBART # double center
+    # y_hat_bart_dc = as.numeric(matBARTdc) # turns it back into a (now constrained) vector
+    # new_y_bart_mat[i,] = y_hat_bart_dc
 
   }
 
-  new_g_hat = colMeans(object$g_hat) - mean(colMeans(object$g_hat)) # constraint: g's sum to zero
-  new_e_hat = colMeans(object$e_hat) - mean(colMeans(object$e_hat)) # constraint: e's sum to zero
-  new_beta_hat = c(new_g_hat,new_e_hat)
+  # new_g_hat = colMeans(object$g_hat) - mean(colMeans(object$g_hat)) # constraint: g's sum to zero
+  # new_e_hat = colMeans(object$e_hat) - mean(colMeans(object$e_hat)) # constraint: e's sum to zero
+  # new_beta_hat = c(new_g_hat,new_e_hat)
 
   out = switch(type,
-               mean =
-                 list(wpostproc = object$y_mean + new_x%*%new_beta_hat + object$y_sd*apply(new_y_bart_mat,2,'mean'),
-                      npostproc = object$y_mean + new_x%*%c(g_estimates_mean, e_estimates_mean) + object$y_sd * apply(y_hat_mat,2,'mean')),
-               median = list(wpostproc = object$y_mean + new_x%*%new_beta_hat + object$y_sd* apply(new_y_bart_mat,2,'median'),
-                             npostproc = object$y_mean + new_x%*%c(g_estimates_median, e_estimates_median) + object$y_sd * apply(y_hat_mat,2,'median'))
+               mean = object$y_mean + new_x%*%c(g_estimates_mean, e_estimates_mean) + object$y_sd * apply(y_hat_mat,2,'mean'),
+               median = object$y_mean + new_x%*%c(g_estimates_median, e_estimates_median) + object$y_sd * apply(y_hat_mat,2,'median')
   )
 
   return(out)
 
 } # end of predict function
-
-
 
 #' @export
 predict_ambarti_alessa = function(object, newdata,
