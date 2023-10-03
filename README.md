@@ -1,6 +1,6 @@
 # AMBARTI models for agricultural experiments
 
-This repository contains R scripts and data sets that can be used to reproduce the simulation and real datasets results in [Sarti*, D.A., Prado*, E.B., Inglis, A.N., dos Santos, A.A.L, Hurley, C., Moral, R.A. \& Parnell, A.C. _Bayesian additive regression trees for genotype by environment interaction models_. The Annals of Applied Statistics 17 (3), 1936-1957 (2023)](https://projecteuclid.org/journals/annals-of-applied-statistics/volume-17/issue-3/Bayesian-additive-regression-trees-for-genotype-by-environment-interaction-models/10.1214/22-AOAS1698.pdf). 
+This repository contains R scripts and data sets that can be used to reproduce the simulation and real datasets results in [Prado*, E.B., Sarti*, D.A., Inglis, A.N., dos Santos, A.A.L, Hurley, C., Moral, R.A. \& Parnell, A.C. _Bayesian additive regression trees for genotype by environment interaction models_. The Annals of Applied Statistics 17 (3), 1936-1957 (2023)](https://projecteuclid.org/journals/annals-of-applied-statistics/volume-17/issue-3/Bayesian-additive-regression-trees-for-genotype-by-environment-interaction-models/10.1214/22-AOAS1698.pdf). 
 
 \* joint first authors.
 
